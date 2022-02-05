@@ -1,0 +1,127 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.main {
+  min-height: 100%;
+}
+
+.content-inside {
+  padding-bottom: 50px;
+}
+
+.footer {
+  height: 50px;
+  margin-top: -50px;
+  background-color: var(--lighter-gray-color);
+  line-height: 50px; /* Vertically center the text there */
+}
+
+.v-align {
+  display: inline-block !important;
+  align-self: center !important;
+}
+
+.form-group {
+  margin-bottom: 0.3rem;
+}
+
+.col-form-label {
+  padding-bottom: 0 !important;
+}
+
+.black-bg {
+  background-color: var(--black-color) !important;
+  border-color: var(--black-color) !important;
+}
+
+.black-text {
+  color: var(--black-color) !important;
+}
+
+.darkwhite-bg {
+  background-color: var(--gray-white-color);
+}
+
+.white-bg {
+  background-color: var(--white-color) !important;
+  border-color: var(--white-color) !important;
+}
+
+.white-text {
+  color: var(--white-color) !important;
+}
+
+.select2-container .select2-selection--single {
+  height: calc(1.5em + 0.75rem + 2px) !important;
+}
+
+.select2-container--default
+  .select2-selection--single
+  .select2-selection__rendered {
+  line-height: 35px !important;
+}
+
+input.form-control,
+select.form-control,
+textarea.form-control,
+.custom-file .custom-file-label {
+  border: 1px solid var(--light-gray-color);
+}
+
+input:focus {
+  border: 1px solid var(--black-color) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.form-control {
+  border-radius: 0;
+}
+
+.btn {
+  border-radius: 0px;
+  border: 0px;
+}
+.navbar {
+  background-color: var(--navbar-color);
+}
+.btn-primary {
+  background-color: var(--btn-primary-color) !important;
+  border: 1px solid var(--btn-primary-color-border) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--btn-primary-color-hover) !important;
+}
+
+.btn-primary:active {
+  background-color: var(--btn-primary-color-active) !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--pagination-color);
+  border-color: var(--pagination-color-border);
+}
+.page-link {
+  color: var(--black-color);
+}
+.page-link:hover {
+  color: var(--pagination-color-hover) !important;
+}
+
+.dollar-value {
+  white-space: nowrap;
+}
+
+.alert-error {
+  color: var(--alert-color);
+  background-color: var(--alert-color-bg);
+  border-color: var(--alert-color-border);
+}
