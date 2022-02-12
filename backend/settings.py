@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'seguridad',
     'novagym',
     # 'novagym.cliente',
+    'comunidad',
 ]
 
 MIDDLEWARE = [
