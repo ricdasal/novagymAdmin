@@ -10,10 +10,11 @@ html {
 
 .main {
   min-height: 100%;
+  padding-top: 100px;
 }
 
-.content-inside {
-  padding-bottom: 50px;
+.main-content {
+  background-color: var(--gray-white-color);
 }
 
 .footer {
@@ -21,11 +22,6 @@ html {
   margin-top: -50px;
   background-color: var(--lighter-gray-color);
   line-height: 50px; /* Vertically center the text there */
-}
-
-.v-align {
-  display: inline-block !important;
-  align-self: center !important;
 }
 
 .form-group {
@@ -86,23 +82,56 @@ input:focus {
 }
 
 .btn {
-  border-radius: 0px;
-  border: 0px;
+  border-radius: 50px;
 }
+
+.v-navbar {
+  max-width: 425px;
+}
+
 .navbar {
   background-color: var(--navbar-color);
+  height: 100px;
+  padding: 0;
 }
+
+.navbar__logo {
+  width: 450px;
+  height: 120px;
+  background-color: var(--black-color);
+  border-radius: 0 0 40px;
+}
+
+.navbar__logo img {
+  max-width: 250px;
+}
+
 .btn-primary {
   background-color: var(--btn-primary-color) !important;
-  border: 1px solid var(--btn-primary-color-border) !important;
+  border: 1px solid var(--btn-primary-color) !important;
+  color: var(--black-color);
 }
 
 .btn-primary:hover {
   background-color: var(--btn-primary-color-hover) !important;
+  border: 1px solid var(--btn-primary-color-hover) !important;
+  color: var(--black-color);
 }
 
 .btn-primary:active {
   background-color: var(--btn-primary-color-active) !important;
+}
+
+.btn-secondary {
+  background-color: var(--btn-secondary-color) !important;
+  border: 1px solid var(--btn-secondary-color) !important;
+  color: var(--black-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-color-hover) !important;
+  border: 1px solid var(--btn-secondary-color-hover) !important;
+  color: var(--black-color);
 }
 
 .page-item.active .page-link {
@@ -124,4 +153,39 @@ input:focus {
   color: var(--alert-color);
   background-color: var(--alert-color-bg);
   border-color: var(--alert-color-border);
+}
+
+.menu,
+.menu:hover {
+  text-decoration: none;
+  color: var(--black-color);
+}
+
+.menu-container {
+  border-bottom: 1px solid var(--black-color);
+  background-color: var(--primary-color);
+}
+
+.menu-container--active {
+  background-color: var(--primary-color-darker);
+}
+
+.menu--collapsable {
+  cursor: pointer;
+}
+
+.menu--collapsable .menu .row {
+  padding-left: 50px;
+}
+
+.menu__image {
+  width: 75px;
+  height: 75px;
+  margin-left: 25px;
+}
+
+.menu__title {
+  font-size: 20px;
+  font-weight: 400;
+  padding-left: 25px;
 }
