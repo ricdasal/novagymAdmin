@@ -122,6 +122,18 @@ input:focus {
   background-color: var(--btn-primary-color-active) !important;
 }
 
+.btn-secondary {
+  background-color: var(--btn-secondary-color) !important;
+  border: 1px solid var(--btn-secondary-color) !important;
+  color: var(--black-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--btn-secondary-color-hover) !important;
+  border: 1px solid var(--btn-secondary-color-hover) !important;
+  color: var(--black-color);
+}
+
 .page-item.active .page-link {
   background-color: var(--pagination-color);
   border-color: var(--pagination-color-border);

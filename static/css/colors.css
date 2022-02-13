@@ -30,6 +30,11 @@
   --btn-primary-color-hover: var(--primary-color-dark);
   --btn-primary-color-active: var(--primary-color-darker);
 
+  --btn-secondary-color: var(--secondary-color);
+  --btn-secondary-color-border: var(--secondary-color-darker);
+  --btn-secondary-color-hover: var(--secondary-color-dark);
+  --btn-secondary-color-active: var(--secondary-color-darker);
+
   /* Login Section*/
   --login-panel-color: var(--black-color);
   --login-panel-color-border: var(--light-gray-color);

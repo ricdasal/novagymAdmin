@@ -37,7 +37,7 @@ def login_user(request):
                 if next_page:
                     return redirect(next_page)
                 else:
-                    return redirect('seguridad:principal')
+                    return redirect('novagym:principal')
             else:
                 messages.error(request, 'Esta cuenta ha sido desactivada.')
                 return redirect('seguridad:login_admin')
