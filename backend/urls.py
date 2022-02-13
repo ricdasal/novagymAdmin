@@ -20,6 +20,7 @@ from .routers import *
 
 urlpatterns = [
     path('', include('seguridad.urls')),
+    path('', include('novagym.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(seguridad_api)),
 ]

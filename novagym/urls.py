@@ -5,4 +5,5 @@ from .apps import NovagymConfig
 app_name = NovagymConfig.name
 
 urlpatterns = [
+    path('', home, name='principal'),
 ]

@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'crispy_forms',
     'seguridad',
     'novagym',
-    # 'novagym.cliente',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,244 @@
+{% load static %}
+<div class="row" id="accordion">
+  <div class="col-12">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'novagym:principal' %}menu-container--active{% endif %}">
+      <div class="col-12">
+        <a class="menu" href="{% url 'novagym:principal' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="dashboard"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Dashboard</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container {% if request.resolver_match.view_name == 'seguridad:listar' %}menu-container--active{% endif %}">
+      <div class="col-12">
+        <a class="menu" href="{% url 'seguridad:listar' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="usuarios"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Usuarios</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="notificaciones"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Notificaciones</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="sugerencias"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Sugerencias</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="anunciantes"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Anunciantes</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="calendario"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Calendario</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="reservaciones"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Reservaciones</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="productos"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Productos</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div
+      class="row  menu-container menu menu--collapsable"
+      data-toggle="collapse"
+      data-target="#collapsewo"
+      aria-expanded="true"
+      aria-controls="collapsewo"
+    >
+      <div class="col-12">
+        <div class="row">
+          <img
+            src="{% static 'images/no_image.png'%}"
+            alt="reporteria"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Reporteria</span>
+            <span class="px-4">
+              <i class="fas fa-angle-down"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="collapsewo" class="collapse row menu menu--collapsable">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row menu-container">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="repo-ventas"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Ventas</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row menu-container">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="repo-nc"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">NovaCoins</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="administrar-nc"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Administrar NC</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="horarios"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Horarios</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="afiliados"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Afiliados</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

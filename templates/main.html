@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-{% include "navbar.html" %}
-<div class="container pt-5 main">
-  <div class="content-inside">
-    {% if messages%}
+{% include "h_navbar.html" %}
+<div class="container-fluid main">
+  {% if messages%}
     {% for message in messages %}
     <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
       {{message}}
     </div>
     {% endfor %}
-    {%endif%}
-    {% block main %}
-
-    {% endblock main %}
+  {% endif %}
+  <div class="row">
+    <div class="col-12 col-md-4 col-xl-3 v-navbar">
+      {% include "v_navbar.html" %}
+    </div>
+    <div class="col-12 col-lg main-content">
+      {% block main %}
+      {% endblock main %}
+    </div>
   </div>
 </div>
 <div class="modal fade" id="mainModal" tabindex="-1" role="dialog" aria-labelledby="title" aria-hidden="true">

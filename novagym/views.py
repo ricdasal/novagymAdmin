@@ -16,7 +16,13 @@ from .models import *
 
 # Admin.
 
-
+@login_required
+def home(request):
+    context = {
+        'title': 'Principal',
+    }
+    return render(request, 'principal.html', context)
+  
 class PersonalPermissionRequieredMixin(PermissionRequiredMixin, AccessMixin):
     raise_exception = False
 

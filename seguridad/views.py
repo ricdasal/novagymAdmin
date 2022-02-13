@@ -25,15 +25,6 @@ from .models import *
 
 # Admin
 
-
-@login_required
-def home(request):
-    context = {
-        'title': 'Principal',
-    }
-    return render(request, 'principal.html', context)
-
-
 def login_user(request):
     if request.POST:
         username = request.POST['username']

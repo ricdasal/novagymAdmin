@@ -1,20 +1,20 @@
 :root {
   /* Colors */
-  --white-color: #ffff;
-  --black-color: #000;
   --red-color: #ff0000;
   --red-color-dark: #8f222d;
   --red-color-darker: #551118;
   --pink-color-light: #f8d7da;
+  --white-color: #ffff;
   --lighter-gray-color: #f5f5f5;
   --gray-white-color: #f7f7f8;
   --light-gray-color: #aaa;
+  --black-color: #000;
 
-  --primary-color: #00928b;
-  --primary-color-dark: #005f5a;
-  --primary-color-darker: #005f5a;
-  --primary-color-light: #005f5a;
-  --primary-color-lighter: #005f5a;
+  --primary-color: #ffd600;
+  --primary-color-dark: #e6bf00;
+  --primary-color-darker: #ccaa00;
+  --primary-color-light: #ffd91a;
+  --primary-color-lighter: #ffdd33;
 
   --secondary-color: #d0ff00;
   --secondary-color-dark: #d0ff00;
@@ -23,7 +23,7 @@
   --secondary-color-lighter: #d0ff00;
 
   --bg-color: var(--primary-color);
-  --navbar-color: var(--red-color-dark);
+  --navbar-color: var(--white-color);
   
   --btn-primary-color: var(--primary-color);
   --btn-primary-color-border: var(--primary-color-darker);
