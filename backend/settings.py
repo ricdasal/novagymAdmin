@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'seguridad',
     'novagym',
+    'gimnasio',
+    'productos'
     # 'novagym.cliente',
 ]
 
@@ -181,3 +183,12 @@ MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Email settings
+
+EMAIL_HOST="localhost"
+EMAIL_PORT="1025"
+EMAIL_HOST_USER=""
+EMAIL_HOST_PASSWORD=""
+EMAIL_USE_TLS=False
+#EMAIL_USE_SSL=False
