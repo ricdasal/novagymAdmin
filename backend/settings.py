@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'seguridad',
     'novagym',
     'gimnasio',
-    'productos'
+    'productos',
+    'contactenos'
     # 'novagym.cliente',
 ]
 
@@ -185,7 +186,7 @@ MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #Email settings
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST="localhost"
 EMAIL_PORT="1025"
 EMAIL_HOST_USER=""
