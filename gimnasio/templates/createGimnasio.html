@@ -1,0 +1,6 @@
+<h1>nuevo gimnasio</h1>
+<form action="{% url 'gimnasio:createGimnasio' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button" type="submit">Submit</button>
+</form>

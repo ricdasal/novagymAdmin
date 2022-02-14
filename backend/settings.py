@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'novagym',
     'gimnasio',
     'productos',
-    'contactenos'
+    'contactenos',
+    'sponsor'
     # 'novagym.cliente',
 ]
 

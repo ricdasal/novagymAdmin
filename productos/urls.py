@@ -10,12 +10,6 @@ urlpatterns = [
      path('create/',createProducto,name='createProducto'),
      path('inventario/create/',createInventario,name='createInventario'),
      path('descuento/create/',createDescuento,name='createDescuento'),
-     #Sponsor
-     path('sponsor-list/', sponsorList, name='sponsor-overview'),
-     path('sponsor-detail/<str:id>', sponsorDetail, name='sponsor-detail'),
-     path('sponsor-create/', sponsorCreate, name='sponsor-create'),
-     path('sponsor-update/<str:id>', sponsorUpdate, name='sponsor-update'),
-     path('sponsor-delete/<str:id>', sponsorDelete, name='sponsor-delete'),
 
      #Producto
 
