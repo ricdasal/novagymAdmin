@@ -62,9 +62,8 @@ class SeguidorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Seguidor
-        fields = ['id', 'usuario', 'seguidor', 'seguidor_info']
-        extra_kwargs = {"usuario": {"write_only": True, 'required': True},
-                        "seguidor": {"write_only": True, 'required': True}}
+        fields = ['usuario', 'seguidor', 'seguidor_info']
+        extra_kwargs = {"usuario": {"write_only": True, 'required': True}}
 
     def create(self, validated_data):
         seguidor = Seguidor.objects.create(**validated_data)
@@ -75,4 +74,4 @@ class SeguidosSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Seguidor
-        fields = ['id', 'seguidos_info']
+        fields = ['usuario', 'seguidos_info']

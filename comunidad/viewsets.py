@@ -1,7 +1,4 @@
-from re import S
-from django import views
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 
@@ -53,6 +50,7 @@ class BiografiaView(viewsets.ViewSet):
 
 
 class PublicacionView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
 
     def retrieve(self, request, pk):
         try:
@@ -96,55 +94,68 @@ class PublicacionView(viewsets.ViewSet):
         data = request.data
         try:
             publicacion = Publicacion.objects.get(pk=pk)
-            archivos = data['archivos'] if 'archivos' in data else []
-            nuevos_archivos = []
-            for i, archivo in enumerate(archivos):
-                if 'id' in archivo:
-                    archivo_db = ArchivoPublicacion.objects.get(id=archivo['id'])
-                    if archivo['archivo'] == None:
-                        archivo_db.delete()
+            if publicacion.usuario == request.user:
+                archivos = data['archivos'] if 'archivos' in data else []
+                nuevos_archivos = []
+                for i, archivo in enumerate(archivos):
+                    if 'id' in archivo:
+                        archivo_db = ArchivoPublicacion.objects.get(id=archivo['id'])
+                        if archivo['archivo'] == None:
+                            archivo_db.delete()
+                    else:
+                        resultado = fileb64decode(archivo['archivo'], request.user.id)
+                        if "message" in resultado:
+                            return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+                        archivos[i]['tipo'] = resultado[0]
+                        archivos[i]['archivo'] = resultado[1]
+                        nuevos_archivos.append(archivos[i])
+                data['archivos'] = nuevos_archivos
+                serializer = PublicacionSerializer(publicacion, data=data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_200_OK)
                 else:
-                    resultado = fileb64decode(archivo['archivo'], request.user.id)
-                    if "message" in resultado:
-                        return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-                    archivos[i]['tipo'] = resultado[0]
-                    archivos[i]['archivo'] = resultado[1]
-                    nuevos_archivos.append(archivos[i])
-            data['archivos'] = nuevos_archivos
-            serializer = PublicacionSerializer(publicacion, data=data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "No tienes permisos para editar esta publicación."} , status=status.HTTP_403_FORBIDDEN)
         except Publicacion.DoesNotExist:
             return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
     def destroy(self, request, pk):
         try:
             publicacion = Publicacion.objects.get(pk=pk)
-            archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
-            for archivo in archivos:
-                archivo.delete()
-            publicacion.delete()
-            return Response(status=status.HTTP_200_OK)
+            if publicacion.usuario == request.user:
+                archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
+                for archivo in archivos:
+                    archivo.delete()
+                publicacion.delete()
+                return Response(status=status.HTTP_200_OK)
+            return Response({"message": "No tienes permisos para eliminar esta publicación."} , status=status.HTTP_403_FORBIDDEN)
         except Publicacion.DoesNotExist:
             return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PublicacionUsuarioView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request):
         publicaciones = Publicacion.objects.filter(usuario=request.user.id)
-        serializer = PublicacionSerializer(publicaciones, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        result = paginator.paginate_queryset(publicaciones, request)
+
+        serializer = PublicacionSerializer(result, many=True)
+        paginated_response = paginator.get_paginated_response(serializer.data)
+
+        return Response(paginated_response.data, status=status.HTTP_200_OK)
 
 
 class ComentarioView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request):
         data = request.data
-        if 'imagen' in data:
+        if 'imagen' in data and data['imagen'] is not None:
             resultado = fileb64decode(data['imagen'], request.user.id)
             if "message" in resultado:
                 return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
@@ -159,7 +170,7 @@ class ComentarioView(viewsets.ViewSet):
             comentarios = publicacion.comentario.filter(comentario_padre=None).all()
 
             return Response(ComentarioSerializer(comentarios, many=True).data ,status=status.HTTP_201_CREATED)
-        return Response({"message": "Error al crear la publicación"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def partial_update(self, request, pk):
         data = request.data
@@ -183,7 +194,7 @@ class ComentarioView(viewsets.ViewSet):
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_200_OK)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(data={"message": "No tienes permisos para editar esta comentario."} , status=status.HTTP_403_FORBIDDEN)
+            return Response({"message": "No tienes permisos para editar esta comentario."} , status=status.HTTP_403_FORBIDDEN)
         except Comentario.DoesNotExist:
             return Response({"message": "Comentario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
         
@@ -203,6 +214,7 @@ class ComentarioView(viewsets.ViewSet):
 
 
 class LikeView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request):
         publicacion_id = request.data['publicacion']
@@ -231,6 +243,7 @@ class LikeView(viewsets.ViewSet):
 
 
 class SeguidorView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
     
     def list(self, request):
         seguidores = Seguidor.objects.filter(usuario=request.user)
@@ -245,21 +258,25 @@ class SeguidorView(viewsets.ViewSet):
     def create(self, request):
         data = request.data
         data['seguidor'] = request.user.id
-        serializer = SeguidorSerializer(data=data)
-        if serializer.is_valid():
-            biografia_seguidor = Biografia.objects.get(usuario=request.user.id)
-            biografia_seguido = Biografia.objects.get(usuario=data['usuario'])
+        try:
+            Seguidor.objects.get(seguidor=request.user.id, usuario=data['usuario'])
+            return Response({"message": "Ya sigues a este usuario"}, status=status.HTTP_400_BAD_REQUEST)
+        except Seguidor.DoesNotExist:
+            serializer = SeguidorSerializer(data=data)
+            if serializer.is_valid():
+                biografia_seguidor = Biografia.objects.get(usuario=request.user.id)
+                biografia_seguido = Biografia.objects.get(usuario=data['usuario'])
 
-            biografia_seguidor.incrementar_seguidos()
-            biografia_seguido.incrementar_seguidores()
+                biografia_seguidor.incrementar_seguidos()
+                biografia_seguido.incrementar_seguidores()
 
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk):
         try:
-            seguidor = Seguidor.objects.get(pk=pk)
+            seguidor = Seguidor.objects.get(seguidor=request.user.id, usuario=pk)
 
             biografia_seguidor = Biografia.objects.get(usuario=seguidor.seguidor)
             biografia_seguido = Biografia.objects.get(usuario=seguidor.usuario)
