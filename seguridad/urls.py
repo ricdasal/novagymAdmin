@@ -4,8 +4,6 @@ from .apps import SeguridadConfig
 
 app_name = SeguridadConfig.name
 urlpatterns = [
-    path('', home, name="principal"),
-  
     path("login/", login_user, name="login_admin"),
     path("logout/", logout_user, name="logout_admin"),
 

@@ -5,7 +5,7 @@
 {% endblock specific_head %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-center" id="login-main" style="height: 100%">
+<div class="d-flex align-items-center justify-content-center" style="height: 100%">
   <div class="main-div">
     <div class="panel py-4 px-3 px-xl-4">
       <form name="loginForm" class="m-0" method="post">
@@ -27,8 +27,8 @@
             <input type="password" class="form-control {%if messages%}is-invalid{%endif%}" id="password" name="password"
               placeholder="Contraseña" />
           </div>
-          <div class="btn-login mt-4 mb-2">
-            <button type="submit" class="btn btn-secondary login">INICIAR SESIÓN</button>
+          <div class="mt-4 mb-2">
+            <button type="submit" class="btn btn-primary center btn-block">INICIAR SESIÓN</button>
           </div>
           {% if request.GET.next %}
           <input type="hidden" name="next" value="{{ request.GET.next }}" />
