@@ -26,4 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(seguridad_api)),
     path('api/', include(neymatex_api.urls)),
+    path('productos/', include('productos.urls')),
+    path('gimnasio/', include('gimnasio.urls')),
+    path('contacto/', include('contactenos.urls')),
+    path('sponsor/', include('sponsor.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
