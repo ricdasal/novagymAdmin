@@ -19,6 +19,7 @@ from django.contrib import admin
 from django.urls import include, path
 
 from .routers import *
+from comunidad.urls import comunidad_api
 
 urlpatterns = [
     path('', include('seguridad.urls')),
@@ -29,5 +30,6 @@ urlpatterns = [
     path('productos/', include('productos.urls')),
     path('gimnasio/', include('gimnasio.urls')),
     path('contacto/', include('contactenos.urls')),
-    path('sponsor/', include('sponsor.urls'))
+    path('sponsor/', include('sponsor.urls')),
+    path('api/', include(comunidad_api)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

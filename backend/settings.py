@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'contactenos',
     'sponsor'
     # 'novagym.cliente',
-
+    'comunidad',
 ]
 
 MIDDLEWARE = [
