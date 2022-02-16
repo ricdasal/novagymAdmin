@@ -10,8 +10,6 @@ class UserDetails(models.Model):
         WOMEN = 'M', 'Mujer'
         OTHER = 'O', 'Otro'
 
-    usuario = models.ForeignKey(
-        User, on_delete=models.CASCADE)
     cedula = models.CharField(max_length=13)
     nombres = models.CharField(max_length=24)
     apellidos = models.CharField(max_length=24)
