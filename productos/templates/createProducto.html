@@ -1,0 +1,6 @@
+<h1>nuevo producto</h1>
+<form action="{% url 'productos:createProducto' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="button" type="submit">Submit</button>
+</form>

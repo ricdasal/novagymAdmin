@@ -1,0 +1,98 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock specific_head %}
+
+{% block main %}
+<div class="row mt-4">
+  <div class="col">
+    <h2 class="text-left">{{title}}</h2>
+  </div>
+  <div class="col">
+    <a href="{% url 'seguridad:agregar' %}" class="btn btn-primary float-right">Agregar usuarios <i
+        class="fas fa-plus-circle"> </i></a>
+  </div>
+  <hr>
+</div>
+<div class="row mt-4 justify-content-center">
+  <div class="col-12 col-lg-9">
+    <form method="get">
+      {% crispy filter.form %}
+      {% include "export_records.html" %}
+    </form>
+  </div>
+  <div class="col-12 table-container">
+    <table class="table table-responsive-lg table-hover" id="tabla-usuarios">
+      <tbody>
+        {% if page_obj %}
+        {% for usuario in page_obj %}
+        <tr>
+          <td scope="row">
+            {% if usuario.imagen and usuario.imagen.path %}
+            <img src="{{usuario.imagen.url}}" alt="{{usuario.nombres}}" class="table__image">
+            {%else%}
+            <img src="{% static 'images/generic_user.png' %}" alt="{{usuario.nombres}}" class="table__image">
+            {% endif %}
+          </td>
+          <td>
+            <p>{{usuario.codigo}} - {{usuario.nombres}} {{usuario.apellidos}}</p>
+            <p>CI: {{usuario.cedula}}</p>
+            <p>Rol:             
+              {% if usuario.usuario.groups.all %}
+                {% for grupo in usuario.usuario.groups.all %}
+                  <span>{{grupo}} </span>
+                {% endfor %}
+              {% endif %}
+            </p>
+            <p>Fecha de registro: {{usuario.created_at}}</p>
+          </td>
+          <td>
+            <p>Telf: {{usuario.telefono}}</p>
+            <p>Email: {{usuario.usuario.email}}</p>
+          </td>
+          <td>
+            <a href="{% url 'seguridad:editar' usuario.pk %}" class="btn btn-sm btn-primary">
+              Ver perfil <i class="fas fa-edit "></i>
+            </a>
+          </td>
+          <td>
+            <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} data-toggle="toggle" data-on="Habilitado" 
+              data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" class="use-modal" data-target="#mainModal"
+              data-url-activar="{%url 'seguridad:activar' usuario.pk%}" data-url-eliminar="{%url 'seguridad:eliminar' usuario.pk%}"
+            >
+          </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <h4>
+          No se encontraron datos.
+        </h4>
+        {% endif %}
+      </tbody>
+    </table>
+    {% include "pagination.html" %}
+  </div>
+</div>
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script>
+  $(".export").click(function () {
+    $("#export").val($(this).data('value'));
+    $('form').submit()
+  });
+  $('button[type="submit"]').click(function (e) {
+    $("#export").val('');
+  })
+</script>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% load static %}
+<header>
+  <nav class="navbar navbar-expand-md navbar-light fixed-top navbar">
+    <div class="navbar__logo d-flex align-items-center justify-content-center px-2 px-xl-5">
+      <img src="{% static 'images/logo.png' %}" alt="logo" class="">
+    </div>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+      aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="navbar-nav mr-auto">
+        {% comment %}
+        {% if perms.novagym.view_producto %}
+        <li class="nav-item {% if request.resolver_match.namespace == 'novagym:producto' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'novagym:producto:listar' %}">Productos</a>
+        </li>
+        {% endif %}
+        {% if perms.novagym.view_orden %}
+        <li class="nav-item {% if request.resolver_match.namespace == 'novagym:orden' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'novagym:orden:listar' %}">Pedidos</a>
+        </li>
+        {% endif %}
+        {% if perms.novagym.view_notificacion %}
+        <li class="nav-item {% if request.resolver_match.namespace == 'novagym:notificacion' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'novagym:notificacion:listar' %}">Notificaciones</a>
+        </li>
+        {% endif %}
+        {% endcomment %}
+      </ul>
+      {% if user.is_authenticated %}
+      <div class="mr-4">
+        <a class="btn" href="#">
+          <i class="far fa-bell"></i>
+        </a>
+      </div>
+      <div class="dropdown">
+        <a class="btn dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="far fa-user"></i> Hola, {{user.detalles.all.0.nombres}}
+        </a>
+        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
+          <a class="dropdown-item" href="#">Agregar Usuario</a>
+          <a class="dropdown-item" href="#">Administrar Usuario</a>
+          <a class="dropdown-item" href="#">Editar Bienvenida</a>
+          <a class="dropdown-item" href="#">Editar mail de compra</a>
+          <a class="dropdown-item" href="{% url 'seguridad:logout_admin' %}?next={{request.path}}">
+            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+          </a>
+        </div>
+      </div>
+      {% else %}
+      <a class="btn btn-light btn-sm"
+        href="{% url 'seguridad:login_admin' %}?next={{request.path}}">
+        <i class="fas fa-sign-out-alt"></i> Iniciar Sesión
+      </a>
+      {% endif %}
+    </div>
+  </nav>
+</header>
