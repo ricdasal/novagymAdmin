@@ -10,6 +10,9 @@ class SponsorSerializer(serializers.ModelSerializer):
     nombre_contacto = serializers.CharField(max_length=24)
     url = serializers.CharField(max_length=255)
     imagen = serializers.CharField(max_length=255)
+    fecha_inicio=serializers.DateField()
+    fecha_fin=serializers.DateField()
+    activo=serializers.BooleanField()
     class Meta:
         model = Sponsor
-        fields = ('id', 'nombre', 'descripcion', 'telefono', 'nombre_contacto', 'url','imagen')
+        fields = ('id', 'nombre', 'descripcion', 'telefono', 'nombre_contacto', 'url','imagen','fecha_inicio','fecha_fin',"activo")

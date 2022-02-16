@@ -69,9 +69,9 @@
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container  {% if request.resolver_match.view_name == 'sponsor:listar' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'sponsor:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"

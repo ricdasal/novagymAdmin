@@ -1,15 +1,20 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
-
+from django_filters.views import FilterView
 from .forms import *
 from .serializers import *
 from django.core.mail import send_mail
-
+from novagym.utils import calculate_pages_to_render
+from datetime import date
 from .models import *
-
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView, UpdateView
 # Create your views here.
 #SPONSOR
 
@@ -60,3 +65,43 @@ def createSponsor(request):
     else:
         form=SponsorForm()
     return render(request,'createSponsor.html',{'form':form})
+
+class ListarSponsors(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Sponsor
+    context_object_name = 'sponsors'
+    template_name = "lista_sponsor.html"
+    permission_required = 'novagym.view_empleado'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Sponsors"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+def deleteSponsor(request,pk):
+    query = Sponsor.objects.get(id=pk)
+    if request.POST:
+        query.delete()
+        messages.success(request, "Sponsor eliminado con éxito.")
+        return redirect('sponsor:listar')
+    return render(request, "ajax/sponsor_confirmar_elminar.html", {"sponsor": query})
+
+class CrearSponsor(CreateView):
+    form_class =SponsorForm
+    model=Sponsor
+    title = "CREAR SPONSOR"
+    template_name = 'sponsor_nuevo.html'
+    success_url = reverse_lazy('sponsor:listar')
+
+class UpdateSponsor(UpdateView):
+    form_class =SponsorForm
+    model=Sponsor
+    title = "ACTUALIZAR SPONSOR"
+    template_name = 'sponsor_nuevo.html'
+    success_url = reverse_lazy('sponsor:listar')
