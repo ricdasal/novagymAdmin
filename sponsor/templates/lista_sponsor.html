@@ -48,16 +48,22 @@
           <td>{{sponsor.fecha_inicio}}</td>
           <td>{{sponsor.fecha_fin}}</td>
           <td>
-            {%if sponsor.compararFechas %}
+            {%if sponsor.activo == 0 and sponsor.compararFechas %}
+            <span class="text-warning">Deshabilitado</span>
+            {%elif sponsor.compararFechas %}
             <span class="text-success">Habilitado</span>
             {%else%}
-            <span class="text-danger">Deshabilitado</span>
+            <span class="text-danger">Caducado</span>
             {%endif%}
           </td>
           <td>
             {% if sponsor.compararFechas %}
             <a href="{% url 'sponsor:update' sponsor.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
+
+            <a class="btn btn-sm btn-warning" 
+               href="{%url 'sponsor:change' sponsor.id%}"><i class="fas fa-power-off "></i></a>
+
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
             data-url="{%url 'sponsor:deleteSponsor' sponsor.id%}" href="#">
               <i class="fas fa-times"></i></a>
@@ -65,6 +71,7 @@
             <a class="btn btn-sm btn-warning use-modal" data-toggle='modal' data-target="#mainModal"
             data-url="{%url 'sponsor:deleteSponsor' sponsor.id%}" href="#"><i class="fas fa-check "></i></a>
             {% endif %}
+            
           </td>
           
         </tr>

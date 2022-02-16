@@ -16,4 +16,5 @@ urlpatterns = [
      path('deleteSponsor/<str:pk>', deleteSponsor, name='deleteSponsor'),
      path('crear/', CrearSponsor.as_view(), name='crear'),
      path('editar/<str:pk>', UpdateSponsor.as_view(), name='update'),
+     path('change/<str:pk>', ChangeState, name='change'),
 ]
