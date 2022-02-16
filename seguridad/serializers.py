@@ -39,5 +39,11 @@ class RegistrarSerializer(serializers.ModelSerializer):
             username=validated_data['email'], email=validated_data['email'])
         user.set_password(validated_data['password'])
         user.save()
+        try:
+          pre = str(int(UserDetails.objects.latest('pk').pk+1))
+          sec = '0'*(4-len(pre))+pre
+        except self.model.DoesNotExist:
+          sec = '0001'
+        detalles_data['codigo']=sec
         UserDetails.objects.create(usuario=user, **detalles_data)
         return user
