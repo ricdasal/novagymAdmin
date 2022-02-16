@@ -1,3 +1,4 @@
+from django.forms import BooleanField
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
@@ -88,15 +89,15 @@ def deleteSponsor(request,pk):
     query = Sponsor.objects.get(id=pk)
     if request.POST:
         query.delete()
-        messages.success(request, "Sponsor eliminado con éxito.")
+        messages.success(request, "Anunciante eliminado con éxito.")
         return redirect('sponsor:listar')
     return render(request, "ajax/sponsor_confirmar_elminar.html", {"sponsor": query})
 
 class CrearSponsor(CreateView):
     form_class =SponsorForm
     model=Sponsor
-    title = "CREAR SPONSOR"
     template_name = 'sponsor_nuevo.html'
+    title = "CREAR SPONSOR"
     success_url = reverse_lazy('sponsor:listar')
 
 class UpdateSponsor(UpdateView):
@@ -105,3 +106,15 @@ class UpdateSponsor(UpdateView):
     title = "ACTUALIZAR SPONSOR"
     template_name = 'sponsor_nuevo.html'
     success_url = reverse_lazy('sponsor:listar')
+
+def ChangeState(request,pk):
+    query = Sponsor.objects.get(id=pk)
+    print(query.activo)
+    if query.activo==0:
+        query.activo=1
+        messages.success(request, "Anunciante "+query.nombre +" habilitado.")
+    elif query.activo==1:
+        query.activo=0
+        messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
+    query.save()
+    return redirect('sponsor:listar')
