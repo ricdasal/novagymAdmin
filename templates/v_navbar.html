@@ -18,7 +18,7 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'seguridad:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'seguridad' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'seguridad:listar' %}">
           <div class="row">

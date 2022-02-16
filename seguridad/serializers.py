@@ -7,7 +7,7 @@ from seguridad.models import UserDetails
 class DetalleSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetails
-        fields = '__all__'
+        exclude = ['usuario']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
