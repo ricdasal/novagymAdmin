@@ -8,8 +8,11 @@
     <span class="asteriskField">*</span>
     {% endif %}
   </label>
-  <div class="d-flex justify-content-between">
-    {% crispy_field field %}
+  <div>
+    <input type="text" data-field="{{ field.html_name }}" class="textinput textInput form-control daterange"/>
+  </div>
+  <div class="d-none">
+    {{ field }}
   </div>
   <small class="form-text text-muted">Mínimo - Máximo</small>
 </div>

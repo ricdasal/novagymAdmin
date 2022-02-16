@@ -1,20 +1,27 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Desactivar empleado</h5>
+  <h5 class="modal-title" id="ordenTitle">Habilitar usuario</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<form method="POST" action="{% url 'seguridad:eliminar' empleado.pk %}">
+<form method="POST" action="{% url 'seguridad:activar' usuario.pk %}">
   {% csrf_token %}
-
   <div class="modal-body">
-    ¿Desea desactivar el siguiente empleado?
+    ¿Desea habilitar el siguiente usuario?
     <div class="row">
       <div class="col-3">
-        Código
+        Cédula
       </div>
       <div class="col">
-        {{empleado.codigo}}
+        {{usuario.cedula}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Correo
+      </div>
+      <div class="col">
+        {{usuario.usuario.email}}
       </div>
     </div>
     <div class="row">
@@ -22,7 +29,7 @@
         Nombre
       </div>
       <div class="col">
-        {{empleado.detalles.nombres}}
+        {{usuario.nombres}}
       </div>
     </div>
     <div class="row">
@@ -30,29 +37,13 @@
         Apellidos
       </div>
       <div class="col">
-        {{empleado.detalles.apellidos}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3">
-        Estado
-      </div>
-      <div class="col">
-        {{empleado.get_estado_display}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3">
-        Sexo
-      </div>
-      <div class="col">
-        {{empleado.detalles.get_sexo_display}}
+        {{usuario.apellidos}}
       </div>
     </div>
   </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    <button id="anular" class="btn btn-danger mr-3" type="submit"> Desactivar </button>
+    <button id="anular" class="btn btn-danger mr-3" type="submit"> Habilitar </button>
   </div>
 </form>
