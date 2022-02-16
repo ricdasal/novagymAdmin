@@ -1,12 +1,13 @@
 from django.contrib.auth import login
-from rest_framework import generics, permissions, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
-from .serializers import *
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.authtoken.serializers import AuthTokenSerializer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import *
+from .serializers import *
 
 # API
 
@@ -32,13 +33,11 @@ class LoginAPI(KnoxLoginView):
     def get_post_response_data(self, request, token, instance):
         data = super().get_post_response_data(request, token, instance)
         try:
-            empleado = Empleado.objects.get(usuario=request.user)
-            empleado_serializer = EmpleadoSerializer(empleado).data
-            data['empleado'] = empleado_serializer
-            data['user']['is_gerente'] = request.user.groups.filter(
-                name='Gerente').exists()
-        except Empleado.DoesNotExist:
-            print("No existe empleado con el usuario enviado.")
+            usuario = UserDetails.objects.get(usuario=request.user)
+            usuario_serializer = DetalleSerializer(usuario).data
+            data['user']['detalles'] = usuario_serializer
+        except UserDetails.DoesNotExist:
+            print("No existe el usuario.")
         return data
 
     def post(self, request, format=None):
@@ -53,13 +52,11 @@ class LoginAPI(KnoxLoginView):
         return super(LoginAPI, self).post(request, format=None)
 
 
-class EmpleadoAPI(APIView):
+class DetallesView(viewsets.ModelViewSet):
     # permission_classes = (permissions.IsAuthenticated,)
     permission_classes = (permissions.AllowAny,)
-
-    def get(self, request, format=None):
-        empleado = Empleado.objects.get(usuario=request.user)
-        return Response(EmpleadoSerializer(empleado).data)
+    serializer_class = DetalleSerializer
+    queryset = UserDetails.objects.all()
 
 
 class TokenValidatorAPI(APIView):

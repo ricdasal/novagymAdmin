@@ -13,17 +13,15 @@ from django.shortcuts import redirect, render, resolve_url
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
-from seguridad.models import Empleado
 from novagym.utils import calculate_pages_to_render
 
-from seguridad.filters import EmpleadoFilter
-from seguridad.forms import (EmpleadoEditarForm, EmpleadoForm,
-                             UsuarioDetallesForm, UsuarioEditarForm,
-                             UsuarioForm)
+from seguridad.filters import UsuarioFilter
+from seguridad.forms import UsuarioDetallesForm, UsuarioEditarForm, UsuarioForm
 
 from .models import *
 
 # Admin
+
 
 def login_user(request):
     if request.POST:
@@ -47,7 +45,7 @@ def login_user(request):
             return redirect('seguridad:login_admin')
     else:
         if request.user and request.user.is_authenticated:
-            return redirect('seguridad:principal')
+            return redirect('novagym:principal')
         else:
             return render(request, 'login.html', {"title": "Iniciar Sesión"})
 
@@ -58,7 +56,7 @@ def logout_user(request):
         return redirect('seguridad:login_admin')
 
 
-class EmpleadoPermissionRequieredMixin(PermissionRequiredMixin, AccessMixin):
+class UsuarioPermissionRequieredMixin(PermissionRequiredMixin, AccessMixin):
     raise_exception = False
 
     def handle_no_permission(self):
@@ -82,18 +80,18 @@ class EmpleadoPermissionRequieredMixin(PermissionRequiredMixin, AccessMixin):
         )
 
 
-class ListarEmpleados(LoginRequiredMixin, EmpleadoPermissionRequieredMixin, FilterView):
+class ListarUsuarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin, FilterView):
     paginate_by = 20
     max_pages_render = 10
-    model = Empleado
-    context_object_name = 'empleados'
-    template_name = "lista_empleado.html"
-    permission_required = 'novagym.view_empleado'
-    filterset_class = EmpleadoFilter
+    model = UserDetails
+    context_object_name = 'usuarios'
+    template_name = "lista_usuarios.html"
+    permission_required = 'novagym.view_user_details'
+    filterset_class = UsuarioFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "Empleados"
+        context['title'] = "Usuarios"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
@@ -102,114 +100,105 @@ class ListarEmpleados(LoginRequiredMixin, EmpleadoPermissionRequieredMixin, Filt
         return super().get(request, *args, **kwargs)
 
 
-class CrearEmpleado(LoginRequiredMixin, EmpleadoPermissionRequieredMixin, CreateView):
-    model = Empleado
-    form_class = EmpleadoForm
+class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateView):
+    model = UserDetails
+    form_class = UsuarioDetallesForm
     user_form_class = UsuarioForm
-    user_details_form_class = UsuarioDetallesForm
-    template_name = 'empleado_nuevo.html'
-    title = "Crear empleado"
+    template_name = 'usuario_nuevo.html'
+    title = "Crear usuario"
     success_url = reverse_lazy('seguridad:listar')
-    permission_required = 'novagym.add_empleado'
+    permission_required = 'novagym.add_usuario'
 
     def get_context_data(self, **kwargs):
-        context = super(CrearEmpleado, self).get_context_data(**kwargs)
+        context = super(CrearUsuario, self).get_context_data(**kwargs)
         if "user_form" not in context:
             context['user_form'] = self.user_form_class()
-        if "user_details_form" not in context:
-            context['user_details_form'] = self.user_details_form_class()
+        if "form" not in context:
+            context['form'] = self.form_class()
         context['title'] = self.title
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = None
-        empleado_form = self.form_class(request.POST, request.FILES)
         usuario_form = self.user_form_class(request.POST)
-        usuario_detalles_form = self.user_details_form_class(request.POST)
-        if usuario_form.is_valid() and empleado_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save()
-            detalles = usuario_detalles_form.save()
-            empleado = empleado_form.save(commit=False)
+        usuario_detalles_form = self.form_class(request.POST)
+        if usuario_form.is_valid() and usuario_detalles_form.is_valid():
+            user = usuario_form.save(commit=False)
+            user.username = user.email
+            user.save()
+            detalles = usuario_detalles_form.save(commit=False)
             try:
                 pre = str(int(self.model.objects.latest('pk').pk+1))
                 sec = '0'*(4-len(pre))+pre
             except self.model.DoesNotExist:
                 sec = '0001'
-            empleado.codigo = sec
-            empleado.usuario = user
-            empleado.detalles = detalles
-            empleado.save()
-            print(usuario_form)
-            messages.success(request, "Empleado creado con éxito.")
+            detalles.codigo = sec
+            detalles.usuario = user
+            detalles.save()
+            messages.success(request, "Usuario creado con éxito.")
             return HttpResponseRedirect(self.success_url)
         else:
-            return self.render_to_response({"form": empleado_form, "user_form": usuario_form,
-                                            "user_details_form": usuario_detalles_form, "title": self.title})
+            return self.render_to_response({"form": usuario_detalles_form, "user_form": usuario_form,
+                                            "title": self.title})
 
 
-class EditarEmpleado(LoginRequiredMixin, EmpleadoPermissionRequieredMixin, UpdateView):
-    model = Empleado
-    form_class = EmpleadoEditarForm
+class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateView):
+    model = UserDetails
+    form_class = UsuarioDetallesForm
     user_form_class = UsuarioEditarForm
-    user_details_form_class = UsuarioDetallesForm
-    template_name = 'empleado_nuevo.html'
-    title = "Editar empleado"
+    template_name = 'usuario_nuevo.html'
+    title = "Editar usuario"
     success_url = reverse_lazy('seguridad:listar')
-    permission_required = 'novagym.change_empleado'
+    permission_required = 'novagym.change_usuario'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if "user_form" not in context:
             context['user_form'] = self.user_form_class(
                 instance=self.object.usuario)
-        if "user_details_form" not in context:
-            context['user_details_form'] = self.user_details_form_class(
+        if "form" not in context:
+            context['form'] = self.form_class(
                 instance=self.object.detalles)
         context['title'] = self.title
         return context
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        empleado_form = self.form_class(
+        usuario_detalles_form = self.form_class(
             request.POST, request.FILES, instance=self.object)
         usuario_form = self.user_form_class(
             request.POST, instance=self.object.usuario)
-        usuario_detalles_form = self.user_details_form_class(
-            request.POST, instance=self.object.detalles)
-        if usuario_form.is_valid() and empleado_form.is_valid() and usuario_detalles_form.is_valid():
+        if usuario_form.is_valid() and usuario_detalles_form.is_valid():
             user = usuario_form.save()
-            detalles = usuario_detalles_form.save()
-            empleado = empleado_form.save(commit=False)
-            empleado.usuario = user
-            empleado.detalles = detalles
-            empleado.save()
-            print(user.groups.all())
-            messages.success(request, "Empleado editado con éxito.")
+            detalles = usuario_detalles_form.save(commit=False)
+            detalles.usuario = user
+            detalles.save()
+            messages.success(request, "Usuario editado con éxito.")
             return HttpResponseRedirect(self.success_url)
         else:
-            return self.render_to_response({"form": empleado_form, "user_form": usuario_form,
-                                            "user_details_form": usuario_detalles_form, "title": self.title})
+            return self.render_to_response({"form": usuario_detalles_form, "user_form": usuario_form,
+                                            "title": self.title})
 
 
 @login_required()
-def empleado_confirmar_eliminacion(request, pk):
-    empleado = Empleado.objects.get(id=pk)
+def usuario_confirmar_eliminacion(request, pk):
+    detalles = UserDetails.objects.get(id=pk)
     if request.POST:
-        usuario = empleado.usuario
+        usuario = detalles.usuario
         usuario.is_active = False
         usuario.save()
-        messages.success(request, "Empleado desactivado con éxito.")
+        messages.success(request, "Usuario deshabilitado con éxito.")
         return redirect('seguridad:listar')
-    return render(request, "ajax/empleado_confirmar_elminar.html", {"empleado": empleado})
+    return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
 
 
 @login_required()
-def empleado_confirmar_activar(request, pk):
-    empleado = Empleado.objects.get(id=pk)
+def usuario_confirmar_activar(request, pk):
+    detalles = UserDetails.objects.get(id=pk)
     if request.POST:
-        usuario = empleado.usuario
+        usuario = detalles.usuario
         usuario.is_active = True
         usuario.save()
-        messages.success(request, "Empleado activado con éxito.")
+        messages.success(request, "Usuario habilitado con éxito.")
         return redirect('seguridad:listar')
-    return render(request, "ajax/empleado_confirmar_activar.html", {"empleado": empleado})
+    return render(request, "ajax/usuario_confirmar_activar.html", {"usuario": detalles})

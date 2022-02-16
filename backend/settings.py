@@ -159,6 +159,7 @@ USE_L10N = True
 
 USE_TZ = True
 
+FORMAT_MODULE_PATH = 'backend.formats'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -172,7 +173,7 @@ STATIC_ROOT = Path.joinpath(BASE_DIR, "static_root")
 
 # Media files
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 
 MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 
