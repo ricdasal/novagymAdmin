@@ -11,9 +11,11 @@ class SponsorForm(forms.ModelForm):
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
-            "descripcion":forms.Textarea()
+            "descripcion":forms.Textarea(),
+            "fecha_inicio": forms.SelectDateWidget(),
+            "fecha_fin": forms.SelectDateWidget()
         }
-        fields = ('nombre', 'descripcion', 'telefono', 'nombre_contacto', 'url','imagen')
+        fields = ('codigo','nombre', 'descripcion', 'telefono', 'nombre_contacto', 'url','imagen','fecha_inicio','fecha_fin')
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
