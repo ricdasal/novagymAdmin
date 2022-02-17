@@ -49,9 +49,9 @@
           <td>{{sponsor.fecha_fin}}</td>
           <td>
             {%if sponsor.activo == 0 and sponsor.compararFechas %}
-            <span class="text-warning">Deshabilitado</span>
+            <span class="text-warning">Inactivo</span>
             {%elif sponsor.compararFechas %}
-            <span class="text-success">Habilitado</span>
+            <span class="text-success">Activo</span>
             {%else%}
             <span class="text-danger">Caducado</span>
             {%endif%}
