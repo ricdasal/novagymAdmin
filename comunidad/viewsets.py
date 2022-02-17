@@ -73,6 +73,8 @@ class PublicacionView(viewsets.ViewSet):
 
     def create(self, request):
         data = request.data
+        if not data:
+            return Response({"message": "Publicación sin contenido."}, status=status.HTTP_400_BAD_REQUEST)
         archivos = data['archivos'] if 'archivos' in data else []
         for i in range(len(archivos)):
             resultado = fileb64decode(archivos[i]['archivo'], request.user.id)
@@ -316,3 +318,66 @@ class RecomendacionAmigoView(viewsets.ReadOnlyModelViewSet):
             random.shuffle(disponibles)
             disponibles = disponibles[:10]
         return disponibles
+
+    
+class HistoriaView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def usuario_detalle(self, usuario):
+        detalle = UserDetails.objects.get(usuario=usuario)
+        biografia = Biografia.objects.get(usuario=usuario)
+        return {
+            "usuario": usuario,
+            "nombres": detalle.nombres,
+            "apellidos": detalle.apellidos,
+            "foto_perfil": biografia.foto_perfil.url,
+        }
+
+    def list(self, request):
+        historias = []
+        historias_usuario = Historia.objects.filter(usuario=request.user)
+        historias_usuario = HistoriaSerializer(historias_usuario, many=True).data
+        data =  self.usuario_detalle(request.user.id)
+        data.update({"historias": historias_usuario})
+        historias.append(data)
+
+        seguidos = Seguidor.objects.filter(seguidor=request.user)
+        for seguido in seguidos:
+            historias_seguido = Historia.objects.filter(usuario=seguido.usuario)
+            if len(historias_seguido) > 0:
+                historias_seguido = HistoriaSerializer(historias_seguido, many=True).data
+                data = self.usuario_detalle(seguido.usuario.id)
+                data.update({"historias": historias_seguido})
+                historias.append(data)
+
+        return Response(historias, status=status.HTTP_200_OK)
+
+    def create(self, request):
+        data = request.data
+        if not data:
+            return Response({"message": "Historia sin contenido."}, status=status.HTTP_400_BAD_REQUEST)
+        if 'archivo' in data and data['archivo'] is not None:
+            resultado = fileb64decode(data['archivo'], request.user.id)
+            if "message" in resultado:
+                return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+            data['tipo_archivo'] = resultado[0]
+            data['archivo'] = resultado[1]
+        data['usuario'] = request.user.id
+        
+        serializer = HistoriaSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def destroy(self, request, pk): 
+        try:
+            historia = Historia.objects.get(pk=pk)
+            if historia.usuario == request.user:
+                historia.delete()
+                return Response(status=status.HTTP_200_OK)
+            else:
+              return Response(data={"message": "No tienes permisos para eliminar esta historia."} , status=status.HTTP_403_FORBIDDEN)  
+        except Comentario.DoesNotExist:
+            return Response({"message": "Historia no encontrada"}, status=status.HTTP_404_NOT_FOUND)

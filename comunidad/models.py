@@ -9,7 +9,6 @@ import os
 
 def usuario_detalle(usuario):
     detalle = UserDetails.objects.get(usuario=usuario)
-    print(detalle)
     return { "nombre": detalle.nombres, "apellido": detalle.apellidos }
 
 class Biografia(models.Model):
@@ -177,3 +176,26 @@ class Comentario(models.Model):
         if self.comentario_padre is None and self.count_comentarios_hijos() > 0:
             return True
         return False
+
+
+class Historia(models.Model):
+
+    class Meta:
+        ordering = ['-fecha_creacion']
+
+    class MediaType(models.TextChoices):
+        IMAGE = 'IMG', 'Imagen'
+        VIDEO = 'VID', 'Video'
+        AUDIO = 'AUD', 'Audio'
+
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    texto = models.TextField(blank=True, default="")
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    archivo = models.FileField(upload_to='historias/', blank=True, null=True)
+    tipo_archivo = models.CharField(max_length=3, choices=MediaType.choices, default="")
+    almacenamiento_utilizado = models.FloatField(default=0.0)
+
+    def delete(self, *args, **kwargs):
+        if self.archivo and os.path.isfile(self.archivo.path):
+            os.remove(self.archivo.path)
+        super(Historia, self).delete(*args, **kwargs)
