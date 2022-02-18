@@ -71,7 +71,7 @@ class ListarSponsors(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Sponsor
-    context_object_name = 'sponsors'
+    context_object_name = 'sponsor'
     template_name = "lista_sponsor.html"
     permission_required = 'novagym.view_empleado'
 

@@ -13,6 +13,8 @@ urlpatterns = [
 
      #Producto
 
+     path('CrearProducto/', CrearProducto.as_view(), name='CrearProducto'),
+     path('listarProductos/', ListarProductos.as_view(), name='listarProductos'),
      path('producto-list/', productoList, name='producto-overview'),
      path('producto-detail/<str:id>', productoDetail, name='producto-detail'),
      path('producto-create/', productoCreate, name='producto-create'),
@@ -21,6 +23,9 @@ urlpatterns = [
 
      #Categoria
      
+     path('deleteCategoria/<str:pk>', deleteCategoria, name='deleteCategoria'),
+     path('listarCategoria/', ListarCategoria.as_view(), name='listarCategoria'),
+     path('crearCategoria/', crearCategoria.as_view(), name='crearCategoria'),
      path('categoria-list/', categoriaList, name='categoria-overview'),
      path('categoria-detail/<str:id>', categoriaDetail, name='categoria-detail'),
      path('categoria-create/', categoriaCreate, name='categoria-create'),

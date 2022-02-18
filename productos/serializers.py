@@ -21,11 +21,10 @@ class NotificacionUsuarioSerializer(serializers.ModelSerializer):
 
 class InventarioSerializer(serializers.ModelSerializer):
     precio = serializers.DecimalField(max_digits=4, decimal_places=2)
-    producto_id=serializers.IntegerField()
     stock = serializers.IntegerField()
     class Meta:
         model = Inventario
-        fields = ('id','precio','producto_id', 'stock')
+        fields = ('id','precio', 'stock')
 
 class CategoriaSerializer(serializers.ModelSerializer):
     nombre = models.CharField(max_length=24)
@@ -44,9 +43,10 @@ class ProductoSerializer(serializers.ModelSerializer):
     valor_presentacion=serializers.DecimalField(max_digits=4, decimal_places=2)
     talla = serializers.CharField(max_length=3)
     unidad_presentacion = serializers.IntegerField()
+    inventario_id=serializers.IntegerField()
     class Meta:
         model = Producto
-        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id', 'valor_presentacion','talla','unidad_presentacion')
+        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id',"inventario_id", 'valor_presentacion','talla','unidad_presentacion')
 
 
 

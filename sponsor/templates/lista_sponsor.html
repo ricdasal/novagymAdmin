@@ -62,14 +62,14 @@
               <i class="fas fa-edit "></i></a>
 
             <a class="btn btn-sm btn-warning" 
-               href="{%url 'sponsor:change' sponsor.id%}"><i class="fas fa-power-off "></i></a>
+               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
 
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-            data-url="{%url 'sponsor:deleteSponsor' sponsor.id%}" href="#">
+            data-url="{%url 'sponsor:deleteSponsor' sponsor.pk%}" href="#">
               <i class="fas fa-times"></i></a>
             {% else %}
             <a class="btn btn-sm btn-warning use-modal" data-toggle='modal' data-target="#mainModal"
-            data-url="{%url 'sponsor:deleteSponsor' sponsor.id%}" href="#"><i class="fas fa-check "></i></a>
+            data-url="{%url 'sponsor:deleteSponsor' sponsor.pk%}" href="#"><i class="fas fa-check "></i></a>
             {% endif %}
             
           </td>
@@ -89,7 +89,11 @@
 {% endblock main %}
 
 {% block specific_scripts %}
-<script src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));
