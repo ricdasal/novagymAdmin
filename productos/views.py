@@ -1,13 +1,16 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
-
+from django.views.generic import CreateView, UpdateView
+from django_filters.views import FilterView
+from novagym.utils import calculate_pages_to_render
 from productos.forms import *
 from .serializers import *
 from django.core.mail import send_mail
-
+from django.contrib import messages
 from .models import *
 # Create your views here.
 #Send email
@@ -220,3 +223,62 @@ def createDescuento(request):
     else:
         form=DescuentoForm()
     return render(request,'createDescuento.html',{'form':form})
+
+
+class crearCategoria(CreateView):
+    form_class =CategoriaForm
+    model=Categoria
+    template_name = 'categoria_nueva.html'
+    title = "CREAR CATEGORIA"
+    success_url = reverse_lazy('productos:listarCategoria')
+
+class ListarCategoria(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Categoria
+    context_object_name = 'categoria'
+    template_name = "lista_categoria.html"
+    permission_required = 'novagym.view_empleado'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Categorias"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class ListarProductos(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Producto
+    context_object_name = 'producto'
+    template_name = "lista_productos.html"
+    permission_required = 'novagym.view_empleado'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Productos"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+def deleteCategoria(request,pk):
+    query = Categoria.objects.get(id=pk)
+    if request.POST:
+        query.delete()
+        messages.success(request, "Categoria eliminada con éxito.")
+        return redirect('productos:listarCategoria')
+    return render(request, "ajax/categoria_confirmar_elminar.html", {"categoria": query})
+
+class CrearProducto(CreateView):
+    form_class =ProductoForm
+    inventario_form_class=InventarioForm
+    model=Producto
+    template_name = 'producto_nuevo.html'
+    title = "CREAR PRODUCTO"
+    success_url = reverse_lazy('productos:listarProductos')
