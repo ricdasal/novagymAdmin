@@ -11,12 +11,7 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
-class Inventario(models.Model):
-    id = models.AutoField(primary_key=True)
-    precio = models.DecimalField(max_digits=4, decimal_places=2)
-    stock = models.IntegerField()
-    def __str__(self):
-        return self.nombre
+
 
 class Producto(models.Model):
     class Talla(models.TextChoices):
@@ -27,7 +22,7 @@ class Producto(models.Model):
         LARGE = 'L', 'Large'
         EXTRA_LARE = 'XL', 'Extra Large'
     id = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=255, unique=True)
+    codigo = models.CharField(max_length=255)
     nombre = models.CharField(max_length=24)
     descripcion = models.CharField(max_length=255)
     precio_referencial = models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
@@ -36,10 +31,27 @@ class Producto(models.Model):
     valor_presentacion=models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
     talla = models.CharField(max_length=3, choices=Talla.choices)
     unidad_presentacion = models.PositiveIntegerField()
-    inventario=models.ForeignKey(Inventario, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.codigo + ' - ' + self.nombre
+
+class Inventario(models.Model):
+    id = models.AutoField(primary_key=True)
+    producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
+    precio = models.DecimalField(max_digits=4, decimal_places=2)
+    stock = models.PositiveIntegerField()
+    def __str__(self):
+        return self.nombre
+
+class ProductoDescuento(models.Model):
+    id = models.AutoField(primary_key=True)
+    producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
+    porcentaje_descuento=models.PositiveIntegerField()
+    fecha_hora_desde=models.DateTimeField()
+    fecha_hora_hasta=models.DateTimeField()
+    estado=models.BooleanField(default=True)
+    def __str__(self):
+        return str(self.producto) +"-"+str(self.porcentaje_descuento)+"-"+ self.estado
 
 class Notificacion(models.Model):
     id = models.AutoField(primary_key=True)
@@ -57,13 +69,3 @@ class NotificacionUsuario(models.Model):
     def __str__(self):
         return str(self.sender_id) +"-"+ str(self.receiver_id)
 
-    
-class ProductoDescuento(models.Model):
-    id = models.AutoField(primary_key=True)
-    producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
-    porcentaje_descuento=models.DecimalField(max_digits=3,decimal_places=2)
-    fecha_hora_desde=models.DateTimeField()
-    fecha_hora_hasta=models.DateTimeField()
-    estado=models.CharField(max_length=24)
-    def __str__(self):
-        return str(self.producto) +"-"+str(self.porcentaje_descuento)+"-"+ self.estado

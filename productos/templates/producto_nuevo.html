@@ -16,18 +16,30 @@
     <hr>
     {% if form.imagen.value %}
     <p style="margin:1%;">Imagen</p>
-    <img src="{{form.imagen.value.url}}" alt="logo_sponsor" name="imagen" id="imagen" width="120" height="120" class="mb-3 img-thumbnail">
+    <img src="{{form.imagen.value.url}}" alt="logo_sponsor" name="imagen" id="imagen" width="120" height="120"
+      class="mb-3 img-thumbnail">
     {% endif %}
     <form method="POST" novalidate enctype="multipart/form-data">
-      {% csrf_token %}
-      {% crispy form %}
-      <div class="d-none" id="img-cont">
-        <b>Preview de foto</b>
-        <br>
-        <img id="img-id" src="#" alt="imagen cargada" class="img-thumbnail w-50" />
+      <div>
+        {% csrf_token %}
+        {{ form.non_form_errors }}
+        {% crispy form %}
+        {{ product_meta_formset.non_form_errors }}
+        {{ product_meta_formset.management_form }}
+        {% for form2 in product_meta_formset %}
+        {% crispy form2 %}
+        {% endfor %}
+
+
+        <div class="d-none" id="img-cont">
+          <b>Preview de foto</b>
+          <br>
+          <img id="img-id" src="#" alt="imagen cargada" class="img-thumbnail w-50" />
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar">
+
       </div>
-      <hr>
-      <input type="submit" class="btn btn-primary" value="Guardar">
+
     </form>
   </div>
 </div>

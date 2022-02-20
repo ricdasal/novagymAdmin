@@ -23,7 +23,7 @@ class CategoriaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ('codigo','inventario','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion')
+        fields = ('codigo','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion')
 
         valor_presentacion=forms.DecimalField(min_value=0),
         precio_referencial=forms.DecimalField(min_value=0)
@@ -52,9 +52,9 @@ class ProductoForm(forms.ModelForm):
                 Column('valor_presentacion', css_class='col-6'),
                 Column('unidad_presentacion', css_class='col-6'),
                 Column('precio_referencial', css_class='col-6'),
-                Column('inventario_id', css_class='col-6'),
             ),
         )
+
 
 class InventarioForm(forms.ModelForm):
     class Meta:
@@ -81,10 +81,15 @@ class InventarioForm(forms.ModelForm):
 class DescuentoForm(forms.ModelForm):
     class Meta:
         model = ProductoDescuento
-        fields = ('producto','porcentaje_descuento', 'fecha_hora_desde','fecha_hora_hasta','estado')
-
+        fields = ('porcentaje_descuento', 'producto', 'fecha_hora_desde','fecha_hora_hasta','estado')
+        widgets={
+            "fecha_inicio": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'}),
+            "fecha_fin": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'})
+        }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
+
+ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)

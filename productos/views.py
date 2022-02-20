@@ -1,6 +1,7 @@
+from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import redirect, render
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
@@ -277,8 +278,74 @@ def deleteCategoria(request,pk):
 
 class CrearProducto(CreateView):
     form_class =ProductoForm
-    inventario_form_class=InventarioForm
-    model=Producto
     template_name = 'producto_nuevo.html'
     title = "CREAR PRODUCTO"
-    success_url = reverse_lazy('productos:listarProductos')
+
+    def get_context_data(self, **kwargs):
+        context = super(CrearProducto, self).get_context_data(**kwargs)
+        context['product_meta_formset'] = ProductoMeta()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        product_meta_formset = ProductoMeta(self.request.POST)
+        if form.is_valid() and product_meta_formset.is_valid():
+            return self.form_valid(form, product_meta_formset)
+        else:
+            return self.form_invalid(form, product_meta_formset)
+        
+    def form_valid(self, form, product_meta_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        # saving ProductMeta Instances
+        product_metas = product_meta_formset.save(commit=False)
+        for meta in product_metas:
+            meta.producto = self.object
+            meta.save()
+        return redirect(reverse("productos:listarProductos"))
+    def form_invalid(self, form, product_meta_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                product_meta_formset=product_meta_formset
+                                )
+        )
+
+class UpdateProducto(UpdateView):
+    model=Producto
+    form_class =ProductoForm
+    template_name = 'producto_nuevo.html'
+    title = "ACTUALIZAR PRODUCTO"
+    
+    def get_context_data(self, **kwargs):
+        context = super(UpdateProducto, self).get_context_data(**kwargs)
+        context['product_meta_formset'] = ProductoMeta()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        product_meta_formset = ProductoMeta(self.request.POST)
+        if form.is_valid() and product_meta_formset.is_valid():
+            return self.form_valid(form, product_meta_formset)
+        else:
+            return self.form_invalid(form, product_meta_formset)
+        
+    def form_valid(self, form, product_meta_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        # saving ProductMeta Instances
+        product_metas = product_meta_formset.save(commit=False)
+        for meta in product_metas:
+            meta.producto = self.object
+            meta.save()
+        return redirect(reverse("productos:listarProductos"))
+    def form_invalid(self, form, product_meta_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                product_meta_formset=product_meta_formset
+                                )
+        )
+    

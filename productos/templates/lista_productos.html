@@ -48,8 +48,9 @@
           <p>Stock: {{ producto.inventario.stock }}</p>
         </td>
         <td>
-          <a href="" class="btn btn-sm btn-primary">
+          <a href="{%url 'productos:UpdateProducto' producto.id%}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit "></i></a>
+
           <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
           data-url="" href="#">
             <i class="fas fa-times"></i></a>
