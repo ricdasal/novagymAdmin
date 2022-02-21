@@ -291,6 +291,7 @@ class CrearProducto(CreateView):
     def get_context_data(self, **kwargs):
         context = super(CrearProducto, self).get_context_data(**kwargs)
         context['product_meta_formset'] = ProductoMeta()
+        context['descuento_meta_formset'] = DescuentoMeta()
         return context
     
     def post(self, request, *args, **kwargs):
@@ -298,17 +299,22 @@ class CrearProducto(CreateView):
         form_class = self.get_form_class()
         form = self.get_form(form_class)
         product_meta_formset = ProductoMeta(self.request.POST)
-        if form.is_valid() and product_meta_formset.is_valid():
-            return self.form_valid(form, product_meta_formset)
+        descuento_meta_formset = DescuentoMeta(self.request.POST)
+        if form.is_valid() and product_meta_formset.is_valid() and descuento_meta_formset.is_valid():
+            return self.form_valid(form, product_meta_formset,descuento_meta_formset)
         else:
             return self.form_invalid(form, product_meta_formset)
         
-    def form_valid(self, form, product_meta_formset):
+    def form_valid(self, form, product_meta_formset,descuento_meta_formset):
         self.object = form.save(commit=False)
         self.object.save()
         # saving ProductMeta Instances
         product_metas = product_meta_formset.save(commit=False)
         for meta in product_metas:
+            meta.producto = self.object
+            meta.save()
+        descuento_metas = descuento_meta_formset.save(commit=False)
+        for meta in descuento_metas:
             meta.producto = self.object
             meta.save()
         return redirect(reverse("productos:listarProductos"))

@@ -2,6 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from .models import *
 from crispy_forms.layout import Column, Div, Field, Layout, Row
+
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
@@ -58,11 +59,12 @@ class ProductoForm(forms.ModelForm):
 
 class InventarioForm(forms.ModelForm):
     class Meta:
+        fields = ('precio','stock')
         model = Inventario  
 
         precio=forms.DecimalField(min_value=0)
 
-        fields = ('precio','stock')
+        
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -81,15 +83,32 @@ class InventarioForm(forms.ModelForm):
 class DescuentoForm(forms.ModelForm):
     class Meta:
         model = ProductoDescuento
-        fields = ('porcentaje_descuento', 'producto', 'fecha_hora_desde','fecha_hora_hasta','estado')
-        widgets={
-            "fecha_inicio": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'}),
-            "fecha_fin": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'})
+        fields = ('porcentaje_descuento', 'fecha_hora_desde','fecha_hora_hasta','estado')
+        labels = {
+            "estado": "Descuento activo"
         }
+        
+        widgets={
+            "porcentaje_descuento":forms.NumberInput(attrs={'min':0,'max': 100}),
+            "fecha_hora_hasta": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'}),
+            "fecha_hora_desde": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'})
+        }
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('porcentaje_descuento', css_class='col-6'),
+                Column('estado', css_class='col-6')
+            ),
+            Row(
+                Column('fecha_hora_desde', css_class='col-6'),
+                Column('fecha_hora_hasta', css_class='col-6')
+            )
+        )
 
 ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
+DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)

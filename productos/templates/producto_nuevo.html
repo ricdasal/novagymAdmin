@@ -1,6 +1,9 @@
 {% extends "main.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+{% endblock specific_head %}
 
 {% block main %}
 <div class="row mt-4">
@@ -23,13 +26,21 @@
       <div>
         {% csrf_token %}
         {{ form.non_form_errors }}
+        {{form.media}}
         {% crispy form %}
         {{ product_meta_formset.non_form_errors }}
         {{ product_meta_formset.management_form }}
+        {{ product_meta_formset.media }}
         {% for form2 in product_meta_formset %}
         {% crispy form2 %}
         {% endfor %}
-
+        
+        {{ descuento_meta_formset.non_form_errors }}
+        {{ descuento_meta_formset.management_form }}
+        {{ descuento_meta_formset.media }}
+        {% for form3 in descuento_meta_formset %}
+        {% crispy form3 %}
+        {% endfor %}
 
         <div class="d-none" id="img-cont">
           <b>Preview de foto</b>
@@ -46,4 +57,8 @@
 {% endblock main %}
 {% block specific_scripts %}
 <script type="text/javascript" src="{% static 'js/utilsImages.js' %}"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js" integrity="sha512-k6/Bkb8Fxf/c1Tkyl39yJwcOZ1P4cRrJu77p83zJjN2Z55prbFHxPs9vN7q3l3+tSMGPDdoH51AEU8Vgo1cgAA==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg==" crossorigin="anonymous" />
 {% endblock specific_scripts %}
