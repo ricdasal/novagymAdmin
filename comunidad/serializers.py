@@ -59,10 +59,11 @@ class ComentarioSerializer(serializers.ModelSerializer):
 
 class SeguidorSerializer(serializers.ModelSerializer):
     seguidor_info = serializers.ReadOnlyField()
+    siguiendo = serializers.ReadOnlyField()
 
     class Meta:
         model = Seguidor
-        fields = ['usuario', 'seguidor', 'seguidor_info']
+        fields = ['usuario', 'seguidor', 'seguidor_info', 'siguiendo']
         extra_kwargs = {"usuario": {"write_only": True, 'required': True}}
 
     def create(self, validated_data):

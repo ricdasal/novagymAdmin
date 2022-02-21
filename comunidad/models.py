@@ -70,6 +70,14 @@ class Seguidor(models.Model):
         data = usuario_detalle(self.seguidor)
         data.update(self.biografia_info(self.seguidor))
         return data
+    
+    @property
+    def siguiendo(self):
+        try:
+            Seguidor.objects.get(usuario=self.seguidor, seguidor=self.usuario)
+            return True
+        except Seguidor.DoesNotExist:
+            return False
         
 
 
@@ -88,9 +96,15 @@ class Publicacion(models.Model):
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
 
+    def biografia_info(self, usuario):
+        biografia = Biografia.objects.get(usuario=usuario)
+        return { "foto_perfil": biografia.foto_perfil.url }
+
     @property
     def usuario_info(self):
-        return usuario_detalle(self.usuario)
+        data = usuario_detalle(self.usuario)
+        data.update(self.biografia_info(self.usuario))
+        return data
 
     @property
     def comentarios(self):
@@ -161,9 +175,15 @@ class Comentario(models.Model):
     def count_comentarios_hijos(self):
         return Comentario.objects.filter(comentario_padre=self).all().count()
     
+    def biografia_info(self, usuario):
+        biografia = Biografia.objects.get(usuario=usuario)
+        return { "foto_perfil": biografia.foto_perfil.url }
+
     @property
     def usuario_info(self):
-        return usuario_detalle(self.usuario)
+        data = usuario_detalle(self.usuario)
+        data.update(self.biografia_info(self.usuario))
+        return data
 
     @property
     def comentarios_hijo(self):
