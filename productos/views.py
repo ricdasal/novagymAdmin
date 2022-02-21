@@ -1,6 +1,7 @@
+from django.forms import formset_factory, inlineformset_factory
 from django.shortcuts import redirect, render
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
@@ -262,7 +263,14 @@ class ListarProductos(FilterView):
         context['title'] = "Productos"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        inventario = Inventario.objects.all()
+        producto = Producto.objects.all()
+        combo= zip(inventario,producto)
+        context['combo'] = combo
         return context
+        
+    def post(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -277,8 +285,89 @@ def deleteCategoria(request,pk):
 
 class CrearProducto(CreateView):
     form_class =ProductoForm
-    inventario_form_class=InventarioForm
-    model=Producto
     template_name = 'producto_nuevo.html'
     title = "CREAR PRODUCTO"
-    success_url = reverse_lazy('productos:listarProductos')
+
+    def get_context_data(self, **kwargs):
+        context = super(CrearProducto, self).get_context_data(**kwargs)
+        context['product_meta_formset'] = ProductoMeta()
+        context['descuento_meta_formset'] = DescuentoMeta()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        product_meta_formset = ProductoMeta(self.request.POST)
+        descuento_meta_formset = DescuentoMeta(self.request.POST)
+        if form.is_valid() and product_meta_formset.is_valid() and descuento_meta_formset.is_valid():
+            return self.form_valid(form, product_meta_formset,descuento_meta_formset)
+        else:
+            return self.form_invalid(form, product_meta_formset)
+        
+    def form_valid(self, form, product_meta_formset,descuento_meta_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        # saving ProductMeta Instances
+        product_metas = product_meta_formset.save(commit=False)
+        for meta in product_metas:
+            meta.producto = self.object
+            meta.save()
+        descuento_metas = descuento_meta_formset.save(commit=False)
+        for meta in descuento_metas:
+            meta.producto = self.object
+            meta.save()
+        return redirect(reverse("productos:listarProductos"))
+    def form_invalid(self, form, product_meta_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                product_meta_formset=product_meta_formset
+                                )
+        )
+
+class UpdateProducto(UpdateView):
+    model=Producto
+    form_class =ProductoForm
+    template_name = 'producto_nuevo.html'
+    title = "ACTUALIZAR PRODUCTO"
+    
+    def get_context_data(self, **kwargs):
+        context = super(UpdateProducto, self).get_context_data(**kwargs)
+        context['product_meta_formset'] = ProductoMeta()
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        product_meta_formset = ProductoMeta(self.request.POST)
+        if form.is_valid() and product_meta_formset.is_valid():
+            return self.form_valid(form, product_meta_formset)
+        else:
+            return self.form_invalid(form, product_meta_formset)
+        
+    def form_valid(self, form, product_meta_formset):
+        self.object = form.save(commit=False)
+        self.object.save()
+        # saving ProductMeta Instances
+        product_metas = product_meta_formset.save(commit=False)
+        for meta in product_metas:
+            meta.producto = self.object
+            meta.save()
+        return redirect(reverse("productos:listarProductos"))
+    def form_invalid(self, form, product_meta_formset):
+        return self.render_to_response(
+            self.get_context_data(form=form,
+                                product_meta_formset=product_meta_formset
+                                )
+        )
+    
+def deleteProducto(request,pk):
+    producto = Producto.objects.get(id=pk)
+    inventario = Inventario.objects.get(id=pk)
+    if request.POST:
+        inventario.delete()
+        producto.delete()
+        messages.success(request, "Producto eliminado con éxito.")
+        return redirect('productos:listarProductos')
+    return render(request, "ajax/sponsor_confirmar_elminar.html", {"producto": producto})

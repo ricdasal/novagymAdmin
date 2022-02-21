@@ -13,6 +13,8 @@ urlpatterns = [
 
      #Producto
 
+     path('deleteProducto/<int:pk>', deleteProducto, name='deleteProducto'),
+     path('UpdateProducto/<int:pk>', UpdateProducto.as_view(), name='UpdateProducto'),
      path('CrearProducto/', CrearProducto.as_view(), name='CrearProducto'),
      path('listarProductos/', ListarProductos.as_view(), name='listarProductos'),
      path('producto-list/', productoList, name='producto-overview'),

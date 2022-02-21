@@ -14,6 +14,7 @@ from novagym.utils import calculate_pages_to_render
 from datetime import date
 from .models import *
 from django.contrib import messages
+import json
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 # Create your views here.
@@ -118,3 +119,10 @@ def ChangeState(request,pk):
         messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
     query.save()
     return redirect('sponsor:listar')
+
+def getAllSponsorImages(request):
+    urls={}
+    sponsors=Sponsor.objects.all()
+    for sponsor in sponsors:
+        urls[sponsor.nombre]=sponsor.imagen
+    return HttpResponse(json.dumps(urls))
