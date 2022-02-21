@@ -30,7 +30,7 @@
         <th scope="col">Acciones</th>
       </tr>
       {% if page_obj %}
-      {% for producto in page_obj %}
+      {% for inventario, producto in combo %}
       <tr>
         <td><img style="width: 150px; height: 150px;" src="{{producto.imagen}}" alt=""></td>
         <td>
@@ -43,16 +43,16 @@
 
           <p>Valor presentación: ${{ producto.valor_presentacion }}</p>
           <p>Precio referencial: ${{ producto.precio_referencial }}</p>
-          <p>Precio: ${{ precio }}</p>
+          <p>Precio: ${{ inventario.precio }}</p>
           <p>Unidad presentación: {{ producto.unidad_presentacion }}</p>
-          <p>Stock: {{ producto.inventario.stock }}</p>
+          <p>Stock: {{ inventario.stock }}</p>
         </td>
         <td>
           <a href="{%url 'productos:UpdateProducto' producto.id%}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit "></i></a>
 
-          <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-          data-url="" href="#">
+          <a class="btn btn-sm btn-danger use-modal"
+           href="{%url 'productos:deleteProducto' producto.id%}">
             <i class="fas fa-times"></i></a>
         </td>
       </tr>

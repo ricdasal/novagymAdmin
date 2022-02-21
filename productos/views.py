@@ -263,7 +263,14 @@ class ListarProductos(FilterView):
         context['title'] = "Productos"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        inventario = Inventario.objects.all()
+        producto = Producto.objects.all()
+        combo= zip(inventario,producto)
+        context['combo'] = combo
         return context
+        
+    def post(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
@@ -349,3 +356,12 @@ class UpdateProducto(UpdateView):
                                 )
         )
     
+def deleteProducto(request,pk):
+    producto = Producto.objects.get(id=pk)
+    inventario = Inventario.objects.get(id=pk)
+    if request.POST:
+        inventario.delete()
+        producto.delete()
+        messages.success(request, "Producto eliminado con éxito.")
+        return redirect('productos:listarProductos')
+    return render(request, "ajax/sponsor_confirmar_elminar.html", {"producto": producto})
