@@ -60,7 +60,7 @@ class PublicacionView(viewsets.ViewSet):
             return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
-        publicaciones = Publicacion.objects.all()
+        publicaciones = Publicacion.objects.filter(visible=True).all()
 
         paginator = PageNumberPagination()
         paginator.page_size = 10
@@ -150,6 +150,24 @@ class PublicacionUsuarioView(viewsets.ViewSet):
         paginated_response = paginator.get_paginated_response(serializer.data)
 
         return Response(paginated_response.data, status=status.HTTP_200_OK)
+
+
+class ReportarPublicacionView(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def partial_update(self, request, pk):
+        data = request.data
+        try:
+            publicacion = Publicacion.objects.get(pk=pk)
+            if 'motivo' not in data:
+                return Response(status=status.HTTP_400_BAD_REQUEST) 
+            data['visible'] = False
+            publicacion.motivo = data['motivo']
+            publicacion.visible = False
+            publicacion.save()
+            return Response(status=status.HTTP_200_OK)
+        except Publicacion.DoesNotExist:
+            return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
 
 class ComentarioView(viewsets.ViewSet):
