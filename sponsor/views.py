@@ -78,7 +78,7 @@ class ListarSponsors(FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "Sponsors"
+        context['title'] = "ANUNCIANTES"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
@@ -86,8 +86,9 @@ class ListarSponsors(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-def deleteSponsor(request,pk):
-    query = Sponsor.objects.get(id=pk)
+@login_required()
+def deleteSponsor(request,id):
+    query = Sponsor.objects.get(id=id)
     if request.POST:
         query.delete()
         messages.success(request, "Anunciante eliminado con éxito.")

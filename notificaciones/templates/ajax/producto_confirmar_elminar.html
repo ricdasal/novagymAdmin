@@ -1,21 +1,20 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar sponsor</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar producto</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-{% csrf_token %}
-<form method="POST" action="{% url 'sponsor:eliminar' sponsor.id %}">
+<form method="POST" action="{%url 'productos:deleteProducto' producto.id%}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente sponsor?
+    ¿Desea eliminar el siguiente producto?
     <div class="row">
       <div class="col-3">
         Código
       </div>
       <div class="col">
-        {{sponsor.codigo}}
+        {{producto.codigo}}
       </div>
     </div>
     <div class="row">
@@ -23,7 +22,7 @@
         Nombre
       </div>
       <div class="col">
-        {{sponsor.nombre}}
+        {{producto.nombre}}
       </div>
     </div>
     <div class="row">
@@ -31,7 +30,7 @@
         Descripción
       </div>
       <div class="col">
-        {{sponsor.descripcion}}
+        {{producto.descripcion}}
       </div>
     </div>
     <div class="row">
@@ -39,7 +38,7 @@
         Imagen
       </div>
       <div class="col">
-        <img src="{{sponsor.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="{{producto.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>
