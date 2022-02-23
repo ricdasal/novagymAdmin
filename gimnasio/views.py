@@ -1,14 +1,22 @@
+from django.forms import BooleanField
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
 from django.shortcuts import render
+from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
-from django.shortcuts import redirect, render
-from django.shortcuts import render
-from gimnasio.forms import GimnasioForm
+from django_filters.views import FilterView
+from .forms import *
 from .serializers import *
 from django.core.mail import send_mail
-
+from novagym.utils import calculate_pages_to_render
+from datetime import date
 from .models import *
+from django.contrib import messages
+import json
+from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView, UpdateView
 
 # Create your views here.
 #Gimnasio - Contacto
@@ -51,12 +59,42 @@ def gimnasioDelete(request,id):
     except:
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def createGimnasio(request):
-    if request.method=='POST':
-        form = GimnasioForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("gimnasio:createGimnasio")
-    else:
-        form=GimnasioForm()
-    return render(request,'createGimnasio.html',{'form':form})
+class ListarGimnasio(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Gimnasio
+    context_object_name = 'gimnasio'
+    template_name = "lista_gimnasio.html"
+    permission_required = 'novagym.view_empleado'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "GIMNASIOS"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class CrearGimnasio(CreateView):
+    form_class =GimnasioForm
+    model=Gimnasio
+    template_name = 'gimnasio_nuevo.html'
+    title = "CREAR SPONSOR"
+    success_url = reverse_lazy('gimnasio:listar')
+
+class UpdateGimnasio(UpdateView):
+    form_class =GimnasioForm
+    model=Gimnasio
+    title = "ACTUALIZAR SPONSOR"
+    template_name = 'sponsor_nuevo.html'
+    success_url = reverse_lazy('gimnasio:listar')
+
+def deleteGimnasio(request,id):
+    query = Gimnasio.objects.get(id=id)
+    if request.POST:
+        query.delete()
+        messages.success(request, "Gimnasio eliminado con éxito.")
+        return redirect('gimnasio:listar')
+    return render(request, "ajax/gimnasio_confirmar_elminar.html", {"gimnasio": query})

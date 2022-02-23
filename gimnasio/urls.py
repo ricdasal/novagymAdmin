@@ -6,7 +6,9 @@ app_name = GimnasioConfig.name
 
 urlpatterns = [
      #Gimnasio-Contacto
-     path('create/',createGimnasio,name='createGimnasio'),
+     path('listar/',ListarGimnasio.as_view(),name='listar'),
+     path('crear/',CrearGimnasio.as_view(),name='crear'),
+     path('eliminar/<int:id>',deleteGimnasio,name='eliminar'),
      path('gimnasio-list/', gimnasioList, name='gimnasio-overview'),
      path('gimnasio-detail/<str:id>', gimnasioDetail, name='gimnasio-detail'),
      path('gimnasio-create/', gimnasioCreate, name='gimnasio-create'),

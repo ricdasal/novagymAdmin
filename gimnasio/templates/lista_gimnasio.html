@@ -2,17 +2,20 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock specific_head %}
+
 {% block main %}
 <div class="row mt-4">
   <div class="col">
-    <h2 class="text-left">CATEGORÍAS</h2>
+    <h2 class="text-left">{{title}}</h2>
   </div>
   <div class="col">
-    <a href="{% url 'productos:crearCategoria' %}" class="btn btn-primary float-right">Agregar categoría <i
+    <a href="{% url 'gimnasio:crear' %}" class="btn btn-primary float-right">Agregar gimnasio <i
         class="fas fa-plus-circle"> </i></a>
-    <a href="{% url 'productos:listarProductos' %}" class="btn btn-primary float-right"
-      style="margin-right: 2%;">Regresar
-      <i class="fas fa-arrow-alt-circle-left"></i></a>
   </div>
   <hr>
 </div>
@@ -28,21 +31,41 @@
         <tr>
           <th scope="col">Imágen</th>
           <th scope="col">Nombre</th>
+          <!-- <th scope="col">Tipo</th> -->
+          <th scope="col">Teléfono</th>
+          <th scope="col">Ubicación</th>
+          <th scope="col">Horarios</th>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Aforo</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% if page_obj %}
-        {% for categoria in page_obj %}
+        {% for gimnasio in page_obj %}
         <tr class="text-center">
-          <td scope="row"><img style="width: 80px; height: 80px;" src="{{categoria.imagen}}" alt=""></td>
-          <td>{{categoria.nombre}}</td>
+          <td scope="row"><img style="width: 80px; height: 80px;" src="{{gimnasio.imagen}}" alt=""></td>
+          <td>{{gimnasio.nombre}}</td>
+          <!-- <td>{{gimnasio.tipo}}</td> -->
+          <td>{{gimnasio.telefono}}</td>
+          <td>{{gimnasio.ubicacion}}</td>
+          <td>{{gimnasio.horario_inicio}} - {{gimnasio.horario_fin}}</td>
+          <td>{{gimnasio.ciudad}}</td>
+          <td>{{gimnasio.estado}}</td>
+          <td>{{gimnasio.aforo}}%</td>
           <td>
             <a href="" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-              data-url="{%url 'productos:deleteCategoria' categoria.id %}" href="#"><i class="fas fa-times"></i></a>
+
+            <a class="btn btn-sm btn-warning" href=""><i class="fas fa-power-off "></i></a>
+
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" 
+            data-url="{% url 'gimnasio:eliminar' gimnasio.id %}"
+              href="#">
+              <i class="fas fa-times "></i></a>
           </td>
+
         </tr>
         {% endfor %}
         {% else %}
