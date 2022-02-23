@@ -28,19 +28,7 @@
         {{ form.non_form_errors }}
         {{form.media}}
         {% crispy form %}
-        {{ product_meta_formset.non_form_errors }}
-        {{ product_meta_formset.management_form }}
-        {{ product_meta_formset.media }}
-        {% for form2 in product_meta_formset %}
-        {% crispy form2 %}
-        {% endfor %}
-        
-        {{ descuento_meta_formset.non_form_errors }}
-        {{ descuento_meta_formset.management_form }}
-        {{ descuento_meta_formset.media }}
-        {% for form3 in descuento_meta_formset %}
-        {% crispy form3 %}
-        {% endfor %}
+
 
         <div class="d-none" id="img-cont">
           <b>Preview de foto</b>

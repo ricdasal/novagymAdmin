@@ -14,4 +14,6 @@ urlpatterns = [
      path('deleteNotificacion/<int:pk>/', deleteNotificacion, name='deleteNotificacion'),
      path('crear/', CrearNotificacion.as_view(), name='crear'),
      path('editar/<str:pk>', UpdateNotificacion.as_view(), name='update'),
+     path('eliminar/<int:id>', deleteNotificacion, name='eliminar'),
+     path('change/<str:pk>', ChangeState, name='change'),
 ]

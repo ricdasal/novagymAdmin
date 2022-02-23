@@ -76,13 +76,13 @@ class ListarNotificacion(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-def deleteNotificacion(request,pk):
-    query = Notificacion.objects.get(id=pk)
+def deleteNotificacion(request,id):
+    query = Notificacion.objects.get(id=id)
     if request.POST:
         query.delete()
         messages.success(request, "Notificacion eliminada con éxito.")
         return redirect('notificaciones:listar')
-    return render(request, "ajax/sponsor_confirmar_elminar.html", {"notificacion": query})
+    return render(request, "ajax/notificacion_confirmar_elminar.html", {"notificacion": query})
 
 class CrearNotificacion(CreateView):
     form_class =NotificacionForm
@@ -97,3 +97,15 @@ class UpdateNotificacion(UpdateView):
     title = "ACTUALIZAR NOTIFICACION"
     template_name = 'notificacion_nueva.html'
     success_url = reverse_lazy('notificaciones:listar')
+
+def ChangeState(request,pk):
+    query = Notificacion.objects.get(id=pk)
+    print(query.activo)
+    if query.activo==0:
+        query.activo=1
+        messages.success(request, "Notificación habilitada.")
+    elif query.activo==1:
+        query.activo=0
+        messages.success(request, "Notificación deshabilitada.")
+    query.save()
+    return redirect('notificaciones:listar')

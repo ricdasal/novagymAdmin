@@ -1,36 +1,44 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar producto</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar notificación</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<form method="POST" action="{%url 'productos:deleteProducto' producto.id%}">
+<form method="POST" action="{%url 'notificaciones:eliminar' notificacion.id%}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente producto?
+    ¿Desea eliminar la siguiente notificación?
     <div class="row">
       <div class="col-3">
-        Código
+        Título
       </div>
       <div class="col">
-        {{producto.codigo}}
+        {{notificacion.titulo}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Nombre
+        Inicio
       </div>
       <div class="col">
-        {{producto.nombre}}
+        {{notificacion.fecha_hora_inicio}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Descripción
+        Fin
       </div>
       <div class="col">
-        {{producto.descripcion}}
+        {{notificacion.fecha_hora_fin}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Frecuencia
+      </div>
+      <div class="col">
+        {{notificacion.frecuencia}}
       </div>
     </div>
     <div class="row">
@@ -38,7 +46,7 @@
         Imagen
       </div>
       <div class="col">
-        <img src="{{producto.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="{{notificacion.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>
