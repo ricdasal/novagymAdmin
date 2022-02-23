@@ -87,8 +87,8 @@ class CrearGimnasio(CreateView):
 class UpdateGimnasio(UpdateView):
     form_class =GimnasioForm
     model=Gimnasio
-    title = "ACTUALIZAR SPONSOR"
-    template_name = 'sponsor_nuevo.html'
+    title = "ACTUALIZAR GIMNASIO"
+    template_name = 'gimnasio_nuevo.html'
     success_url = reverse_lazy('gimnasio:listar')
 
 def deleteGimnasio(request,id):
@@ -98,3 +98,21 @@ def deleteGimnasio(request,id):
         messages.success(request, "Gimnasio eliminado con éxito.")
         return redirect('gimnasio:listar')
     return render(request, "ajax/gimnasio_confirmar_elminar.html", {"gimnasio": query})
+
+def changeState(request,pk):
+    gimnasio=Gimnasio.objects.get(id=pk)
+    if gimnasio.estado:
+        gimnasio.estado=False
+    else:
+        gimnasio.estado=True
+    gimnasio.save()
+    return redirect('gimnasio:listar')
+
+def changeAforo(request):
+    gimnasios=Gimnasio.objects.all()
+    aforoGlobal = request.GET.get('aforo')
+    if aforoGlobal:
+        for gimnasio in gimnasios:
+            gimnasio.aforo=aforoGlobal
+            gimnasio.save()
+    return redirect('gimnasio:listar')

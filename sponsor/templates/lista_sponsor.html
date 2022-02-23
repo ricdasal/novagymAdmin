@@ -67,9 +67,14 @@
             <a href="{% url 'sponsor:update' sponsor.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
+              {% if sponsor.activo %}
+            <a class="btn btn-sm btn-success" 
+               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
+              {% else %}
             <a class="btn btn-sm btn-warning" 
                href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
 
+               {%endif%}
                <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
                data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
                  <i class="fas fa-times "></i></a>
