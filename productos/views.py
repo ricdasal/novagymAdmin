@@ -275,8 +275,8 @@ class ListarProductos(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-def deleteCategoria(request,pk):
-    query = Categoria.objects.get(id=pk)
+def deleteCategoria(request,id):
+    query = Categoria.objects.get(id=id)
     if request.POST:
         query.delete()
         messages.success(request, "Categoria eliminada con éxito.")
@@ -362,12 +362,14 @@ class UpdateProducto(UpdateView):
                                 )
         )
     
-def deleteProducto(request,pk):
-    producto = Producto.objects.get(id=pk)
-    inventario = Inventario.objects.get(id=pk)
+def deleteProducto(request,id):
+    producto = Producto.objects.get(id=id)
+    inventario = Inventario.objects.get(id=id)
+    descuento = ProductoDescuento.objects.get(id=id)
     if request.POST:
+        descuento.delete()
         inventario.delete()
         producto.delete()
         messages.success(request, "Producto eliminado con éxito.")
         return redirect('productos:listarProductos')
-    return render(request, "ajax/sponsor_confirmar_elminar.html", {"producto": producto})
+    return render(request, "ajax/producto_confirmar_elminar.html", {"producto": producto})

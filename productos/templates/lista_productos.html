@@ -51,9 +51,10 @@
           <a href="{%url 'productos:UpdateProducto' producto.id%}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit "></i></a>
 
-          <a class="btn btn-sm btn-danger use-modal"
-           href="{%url 'productos:deleteProducto' producto.id%}">
-            <i class="fas fa-times"></i></a>
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+            data-url="{%url 'productos:deleteProducto' producto.id%}" href="#">
+              <i class="fas fa-times "></i></a>
+            
         </td>
       </tr>
       {% endfor %}
@@ -69,7 +70,11 @@
 {% endblock main %}
 
 {% block specific_scripts %}
-<script src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

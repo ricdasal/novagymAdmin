@@ -12,8 +12,8 @@ urlpatterns = [
      path('descuento/create/',createDescuento,name='createDescuento'),
 
      #Producto
-
-     path('deleteProducto/<int:pk>', deleteProducto, name='deleteProducto'),
+     
+     path('deleteProducto/<int:id>', deleteProducto, name='deleteProducto'),
      path('UpdateProducto/<int:pk>', UpdateProducto.as_view(), name='UpdateProducto'),
      path('CrearProducto/', CrearProducto.as_view(), name='CrearProducto'),
      path('listarProductos/', ListarProductos.as_view(), name='listarProductos'),
@@ -25,7 +25,7 @@ urlpatterns = [
 
      #Categoria
      
-     path('deleteCategoria/<str:pk>', deleteCategoria, name='deleteCategoria'),
+     path('deleteCategoria/<int:id>', deleteCategoria, name='deleteCategoria'),
      path('listarCategoria/', ListarCategoria.as_view(), name='listarCategoria'),
      path('crearCategoria/', crearCategoria.as_view(), name='crearCategoria'),
      path('categoria-list/', categoriaList, name='categoria-overview'),

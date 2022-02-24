@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from .models import *
 from crispy_forms.layout import Column, Div, Field, Layout, Row
-
+from .widgets import DateTimePickerInput
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
@@ -83,6 +83,7 @@ class InventarioForm(forms.ModelForm):
 class DescuentoForm(forms.ModelForm):
     class Meta:
         model = ProductoDescuento
+        
         fields = ('porcentaje_descuento', 'fecha_hora_desde','fecha_hora_hasta','estado')
         labels = {
             "estado": "Descuento activo"
@@ -90,8 +91,8 @@ class DescuentoForm(forms.ModelForm):
         
         widgets={
             "porcentaje_descuento":forms.NumberInput(attrs={'min':0,'max': 100}),
-            "fecha_hora_hasta": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'}),
-            "fecha_hora_desde": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'})
+            "fecha_hora_hasta": DateTimePickerInput(),
+            "fecha_hora_desde": DateTimePickerInput(),
         }
         
     def __init__(self, *args, **kwargs):

@@ -1,0 +1,37 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+<div class="row mt-4">
+  <div class="col-12 col-lg-8">
+    <h2>
+      <div class="row">
+        <div class="col-12 col-lg-6">ANUNCIANTE</div>
+        {% if form.codigo.value %}
+        <div class="col-12 col-lg-6 text-right">Código: {{form.codigo.value}}</div>
+        {% endif %}
+      </div>
+    </h2>
+    <hr>
+    {% if form.imagen.value %}
+    <p style="margin:1%;">Imagen</p>
+    <img src="{{form.imagen.value.url}}" alt="logo_sponsor" name="imagen" id="imagen" width="120" height="120" class="mb-3 img-thumbnail">
+    {% endif %}
+    <form method="POST" novalidate enctype="multipart/form-data">
+      {% csrf_token %}
+      {% crispy form %}
+      <div class="d-none" id="img-cont">
+        <b>Preview de foto</b>
+        <br>
+        <img id="img-id" src="#" alt="imagen cargada" class="img-thumbnail w-50" />
+      </div>
+      <hr>
+      <input type="submit" class="btn btn-primary" value="Guardar">
+    </form>
+  </div>
+</div>
+{% endblock main %}
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/utilsImages.js' %}"></script>
+{% endblock specific_scripts %}
