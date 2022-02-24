@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+from decimal import Decimal
+
+from almacenamiento.models import AlmacenamientoGlobal, AlmacenamientoUsuario
 from seguridad.models import UserDetails
 
 from seguridad.serializers import UserSerializer
@@ -124,12 +127,57 @@ class ArchivoPublicacion(models.Model):
         Publicacion, related_name='archivos', on_delete=models.CASCADE)
     archivo = models.FileField(upload_to='publicacion/')
     tipo = models.CharField(max_length=3, choices=MediaType.choices)
-    almacenamiento_utilizado = models.FloatField(default=0.0)
+    almacenamiento_utilizado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
 
     def delete(self, *args, **kwargs):
         if self.archivo and os.path.isfile(self.archivo.path):
             os.remove(self.archivo.path)
         super(ArchivoPublicacion, self).delete(*args, **kwargs)
+    
+    #aumentar el almacenamiento ocupado por el usuario
+    def aumentar_almacenamiento_usuario(self, usuario):
+        almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
+        almacenamiento.usado += self.almacenamiento_utilizado
+        print("usuario")
+        print(almacenamiento.usado)
+        almacenamiento.save()
+    
+    def aumentar_almacenamiento_global(self):
+        almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
+        almacenamiento.total_usado += self.almacenamiento_utilizado
+        print("servidor")
+        print(almacenamiento.total_usado)
+        almacenamiento.save()
+    
+    def reducir_almacenamiento_usuario(self, usuario):
+        almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
+        print("usuario")
+        print(almacenamiento.usado)
+        print("-")
+        print(self.almacenamiento_utilizado)
+        actual = almacenamiento.usado - self.almacenamiento_utilizado
+        if actual > 0:
+            almacenamiento.usado = actual
+        else:
+            almacenamiento.usado = 0
+        print("usuario")
+        print(almacenamiento.usado)
+        almacenamiento.save()
+    
+    def reducir_almacenamiento_global(self):
+        almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
+        print("servidor")
+        print(almacenamiento.total_usado)
+        print("-")
+        print(self.almacenamiento_utilizado)
+        print(almacenamiento.total_usado - self.almacenamiento_utilizado)
+        actual = almacenamiento.total_usado - self.almacenamiento_utilizado
+        if actual > 0:
+            almacenamiento.total_usado = actual
+        else:
+            almacenamiento.total_usado = 0
+        print(almacenamiento.total_usado)
+        almacenamiento.save()
 
 
 class Like(models.Model):
@@ -213,7 +261,7 @@ class Historia(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     archivo = models.FileField(upload_to='historias/', blank=True, null=True)
     tipo_archivo = models.CharField(max_length=3, choices=MediaType.choices, default="")
-    almacenamiento_utilizado = models.FloatField(default=0.0)
+    almacenamiento_utilizado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
 
     def delete(self, *args, **kwargs):
         if self.archivo and os.path.isfile(self.archivo.path):

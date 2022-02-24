@@ -5,6 +5,7 @@ from rest_framework import status, viewsets, permissions
 from .serializers import *
 from .models import Publicacion
 
+from almacenamiento.utils import almacenamiento_disponible_user, almacenamiento_disponible_servidor
 from .utils import fileb64decode, eliminar_archivo
 import random
 
@@ -82,15 +83,21 @@ class PublicacionView(viewsets.ViewSet):
                 return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             archivos[i]['tipo'] = resultado[0]
             archivos[i]['archivo'] = resultado[1]
+            archivos[i]['almacenamiento_utilizado'] = round(archivos[i]['almacenamiento_utilizado'], 2)
 
         data['archivos'] = archivos
         data['usuario'] = request.user.id
+
+        if not almacenamiento_disponible_user(request.user, data['archivos']):
+            return Response({"message": "Publicación supera la capacidad maxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+        if not almacenamiento_disponible_servidor(data['archivos']):
+            return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = PublicacionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
-        return Response({"message": "Error al crear la publicación"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def partial_update(self, request, pk):
         data = request.data
@@ -128,6 +135,8 @@ class PublicacionView(viewsets.ViewSet):
             if publicacion.usuario == request.user:
                 archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
                 for archivo in archivos:
+                    archivo.reducir_almacenamiento_usuario(publicacion.usuario)
+                    archivo.reducir_almacenamiento_global()
                     archivo.delete()
                 publicacion.delete()
                 return Response(status=status.HTTP_200_OK)

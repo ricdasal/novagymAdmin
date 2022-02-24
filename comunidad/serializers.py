@@ -1,5 +1,7 @@
 from dataclasses import fields
 from rest_framework import serializers
+from decimal import Decimal
+from almacenamiento.models import *
 from .models import *
 
 
@@ -33,7 +35,9 @@ class PublicacionSerializer(serializers.ModelSerializer):
         archivos = validated_data.pop('archivos')
         publicacion = Publicacion.objects.create(**validated_data)
         for archivo in archivos:
-            ArchivoPublicacion.objects.create(publicacion=publicacion, **archivo)
+            archivo = ArchivoPublicacion.objects.create(publicacion=publicacion, **archivo)
+            archivo.aumentar_almacenamiento_usuario(publicacion.usuario)
+            archivo.aumentar_almacenamiento_global()
         return publicacion
     
     def update(self, instance, validated_data):
