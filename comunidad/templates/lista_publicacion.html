@@ -1,0 +1,76 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+   <div class="row my-4">
+      <div class="col">
+      <h2 class="text-left">COMUNIDAD</h2>
+      </div>
+      <div class="col">
+      <a href="{% url 'comunidad:crear-publicacion' %}" class="btn btn-primary float-right">Crear Publicación <i
+            class="fas fa-plus-circle"> </i></a>
+      </div>
+      <hr>
+   </div>
+
+   <ul class="nav nav-tabs my-5">
+      <li class="nav-item">
+        <a class="nav-link {% if tipo == 'novagym' %} active {% endif %}" aria-current="page" href="{% url 'comunidad:publicacion_novagym' %}">Publicaciones Novagym</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if tipo == 'reporte' %} active {% endif %}" href="{% url 'comunidad:publicacion_reportada' %}">Publicaciones Reportadas</a>
+      </li>
+    </ul>
+
+   {% if page_obj %}
+      {% for publicacion in page_obj %}
+         {% if tipo == 'reporte' %}
+            <div class="card mx-auto mb-1" class="card" style="width: 35rem;">
+               <div class="card-body">
+                  <h5 class="card-subtitle text-muted">Motivo del reporte:</h5>
+                  <p class="card-text">{{ publicacion.motivo }}</p>
+               </div>
+            </div>
+         {% endif %}
+         <div class="card mx-auto mb-5" style="width: 35rem;">
+            {% for archivo in publicacion.archivos_publicacion %}
+               {% if archivo.tipo == 'AUD' %}
+                  <audio class="mx-auto mt-3" style="width: 25rem;"  controls>
+                     <source src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" type="audio/mpeg">
+                     Your browser does not support the audio element.
+               </audio>
+               {% elif archivo.tipo == 'IMG' %}
+                  <img src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" class="card-img-top" alt="">
+               {% else %}
+                  <video width="320" height="240" controls>
+                     <source src="'http://localhost:8000'|add:archivo.archivo.url }}" type="video/mp4"> Your browser does not support the video tag.
+               </video>
+               {% endif %}
+            {% endfor %}
+            <div class="card-body">
+            <h5 class="card-title">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
+            <p class="card-text">{{ publicacion.texto }}</p> 
+            {% if tipo == 'reporte' %}   
+               <a class="btn btn-primary use-modal" class='use-modal' data-toggle='modal' data-target='#mainModal' 
+                  href='#' role="button" data-url-activar="{% url 'comunidad:aceptar-publicacion' publicacion.pk %}">Aceptar</a>
+               <a class="btn btn-danger" href="{%url 'comunidad:eliminar-publicacion' publicacion.pk%}" role="button">Eliminar</a>
+            {% endif %}
+            </div>
+         </div>
+      {% endfor %}
+   {% else %}
+      <h4>
+         No se encontraron datos.
+      </h4>
+   {% endif %}
+   {% include "pagination.html" %}
+
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+{% endblock %}
+

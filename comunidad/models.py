@@ -90,14 +90,14 @@ class Publicacion(models.Model):
         ordering = ['-fecha_creacion']
 
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
-    texto = models.TextField(blank=True, null=True)
+    texto = models.TextField(blank=True, default="")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     num_likes = models.IntegerField(default=0)
     visible = models.BooleanField(default=True)
-    motivo = models.TextField(blank=True, null=True)
+    motivo = models.TextField(blank=True, default="")
 
-    def __str__(self):
-        return f'{str(self.usuario)}: {self.pk}'
+    # def __str__(self):
+    #     return f'{str(self.usuario)}: {self.pk}'
 
     def biografia_info(self, usuario):
         biografia = Biografia.objects.get(usuario=usuario)
@@ -114,6 +114,10 @@ class Publicacion(models.Model):
         from .serializers import ComentarioSerializer
         all_comentarios = self.comentario.filter(comentario_padre=None).all()
         return ComentarioSerializer(all_comentarios, many=True).data
+
+    @property
+    def archivos_publicacion(self):
+        return self.archivos.filter(publicacion=self).all()
         
     
 
@@ -138,45 +142,29 @@ class ArchivoPublicacion(models.Model):
     def aumentar_almacenamiento_usuario(self, usuario):
         almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
         almacenamiento.usado += self.almacenamiento_utilizado
-        print("usuario")
-        print(almacenamiento.usado)
         almacenamiento.save()
     
     def aumentar_almacenamiento_global(self):
         almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
         almacenamiento.total_usado += self.almacenamiento_utilizado
-        print("servidor")
-        print(almacenamiento.total_usado)
         almacenamiento.save()
     
     def reducir_almacenamiento_usuario(self, usuario):
         almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
-        print("usuario")
-        print(almacenamiento.usado)
-        print("-")
-        print(self.almacenamiento_utilizado)
         actual = almacenamiento.usado - self.almacenamiento_utilizado
         if actual > 0:
             almacenamiento.usado = actual
         else:
             almacenamiento.usado = 0
-        print("usuario")
-        print(almacenamiento.usado)
         almacenamiento.save()
     
     def reducir_almacenamiento_global(self):
         almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
-        print("servidor")
-        print(almacenamiento.total_usado)
-        print("-")
-        print(self.almacenamiento_utilizado)
-        print(almacenamiento.total_usado - self.almacenamiento_utilizado)
         actual = almacenamiento.total_usado - self.almacenamiento_utilizado
         if actual > 0:
             almacenamiento.total_usado = actual
         else:
             almacenamiento.total_usado = 0
-        print(almacenamiento.total_usado)
         almacenamiento.save()
 
 

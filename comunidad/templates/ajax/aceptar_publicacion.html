@@ -1,0 +1,17 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Aceptar Publicación</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form method="POST" action="{% url 'comunidad:aceptar-publicacion' publicacion.pk %}">
+  {% csrf_token %}
+  <div class="modal-body">
+    La publicacion volvera a ser visible para los usuarios
+  </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    <button id="anular" class="btn btn-danger mr-3" type="submit"> Continuar </button>
+  </div>
+</form>

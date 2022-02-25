@@ -1,16 +1,15 @@
-from rest_framework import routers
-from .viewsets import *
+from django.urls import path
+from .views import *
+from .apps import ComunidadConfig
 
-comunidad = routers.DefaultRouter()
+app_name = ComunidadConfig.name
 
-comunidad.register(r'biografia', BiografiaView, 'biografia')
-comunidad.register(r'publicacion', PublicacionView, 'publicacion')
-comunidad.register(r'publicacionUsuario', PublicacionUsuarioView, 'publicacionUsuario')
-comunidad.register(r'reportarPublicacion', ReportarPublicacionView, 'reportarPublicacion')
-comunidad.register(r'publicacionLike', LikeView, 'publicacionLike')
-comunidad.register(r'comentario', ComentarioView, 'comentario')
-comunidad.register(r'seguidor', SeguidorView, 'seguidor')
-comunidad.register(r'recomendacionAmigo', RecomendacionAmigoView, 'recomendacionAmigo')
-comunidad.register(r'historia', HistoriaView, 'historia')
+urlpatterns = [
+     path('publicacion_reportada/', ListaPublicacionReportada.as_view(), name='publicacion_reportada'),
+     path('publicacion_novagym/', ListaPublicacionNovagym.as_view(), name='publicacion_novagym'),
 
-comunidad_api = comunidad.urls
+     path('crear-publicacion/', CrearPublicacion.as_view(), name='crear-publicacion'),
+
+     path('aceptar-publicacion/<int:pk>/', aceptar_publicacion, name='aceptar-publicacion'),
+     path('eliminar-publicacion/<int:pk>/', CrearPublicacion.as_view(), name='eliminar-publicacion')
+]
