@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-
+{% csrf_token %}
 {% block specific_head %}
 <link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
@@ -14,7 +14,19 @@
     <h2 class="text-left">{{title}}</h2>
   </div>
   <div class="col">
-    <a href="{% url 'sponsor:crear' %}" class="btn btn-primary float-right">Agregar sponsor <i
+    <form action="{% url 'gimnasio:changeAforo' %}" method="get">
+      {% csrf_token %}
+      <div class="input-group mb-3">
+        <input id="aforo" name="aforo" type="number" max="100" min="0" class="form-control" placeholder="Aforo global" aria-label=""
+          aria-describedby="basic-addon1">
+        <div class="input-group-prepend">
+          <input type="submit" class="btn btn-primary" type="button" value="Cambiar"></input>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="col">
+    <a href="{% url 'gimnasio:crear' %}" class="btn btn-primary float-right">Agregar gimnasio <i
         class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
@@ -30,62 +42,52 @@
       <thead class="thead-light">
         <tr>
           <th scope="col">Imágen</th>
-          <th scope="col">Código</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Descripción</th>
-          <th scope="col">Contacto</th>
-          <th scope="col">URL</th>
-          <th scope="col">Fecha inicio</th>
-          <th scope="col">Fecha fin</th>
-          <th scope="col">Activo</th>
+          <!-- <th scope="col">Tipo</th> -->
+          <th scope="col">Teléfono</th>
+          <th scope="col">Ubicación</th>
+          <th scope="col">Horarios</th>
+          <th scope="col">Ciudad</th>
+          <th scope="col">Aforo</th>
+          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% if page_obj %}
-        {% for sponsor in page_obj %}
+        {% for gimnasio in page_obj %}
         <tr class="text-center">
-          <td scope="row"><img style="width: 80px; height: 80px;" src="{{sponsor.imagen}}" alt=""></td>
-          <td>{{sponsor.codigo}}</td>
-          <td>{{sponsor.nombre}}</td>
-          <td>{{sponsor.descripcion}}</td>
-          <td>{{sponsor.nombre_contacto}}: {{sponsor.telefono}}</td>
-          <td>{{sponsor.url}}</td>
-          <td>{{sponsor.fecha_inicio}}</td>
-          <td>{{sponsor.fecha_fin}}</td>
+          <td scope="row"><img style="width: 80px; height: 80px;" src="{{gimnasio.imagen}}" alt=""></td>
+          <td>{{gimnasio.nombre}}</td>
+          <!-- <td>{{gimnasio.tipo}}</td> -->
+          <td>{{gimnasio.telefono}}</td>
+          <td>{{gimnasio.ubicacion}}</td>
+          <td>{{gimnasio.horario_inicio}} - {{gimnasio.horario_fin}}</td>
+          <td>{{gimnasio.ciudad}}</td>
+          <td>{{gimnasio.aforo}}%</td>
           <td>
-            {%if sponsor.activo == 0 and sponsor.compararFechas %}
-            <span class="text-warning">Inactivo</span>
-            {%elif sponsor.compararFechas %}
+            {% if gimnasio.estado == True %}
             <span class="text-success">Activo</span>
             {%else%}
-            <span class="text-danger">Caducado</span>
+            <span class="text-danger">Inactivo</span>
             {%endif%}
           </td>
           <td>
-            {% if sponsor.compararFechas %}
-            <a href="{% url 'sponsor:update' sponsor.pk %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'gimnasio:update' gimnasio.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
-              {% if sponsor.activo %}
-            <a class="btn btn-sm btn-success" 
-               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
-              {% else %}
-            <a class="btn btn-sm btn-warning" 
-               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
-
-               {%endif%}
-               <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-               data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
-                 <i class="fas fa-times "></i></a>
-            {% else %}
-            <a class="btn btn-sm btn-warning use-modal" data-toggle='modal' data-target="#mainModal"
-            data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
-              <i class="fas fa-check "></i></a>
-            {% endif %}
-            
+            {% if gimnasio.estado == True %}
+            <a class="btn btn-sm btn-success" href="{% url 'gimnasio:changeState' gimnasio.id %}"><i
+                class="fas fa-power-off "></i></a>
+            {%else%}
+            <a class="btn btn-sm btn-danger" href="{% url 'gimnasio:changeState' gimnasio.id %}"><i
+                class="fas fa-power-off "></i></a>
+            {%endif%}
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+              data-url="{% url 'gimnasio:eliminar' gimnasio.id %}" href="#">
+              <i class="fas fa-times "></i></a>
           </td>
-          
+
         </tr>
         {% endfor %}
         {% else %}

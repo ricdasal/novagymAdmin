@@ -1,37 +1,37 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar sponsor</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar gimnasio</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% csrf_token %}
-<form method="POST" action="{% url 'sponsor:eliminar' sponsor.id %}">
+<form method="POST" action="{% url 'gimnasio:eliminar' gimnasio.id %}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente sponsor?
-    <div class="row">
-      <div class="col-3">
-        Código
-      </div>
-      <div class="col">
-        {{sponsor.codigo}}
-      </div>
-    </div>
+    ¿Desea eliminar el siguiente gimnasio?
     <div class="row">
       <div class="col-3">
         Nombre
       </div>
       <div class="col">
-        {{sponsor.nombre}}
+        {{gimnasio.nombre}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Descripción
+        Ciudad
       </div>
       <div class="col">
-        {{sponsor.descripcion}}
+        {{gimnasio.ciudad}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Ubicación
+      </div>
+      <div class="col">
+        {{gimnasio.ubicacion}}
       </div>
     </div>
     <div class="row">
@@ -39,7 +39,7 @@
         Imagen
       </div>
       <div class="col">
-        <img src="{{sponsor.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="{{gimnasio.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>
