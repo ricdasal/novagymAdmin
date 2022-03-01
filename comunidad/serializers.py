@@ -53,12 +53,14 @@ class ComentarioSerializer(serializers.ModelSerializer):
     usuario_info = serializers.ReadOnlyField()
     comentarios_hijo = serializers.ReadOnlyField()
     es_padre = serializers.ReadOnlyField()
+    nivel_comentario = serializers.ReadOnlyField()
 
     class Meta:
         model = Comentario
         fields = ['id', 'texto', 'publicacion', 'usuario', 
                 'usuario_info', 'fecha_creacion', 'imagen', 
-                'comentario_padre', 'es_padre', 'comentarios_hijo']
+                'nivel_comentario', 'comentario_padre', 'es_padre',
+                'comentarios_hijo']
 
 
 class SeguidorSerializer(serializers.ModelSerializer):

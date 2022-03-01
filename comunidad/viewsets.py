@@ -8,6 +8,8 @@ from .models import Publicacion
 from almacenamiento.utils import almacenamiento_disponible_user, almacenamiento_disponible_servidor
 from .utils import fileb64decode, eliminar_archivo
 import random
+from django.utils import timezone
+import datetime
 
 class BiografiaView(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
@@ -61,11 +63,19 @@ class PublicacionView(viewsets.ViewSet):
             return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
-        publicaciones = Publicacion.objects.filter(visible=True).all()
+        start = timezone.now().replace(hour=0, minute=0, second=0)
+        end = timezone.now().replace(hour=23, minute=59, second=59)
+        publicaciones_admin = Publicacion.objects.filter(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
+        publicaciones = Publicacion.objects.filter(visible=True).order_by('-fecha_creacion')
+        data = []
+        if len(publicaciones_admin) > 0:
+            data = list(publicaciones_admin) + list(publicaciones.exclude(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end))
+        else:
+            data = publicaciones
 
         paginator = PageNumberPagination()
         paginator.page_size = 10
-        result = paginator.paginate_queryset(publicaciones, request)
+        result = paginator.paginate_queryset(data, request)
 
         serializer = PublicacionSerializer(result, many=True)
         paginated_response = paginator.get_paginated_response(serializer.data)

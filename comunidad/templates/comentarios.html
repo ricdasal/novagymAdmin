@@ -1,0 +1,15 @@
+{% load static %}
+
+{% for comentario in comentarios %}
+    <div class="d-flex" style="margin-left: {% if comentario.nivel_comentario == 0 %} {{comentario.nivel_comentario}}rem; 
+        {% else %} {{comentario.nivel_comentario|add:'+1'}}rem; {% endif %}">
+        <img class="mr-3" src="http://localhost:8000{{ comentario.usuario_info.foto_perfil }}" style="width: 30px; height: 30px; border-radius: 50%">
+        <div class="pt-2 px-3 mb-2 w-auto bg-light" style="border-radius: 25px; max-width: 90%;">
+            <span>{{ comentario.usuario_info.nombre }} {{ comentario.usuario_info.apellido }}</span>
+            <p>{{ comentario.texto }}</p>
+        </div>
+    </div>
+    {% if comentario.es_padre %}
+        {% include "comentarios.html" with comentarios=comentario.comentarios_hijo %}
+    {% endif %}
+{% endfor %}

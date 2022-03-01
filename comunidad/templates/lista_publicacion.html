@@ -26,36 +26,61 @@
    {% if page_obj %}
       {% for publicacion in page_obj %}
          {% if tipo == 'reporte' %}
-            <div class="card mx-auto mb-1" class="card" style="width: 35rem;">
+            <div class="card mx-auto mb-1" class="card" style="width: 45rem;">
                <div class="card-body">
                   <h5 class="card-subtitle text-muted">Motivo del reporte:</h5>
                   <p class="card-text">{{ publicacion.motivo }}</p>
                </div>
             </div>
          {% endif %}
-         <div class="card mx-auto mb-5" style="width: 35rem;">
-            {% for archivo in publicacion.archivos_publicacion %}
-               {% if archivo.tipo == 'AUD' %}
-                  <audio class="mx-auto mt-3" style="width: 25rem;"  controls>
-                     <source src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" type="audio/mpeg">
-                     Your browser does not support the audio element.
-               </audio>
-               {% elif archivo.tipo == 'IMG' %}
-                  <img src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" class="card-img-top" alt="">
-               {% else %}
-                  <video width="320" height="240" controls>
-                     <source src="'http://localhost:8000'|add:archivo.archivo.url }}" type="video/mp4"> Your browser does not support the video tag.
-               </video>
+         <div class="card mx-auto mb-5 p-3" style="width: 45rem; height: auto;">
+            <div class="d-flex justify-content-between mb-3">
+               <div>
+                  <div class="d-flex align-items-center">
+                     {% if tipo == 'reporte' %}
+                        <img class="mr-3" src="http://localhost:8000{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
+                     {% endif %}
+                     <h5 class="card-title mb-0">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
+                  </div>
+                  <span>{{ publicacion.fecha_creacion|date:"D d M Y P" }}</span>
+               </div>
+               {% if tipo == 'novagym' %}   
+                  <div class="d-flex justify-content-between align-items-center">
+                     <a class="use-modal mr-2" title="Editar Publicación" data-toggle='modal' data-target='#mainModal' 
+                        href='#' data-url="{% url 'comunidad:editar-publicacion' publicacion.pk %}">
+                        <i class="fas fa-edit"></i>
+                     </a>
+                     <a class="use-modal ml-2" title="Eliminar Publicación" data-toggle='modal' data-target='#mainModal' 
+                        href='#' data-url="{% url 'comunidad:eliminar-publicacion' publicacion.pk %}">
+                        <i class="fas fa-trash"></i>
+                     </a>
+                  </div>
                {% endif %}
-            {% endfor %}
-            <div class="card-body">
-            <h5 class="card-title">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
-            <p class="card-text">{{ publicacion.texto }}</p> 
-            {% if tipo == 'reporte' %}   
-               <a class="btn btn-primary use-modal" class='use-modal' data-toggle='modal' data-target='#mainModal' 
-                  href='#' role="button" data-url-activar="{% url 'comunidad:aceptar-publicacion' publicacion.pk %}">Aceptar</a>
-               <a class="btn btn-danger" href="{%url 'comunidad:eliminar-publicacion' publicacion.pk%}" role="button">Eliminar</a>
+            </div>
+            {% if publicacion.archivos_publicacion|length > 0 %}
+               {% include "util/carousel.html" with archivos=publicacion.archivos_publicacion %}
             {% endif %}
+            {% if tipo == 'novagym' %}
+               <div class="d-flex">
+                  <span class="mr-4"><i class="fas fa-heart"></i> Le gusta a {{ publicacion.num_likes }} personas</span>
+                  <a class="ver-comentarios-{{ publicacion.id }}" style="text-decoration: underline; cursor: pointer;">
+                     <i class="fas fa-comment"></i> {{ publicacion.num_comentarios }} comentarios
+                  </a>
+               </div>
+            {% endif %}
+            <div class="card-body py-3 px-0">
+               <p class="card-text">{{ publicacion.texto }}</p> 
+               {% if tipo == 'novagym' %}
+                  <div class="comentarios-{{ publicacion.id }} mt-4" style="display: none">
+                     {% include "comentarios.html" with comentarios=publicacion.comentarios %}
+                  </div>
+               {% endif %}
+               {% if tipo == 'reporte' %}   
+                  <a class="btn btn-primary use-modal" data-toggle='modal' data-target='#mainModal' 
+                     href='#' role="button" data-url="{% url 'comunidad:aceptar-publicacion' publicacion.pk %}">Aceptar</a>
+                  <a class="btn btn-danger use-modal" data-toggle='modal' data-target='#mainModal' 
+                  href='#' role="button" data-url="{% url 'comunidad:bloquear-publicacion' publicacion.pk %}">Bloquear</a>
+               {% endif %}
             </div>
          </div>
       {% endfor %}
@@ -70,7 +95,19 @@
 
 {% block specific_scripts %}
 <script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script>
+    $('a').click(function (e) {
+      clase_actual = e.currentTarget.className.split("-")
+      div_comentarios = document.getElementsByClassName(`comentarios-${clase_actual[2]}`)[0];
+      if (div_comentarios) {
+         if (div_comentarios.style.display == "none")
+            div_comentarios.style.display = "block";
+         else
+            div_comentarios.style.display = "none";
+      }
+   })
+</script>
 {% endblock %}
 

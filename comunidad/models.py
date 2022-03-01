@@ -1,12 +1,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from decimal import Decimal
-
 from almacenamiento.models import AlmacenamientoGlobal, AlmacenamientoUsuario
 from seguridad.models import UserDetails
 
-from seguridad.serializers import UserSerializer
 
 import os
 
@@ -86,9 +83,6 @@ class Seguidor(models.Model):
 
 class Publicacion(models.Model):
 
-    class Meta:
-        ordering = ['-fecha_creacion']
-
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
     texto = models.TextField(blank=True, default="")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -108,6 +102,10 @@ class Publicacion(models.Model):
         data = usuario_detalle(self.usuario)
         data.update(self.biografia_info(self.usuario))
         return data
+
+    @property
+    def num_comentarios(self):
+        return self.comentario.all().count()
 
     @property
     def comentarios(self):
@@ -229,9 +227,18 @@ class Comentario(models.Model):
     
     @property
     def es_padre(self):
-        if self.comentario_padre is None and self.count_comentarios_hijos() > 0:
+        if self.count_comentarios_hijos() > 0:
             return True
         return False
+    
+    @property
+    def nivel_comentario(self):
+        nivel = 0
+        padre = self.comentario_padre
+        while padre != None:
+            nivel += 1
+            padre = padre.comentario_padre
+        return nivel
 
 
 class Historia(models.Model):

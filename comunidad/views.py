@@ -1,10 +1,11 @@
-import io
 from pyexpat.errors import messages
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib import messages
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
+from django.conf import settings
+from django.core.files.base import File
 
 from novagym.utils import calculate_pages_to_render
 from comunidad.utils import enum_media
@@ -12,40 +13,19 @@ from comunidad.utils import enum_media
 from .models import ArchivoPublicacion, Publicacion
 from .forms import PublicacionForm, ArchivoFormSet
 
-import base64
-
-
-class ListaPublicacionReportada(FilterView):
-    paginate_by = 20
-    max_pages_render = 10
-    model = Publicacion
-    queryset = Publicacion.objects.filter(visible=False).all()
-    context_object_name = 'publicacion_reportada'
-    template_name = "lista_publicacion.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "Publicaciones Reportadas"
-        context['tipo'] = "reporte"
-        page_obj = context["page_obj"]
-        context['num_pages'] = calculate_pages_to_render(self, page_obj)
-        return context
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+import os
 
 
 class ListaPublicacionNovagym(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Publicacion
-    queryset = Publicacion.objects.filter(usuario__is_superuser=1).all()
+    queryset = Publicacion.objects.filter(usuario__is_superuser=1).order_by('-fecha_creacion')
     context_object_name = 'publicacion_novagym'
     template_name = "lista_publicacion.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "Publicaciones Reportadas"
         context['tipo'] = "novagym"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
@@ -79,9 +59,12 @@ class CrearPublicacion(CreateView):
                 file = f.cleaned_data['archivo'] 
                 archivo = ArchivoPublicacion(publicacion=self.object, archivo=file)
                 archivo.almacenamiento_utilizado = round(file.size/1000, 2)
-                type = file.content_type.split("/")
+                tipo = file.content_type.split("/")
+                if tipo[0] not in enum_media:
+                    messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
+                    return redirect('comunidad:publicacion_novagym')
                 #verificar que el tipo sea solo img, vid, aud
-                archivo.tipo = enum_media[type[0]]
+                archivo.tipo = enum_media[tipo[0]]
                 archivo.save()
         return super().form_valid(form)
     
@@ -89,9 +72,84 @@ class CrearPublicacion(CreateView):
         return reverse("comunidad:publicacion_novagym")
 
 
+def eliminar_publicacion(request, pk):
+    if request.POST:
+        try:
+            publicacion = Publicacion.objects.get(pk=pk)
+            archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
+            for archivo in archivos:
+                archivo.reducir_almacenamiento_usuario(publicacion.usuario)
+                archivo.reducir_almacenamiento_global()
+                archivo.delete()
+            publicacion.delete()
+            messages.success(request, "La publicación ha sido eliminada.")
+        except:
+            messages.error(request, "No se ha encontrado la publicación.")
+        return redirect('comunidad:publicacion_novagym')
+    return render(request, 'ajax/eliminar_publicacion.html', {'publicacion': pk})
+
+
+
+class ListaPublicacionReportada(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Publicacion
+    queryset = Publicacion.objects.filter(visible=False).all()
+    context_object_name = 'publicacion_reportada'
+    template_name = "lista_publicacion.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Publicaciones Reportadas"
+        context['tipo'] = "reporte"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
 def aceptar_publicacion(request, pk):
     if request.POST:
-        print("listo para eliminar")
-        messages.success(request, 'Operacion realizada con exito.')
-    print("llegando")
+        try:
+            publicacion = Publicacion.objects.get(pk=pk)
+            publicacion.visible = True
+            publicacion.motivo = ""
+            publicacion.save()
+            messages.success(request, 'Operacion realizada con exito.')
+        except Publicacion.DoesNotExist:
+            messages.error(request, "No se ha encontrado la publicación.")
+        return redirect('comunidad:publicacion_reportada')
     return render(request, 'ajax/aceptar_publicacion.html', {'publicacion': pk})
+
+def bloquear_publicacion(request, pk):
+    if request.POST:
+        try:
+            publicacion = Publicacion.objects.get(pk=pk)
+            publicacion.visible = True
+            publicacion.texto = ""
+            publicacion.motivo = ""
+
+            archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
+            for archivo in archivos:
+                archivo.reducir_almacenamiento_usuario(publicacion.usuario)
+                archivo.reducir_almacenamiento_global()
+                archivo.delete()
+
+            archivo = ArchivoPublicacion()
+            ruta = f'{settings.MEDIA_ROOT}/publicacion/publicacion_reportada.jpg'
+            with open(ruta, 'rb') as f:
+                file = File(f)
+                archivo.publicacion = publicacion
+                archivo.tipo = "IMG"
+                archivo.almacenamiento_utilizado = round(os.path.getsize(ruta) * 0.001, 2)
+                archivo.archivo.save(f'reportado_{publicacion.id}_{publicacion.usuario.id}.jpg', file)
+                archivo.save()
+
+            publicacion.save()
+            messages.success(request, 'Operacion realizada con exito.')
+        except Publicacion.DoesNotExist:
+            messages.error(request, "No se ha encontrado la publicación.")
+        return redirect('comunidad:publicacion_reportada')
+    return render(request, 'ajax/bloquear_publicacion.html', {'publicacion': pk})
