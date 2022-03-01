@@ -17,7 +17,7 @@ class UserDetails(models.Model):
         CLI = 'C', 'Cliente'
         EMP = 'E', 'Empleado'
 
-    usuario = models.ForeignKey(
+    usuario = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="detalles")
     codigo = models.CharField(max_length=255, blank=True)
     cedula = models.CharField(max_length=13)
