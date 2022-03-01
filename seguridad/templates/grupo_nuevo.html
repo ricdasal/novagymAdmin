@@ -1,0 +1,96 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block specific_head %}
+<style>
+  .checkbox {
+    width: 20px;
+    height: 20px;
+  }
+</style>
+{% endblock specific_head %}
+
+
+{% block main %}
+<div class="row mt-4 justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h2>
+      <div class="row">
+        <div class="col-12 col-lg-6">{{title|upper}}</div>
+      </div>
+    </h2>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      {% crispy form %}
+      <div class="form-row mt-4">
+        <div class="col-12">
+          <b><label for="tabla-permisos">Permisos del rol</label></b>
+        </div>
+      </div>
+      <table class="table table-hover" id="tabla-permisos">
+        <thead>
+          <tr class="text-center">
+            <th></th>
+            <th>Ver</th>
+            <th>Crear</th>
+            <th>Editar</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app, app_details in apps.items %}
+          <tr id="{{app}}">
+            <th>
+              <input type="checkbox" onchange="allPermissions(this,'{{app}}')" name="apps" value="{{app}}"
+                class="checkbox">
+              <label>{{app_details.label}}</label>
+            </th>
+            {% for perm, value in app_details.permissions.items %}
+            <td class="text-center">
+              <input type="checkbox" name="apps_permissions" id="{{perm}}" class="checkbox"
+                onchange="checkPermissions('{{app}}')" {%if value%}checked{%endif%} value="{{perm}}">
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <input type="submit" class="btn btn-primary" value="Guardar">
+      {% if rol %}
+      <a class="btn btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+        data-url="{%url 'seguridad:eliminar_rol' rol.pk%}" href="#">Eliminar 
+        <i class="fas fa-times"></i>
+      </a>
+      {% endif %}
+      {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}" />
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script>
+  function allPermissions(e, app) {
+    $('input:checkbox[name=apps_permissions]', '#' + app).prop("checked", $(e).is(':checked'));
+  }
+
+  function checkPermissions(app) {
+    let checkAll = true;
+    $('input:checkbox[name=apps_permissions]', '#' + app).each(function () {
+      checkAll = checkAll && $(this).is(':checked');
+      if (!checkAll) return false;
+    })
+    $('input:checkbox[name=apps]', '#' + app).prop("checked", checkAll);
+  }
+  $(document).ready(function () {
+    $('tr', 'tbody').each(function () {
+      checkPermissions($(this).attr('id'))
+    });
+  })
+</script>
+{% endblock specific_scripts %}
