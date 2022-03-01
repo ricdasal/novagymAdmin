@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import (AccessMixin, LoginRequiredMixin,
                                         PermissionRequiredMixin)
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
@@ -15,7 +15,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
-from django.contrib.auth.models import Permission
+
 from seguridad.filters import UsuarioFilter
 from seguridad.forms import (RolUsuarioForm, UsuarioDetallesForm,
                              UsuarioEditarForm, UsuarioForm)
@@ -23,6 +23,16 @@ from seguridad.forms import (RolUsuarioForm, UsuarioDetallesForm,
 from .models import *
 
 # Admin
+
+APP_PERMISSIONS = {
+    'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
+    # 'novagym':'',
+    # 'gimnasio': {'model': 'gimnasio', 'label': ''},
+    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
+    # 'contactenos':'',
+    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    # 'comunidad': {'model': 'publicacion', 'label': ''},
+}  # TODO: agregar apps:model
 
 
 def login_user(request):
@@ -249,21 +259,10 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        apps = []
-        if self.request.POST:
-            apps = self.request.POST.getlist('apps', None)
-        current_apps = {
-            'seguridad': {'label': 'Usuarios', 'value': 1 if 'seguridad' in apps else 0,
-                          'permissions': self.get_permissions_template('seguridad', 'userdetails')},
-            # 'novagym':'',
-            # 'gimnasio': {'model': 'gimnasio', 'label': ''},
-            'productos': {'label': 'Productos', 'value': 1 if 'productos' in apps else 0,
-                          'permissions': self.get_permissions_template('productos', 'producto')},
-            # 'contactenos':'',
-            'sponsor': {'label': 'Negocios Afiliados', 'value': 1 if 'sponsor' in apps else 0,
-                        'permissions': self.get_permissions_template('sponsor', 'sponsor')},
-            # 'comunidad': {'model': 'publicacion', 'label': ''},
-        }  # TODO: agregar apps:model
+        current_apps = {}
+        for app, details in APP_PERMISSIONS.items():
+            current_apps[app] = {'label': details['label'], 'permissions': self.get_permissions_template(
+                details['app'], details['model'])}
         context['apps'] = current_apps
         context['title'] = self.title
         return context
@@ -295,7 +294,7 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
                 else:
                     return HttpResponseRedirect(self.success_url)
         messages.error(
-            request, "Por favor, seleccione los permisos del rol a crear.")
+            request, "Por favor, verifique los datos del rol ingresado.")
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
@@ -327,21 +326,10 @@ class EditarRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Upda
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        apps = []
-        if self.request.POST:
-            apps = self.request.POST.getlist('apps', None)
-        current_apps = {
-            'seguridad': {'label': 'Usuarios', 'value': 1 if 'seguridad' in apps else 0,
-                          'permissions': self.get_permissions_template('seguridad', 'userdetails')},
-            # 'novagym':'',
-            # 'gimnasio': {'model': 'gimnasio', 'label': ''},
-            'productos': {'label': 'Productos', 'value': 1 if 'productos' in apps else 0,
-                          'permissions': self.get_permissions_template('productos', 'producto')},
-            # 'contactenos':'',
-            'sponsor': {'label': 'Negocios Afiliados', 'value': 1 if 'sponsor' in apps else 0,
-                        'permissions': self.get_permissions_template('sponsor', 'sponsor')},
-            # 'comunidad': {'model': 'publicacion', 'label': ''},
-        }  # TODO: agregar apps:model
+        current_apps = {}
+        for app, details in APP_PERMISSIONS.items():
+            current_apps[app] = {'label': details['label'], 'permissions': self.get_permissions_template(
+                details['app'], details['model'])}
         context['apps'] = current_apps
         context['title'] = self.title
         return context
@@ -385,3 +373,33 @@ def rol_confirmar_eliminacion(request, pk):
         messages.info(request, "Rol eliminado con éxito.")
         return redirect('seguridad:listar')
     return render(request, "ajax/rol_confirmar_elminar.html", {"rol": rol})
+
+
+@login_required
+@permission_required('seguridad.view_userdetails')
+def rol_permisos_template(request, pk):
+    rol = Group.objects.get(id=pk)
+    
+    def get_permissions_template(app_name, model):
+        permissions = ['view', 'add', 'change', 'delete']
+        app_permissions = []
+        app_permissions = rol.permissions.order_by('codename').values_list(
+            'codename', flat=True).distinct()
+        app_permissions = [app_name+'.'+perm for perm in app_permissions]
+        result = {}
+        for perm in permissions:
+            full_perm_name = app_name+'.'+perm+'_'+model
+            result[full_perm_name] = 1 if full_perm_name in app_permissions else 0
+        return result
+
+    def get_context_data():
+        context = {}
+        current_apps = {}
+        for app, details in APP_PERMISSIONS.items():
+            current_apps[app] = {'label': details['label'], 'permissions': get_permissions_template(
+                details['app'], details['model'])}
+        context['apps'] = current_apps
+        context['readonly'] = 1
+        return context
+
+    return render(request, "permisos.html", get_context_data())
