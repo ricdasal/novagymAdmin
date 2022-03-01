@@ -29,7 +29,7 @@
         <div class="col-8 col-lg-4">
           <label for="">{{user_form.groups.label}}</label>
           <div>
-            <select name="groups" class="select custom-select" id="id_groups">
+            <select name="groups" class="select custom-select" id="id_groups" data-url="{% url 'seguridad:ver_rol' %}">
               {% for value, label in user_form.groups.field.choices %}
                 <option value="{{value}}" {%if value in user_form.groups.value %}selected{%endif%}>{{label}}</option>
               {% endfor %}
@@ -37,13 +37,15 @@
           </div>
         </div>
         <div class="col-4 col-lg-auto align-self-end">
-          <a href="{% url 'seguridad:agregar_rol' %}?next={{ request.path|urlencode }}" class="btn btn-primary mr-2">
+          <a href="{% url 'seguridad:agregar_rol' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary mr-2">
             <i class="fas fa-plus-circle"> </i>
           </a>
-          <a href="{% url 'seguridad:editar_rol' %}?next={{ request.path|urlencode }}" class="btn btn-primary" id="edit-rol">
+          <a href="{% url 'seguridad:editar_rol' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary" id="edit-rol">
             <i class="fas fa-edit "></i>
           </a>
         </div>
+      </div>
+      <div id="permisos-container">
       </div>
       {%endif%}
       <div class="d-none" id="img-cont">
@@ -68,16 +70,27 @@
   function updateEditRolURL(id) {
     let url = document.getElementById('edit-rol');
     let pathname = url.pathname;
-    pathname = pathname.slice(0, pathname.lastIndexOf('/')+1)
+    pathname = pathname.slice(0, pathname.lastIndexOf('/') + 1);
     let search = url.search;
     url.href = `${pathname}${id}${search}`;
   }
+
+  function showRolPermissions(id, url) {
+    let new_url = `${url}${id}`
+    $.ajax({
+      url: new_url,
+      success: function (data) {
+        $('#permisos-container').html(data);
+      },
+    });
+  }
   $(document).ready(function () {
-    let $rolSelector = $('#id_groups')
-    updateEditRolURL($rolSelector.val())
     $(document).on('change', '#id_groups', function () {
-      updateEditRolURL($rolSelector.val())
+      let $this = $(this);
+      showRolPermissions($this.val(), $this.data('url'));
+      updateEditRolURL($this.val());
     })
+    $('#id_groups').trigger('change');
   })
 </script>
 {%endif%}
