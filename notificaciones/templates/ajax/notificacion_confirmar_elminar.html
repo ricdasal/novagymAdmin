@@ -1,37 +1,44 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar sponsor</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar notificación</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-{% csrf_token %}
-<form method="POST" action="{% url 'sponsor:eliminar' sponsor.id %}">
+<form method="POST" action="{%url 'notificaciones:eliminar' notificacion.id%}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente sponsor?
+    ¿Desea eliminar la siguiente notificación?
     <div class="row">
       <div class="col-3">
-        Código
+        Título
       </div>
       <div class="col">
-        {{sponsor.codigo}}
+        {{notificacion.titulo}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Nombre
+        Inicio
       </div>
       <div class="col">
-        {{sponsor.nombre}}
+        {{notificacion.fecha_hora_inicio}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Descripción
+        Fin
       </div>
       <div class="col">
-        {{sponsor.descripcion}}
+        {{notificacion.fecha_hora_fin}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Frecuencia
+      </div>
+      <div class="col">
+        {{notificacion.frecuencia}}
       </div>
     </div>
     <div class="row">
@@ -39,7 +46,7 @@
         Imagen
       </div>
       <div class="col">
-        <img src="{{sponsor.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="{{notificacion.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>

@@ -2,6 +2,7 @@ from crispy_forms.helper import FormHelper
 from django import forms
 from .models import *
 from crispy_forms.layout import Column, Div, Field, Layout, Row
+from .widgets import DatePickerInput
 class SponsorForm(forms.ModelForm):
     class Meta:
         model= Sponsor
@@ -14,8 +15,8 @@ class SponsorForm(forms.ModelForm):
         widgets = {
             "imagen": forms.ClearableFileInput(),
             "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
-            "fecha_inicio": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'}),
-            "fecha_fin": forms.SelectDateWidget(attrs={'style': 'display: inline-block; width: 33%;'})
+            "fecha_inicio": DatePickerInput(),
+            "fecha_fin": DatePickerInput()
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -11,7 +11,8 @@ class Gimnasio(models.Model):
     ubicacion = models.CharField(max_length=24)
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)
-    estado = models.CharField(max_length=24)
+    estado = models.BooleanField(default=True)
     ciudad = models.CharField(max_length=24)
+    aforo = models.PositiveIntegerField()
     def __str__(self):
         return self.nombre +"-"+self.tipo+"-"+ self.ciudad
