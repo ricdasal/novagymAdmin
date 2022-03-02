@@ -38,8 +38,10 @@ class Producto(models.Model):
 class Inventario(models.Model):
     id = models.AutoField(primary_key=True)
     producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
-    precio = models.DecimalField(max_digits=4, decimal_places=2)
+    precio = models.DecimalField(max_digits=4, decimal_places=2,default=0)
     stock = models.PositiveIntegerField()
+    novacoins=models.PositiveIntegerField()
+    usaNovacoins=models.BooleanField(default=0)
     def __str__(self):
         return self.nombre
 
