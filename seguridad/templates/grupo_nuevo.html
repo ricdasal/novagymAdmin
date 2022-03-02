@@ -1,0 +1,54 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+<div class="row mt-4 justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h2>
+      <div class="row">
+        <div class="col-12 col-lg-6">{{title|upper}}</div>
+      </div>
+    </h2>
+    <form method="POST" novalidate>
+      {% csrf_token %}
+      {% crispy form %}
+      {% include "permisos.html" with apps=apps readonly=0 %}
+      <input type="submit" class="btn btn-primary" value="Guardar">
+      {% if rol %}
+      <a class="btn btn-danger use-modal float-right" data-toggle='modal' data-target="#mainModal"
+        data-url="{%url 'seguridad:eliminar_rol' rol.pk%}" href="#">Eliminar 
+        <i class="fas fa-times"></i>
+      </a>
+      {% endif %}
+      {% if request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}" />
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script>
+  function allPermissions(e, app) {
+    $('input:checkbox[name=apps_permissions]', '#' + app).prop("checked", $(e).is(':checked'));
+  }
+
+  function checkPermissions(app) {
+    let checkAll = true;
+    $('input:checkbox[name=apps_permissions]', '#' + app).each(function () {
+      checkAll = checkAll && $(this).is(':checked');
+      if (!checkAll) return false;
+    })
+    $('input:checkbox[name=apps]', '#' + app).prop("checked", checkAll);
+  }
+  $(document).ready(function () {
+    $('tr', 'tbody').each(function () {
+      checkPermissions($(this).attr('id'))
+    });
+  })
+</script>
+{% endblock specific_scripts %}

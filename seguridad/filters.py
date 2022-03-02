@@ -10,7 +10,6 @@ from seguridad.models import UserDetails
 
 class UsuarioFilter(django_filters.FilterSet):
     usuario__email = django_filters.CharFilter(lookup_expr="icontains")
-    codigo = django_filters.CharFilter(lookup_expr="icontains")
     fecha_nacimiento = django_filters.DateFromToRangeFilter(
         widget=RangeWidget(attrs={"type": "date"}))
     created_at = django_filters.DateFromToRangeFilter(
@@ -21,13 +20,11 @@ class UsuarioFilter(django_filters.FilterSet):
     class Meta:
         model = UserDetails
         fields = ['usuario__email',
-                  'codigo',
                   'cedula',
                   'nombres',
                   'apellidos',
                   'fecha_nacimiento',
                   "sexo",
-                  "tipo",
                   "rol",
                   "created_at",
                   ]

@@ -176,6 +176,7 @@ FORMAT_MODULE_PATH = 'backend.formats'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
+    Path.joinpath(BASE_DIR, "staticfiles"),
     Path.joinpath(BASE_DIR, "static"),
 ]
 STATIC_ROOT = Path.joinpath(BASE_DIR, "static_root")
