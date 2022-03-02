@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from firebase_admin import initialize_app
 
 import environ
 
@@ -55,7 +56,9 @@ INSTALLED_APPS = [
     'contactenos',
     'sponsor',
     'comunidad',
-    'notificaciones'
+    'notificaciones',
+    'fcm_django'
+    # 'novagym.cliente',
 ]
 
 MIDDLEWARE = [
@@ -197,3 +200,21 @@ EMAIL_HOST_USER=""
 EMAIL_HOST_PASSWORD=""
 EMAIL_USE_TLS=False
 #EMAIL_USE_SSL=False
+
+default_app = initialize_app()
+
+FCM_DJANGO_SETTINGS = {
+     # default: _('FCM Django')
+    "APP_VERBOSE_NAME": "Messaging",
+     # true if you want to have only one active device per registered user at a time
+     # default: False
+    "ONE_DEVICE_PER_USER": True,
+     # devices to which notifications cannot be sent,
+     # are deleted upon receiving error response from FCM
+     # default: False
+    "DELETE_INACTIVE_DEVICES": False,
+    # Transform create of an existing Device (based on registration id) into
+                # an update. See the section
+    # "Update of device with duplicate registration ID" for more details.
+    "UPDATE_ON_DUPLICATE_REG_ID": True,
+}
