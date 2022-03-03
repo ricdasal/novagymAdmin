@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'django_filters',
     'knox',
     'crispy_forms',
+    'fcm_django',
+    #APPS
     'seguridad',
     'novagym',
     'gimnasio',
@@ -57,8 +59,7 @@ INSTALLED_APPS = [
     'sponsor',
     'comunidad',
     'notificaciones',
-    'fcm_django'
-    # 'novagym.cliente',
+    'membresia',
 ]
 
 MIDDLEWARE = [
