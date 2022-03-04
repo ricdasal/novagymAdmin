@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'sponsor',
     'comunidad',
     'notificaciones',
+    'push_notifications',
+    # 'novagym.cliente',
     'membresia',
 ]
 
@@ -201,21 +203,8 @@ EMAIL_HOST_USER=""
 EMAIL_HOST_PASSWORD=""
 EMAIL_USE_TLS=False
 #EMAIL_USE_SSL=False
-
-default_app = initialize_app()
-
-FCM_DJANGO_SETTINGS = {
-     # default: _('FCM Django')
-    "APP_VERBOSE_NAME": "Messaging",
-     # true if you want to have only one active device per registered user at a time
-     # default: False
-    "ONE_DEVICE_PER_USER": True,
-     # devices to which notifications cannot be sent,
-     # are deleted upon receiving error response from FCM
-     # default: False
-    "DELETE_INACTIVE_DEVICES": False,
-    # Transform create of an existing Device (based on registration id) into
-                # an update. See the section
-    # "Update of device with duplicate registration ID" for more details.
-    "UPDATE_ON_DUPLICATE_REG_ID": True,
+PUSH_NOTIFICATIONS_SETTINGS = {
+        "FCM_API_KEY": "a key",
 }
+
+SOUTH_MIGRATION_MODULES = {"push_notifications": "push_notifications.south_migrations"}
