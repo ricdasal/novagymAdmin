@@ -14,20 +14,20 @@
         {% for archivo in archivos %}
             {% if archivo.tipo == 'IMG' %}
                 <li class="slide" data-active>
-                    <img src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" alt="">
+                    <img src="{{ archivo.archivo.url }}" alt="">
                 </li>
             {% elif archivo.tipo == 'AUD' %}
                 <li class="slide d-flex flex-column align-items-center justify-content-end" style="background: black"  data-active>
                     <h4 class="" style="color: white">Audio</h4>
                     <audio style="width: 25rem; margin: 6rem 0" controls>
-                        <source src="{{ 'http://localhost:8000'|add:archivo.archivo.url }}" type="audio/{{ archivo.archivo.url|mime_type }}">
+                        <source src="{{ archivo.archivo.url }}" type="audio/{{ archivo.archivo.url|mime_type }}">
                         Your browser does not support the audio element.
                     </audio>
                 </li>
             {% else %}
                 <li class="slide" data-active>
                     <video width="320" height="240" controls>
-                        <source src="'http://localhost:8000'|add:archivo.archivo.url }}" type="video/{{ archivo.archivo.url|mime_type }}"> 
+                        <source src="{{ archivo.archivo.url }}" type="video/{{ archivo.archivo.url|mime_type }}"> 
                         Your browser does not support the video tag.
                     </video>
                 </li>

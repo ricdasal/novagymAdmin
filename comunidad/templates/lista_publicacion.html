@@ -1,6 +1,5 @@
 {% extends "main.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block main %}
    <div class="row my-4">
@@ -38,7 +37,7 @@
                <div>
                   <div class="d-flex align-items-center">
                      {% if tipo == 'reporte' %}
-                        <img class="mr-3" src="http://localhost:8000{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
+                        <img class="mr-3" src="{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
                      {% endif %}
                      <h5 class="card-title mb-0">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
                   </div>
@@ -46,8 +45,7 @@
                </div>
                {% if tipo == 'novagym' %}   
                   <div class="d-flex justify-content-between align-items-center">
-                     <a class="use-modal mr-2" title="Editar Publicación" data-toggle='modal' data-target='#mainModal' 
-                        href='#' data-url="{% url 'comunidad:editar-publicacion' publicacion.pk %}">
+                     <a class="mr-2" title="Editar Publicación" href="{% url 'comunidad:editar-publicacion' publicacion.pk %}">
                         <i class="fas fa-edit"></i>
                      </a>
                      <a class="use-modal ml-2" title="Eliminar Publicación" data-toggle='modal' data-target='#mainModal' 

@@ -1,3 +1,4 @@
+from decimal import Decimal
 from pyexpat.errors import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -41,9 +42,8 @@ class CrearPublicacion(CreateView):
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
-        
+        data['crear'] = True
         if self.request.POST:
-            print("POST del get context")
             data['archivos'] = ArchivoFormSet(self.request.POST, self.request.FILES)
         else:
             data['archivos'] = ArchivoFormSet()
@@ -51,21 +51,65 @@ class CrearPublicacion(CreateView):
     
     def form_valid(self, form):
         context = self.get_context_data()
+        archivos = self.request.FILES.getlist('archivos-0-archivo')
         formset = context['archivos']
         if form.is_valid() and formset.is_valid():
             form.instance.usuario = self.request.user
             self.object = form.save()
-            for f in formset:
-                file = f.cleaned_data['archivo'] 
-                archivo = ArchivoPublicacion(publicacion=self.object, archivo=file)
-                archivo.almacenamiento_utilizado = round(file.size/1000, 2)
+            for file in archivos:
+                tamanio = round(file.size/1000, 2)
                 tipo = file.content_type.split("/")
                 if tipo[0] not in enum_media:
                     messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
                     return redirect('comunidad:publicacion_novagym')
-                #verificar que el tipo sea solo img, vid, aud
-                archivo.tipo = enum_media[tipo[0]]
-                archivo.save()
+                archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
+                    tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
+                archivo.aumentar_almacenamiento_usuario(self.request.user)
+                archivo.aumentar_almacenamiento_global()
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse("comunidad:publicacion_novagym")
+
+
+class EditarPublicacion(UpdateView):
+    model = Publicacion
+    form_class = PublicacionForm
+    template_name = 'nueva_publicacion.html'
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        data['editar'] = True
+        data['publicacion'] = self.object.pk
+        if self.request.POST:
+            data['archivos'] = ArchivoFormSet(self.request.POST, self.request.FILES, instance=self.object)
+        else:
+            data['archivos'] = ArchivoFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        
+        archivos = ArchivoPublicacion.objects.filter(publicacion=context['publicacion'])
+        for archivo in archivos:
+            archivo.reducir_almacenamiento_usuario(self.request.user)
+            archivo.reducir_almacenamiento_global()
+            archivo.delete()
+
+        nuevos_archivos = self.request.FILES.getlist('archivos-0-archivo')
+        if form.is_valid():
+            form.instance.usuario = self.request.user
+            self.object = form.save()
+            for file in nuevos_archivos:
+                tamanio = round(file.size/1000, 2)
+                tipo = file.content_type.split("/")
+                if tipo[0] not in enum_media:
+                    messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
+                    return redirect('comunidad:publicacion_novagym')
+                archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
+                    tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
+                archivo.aumentar_almacenamiento_usuario(self.request.user)
+                archivo.aumentar_almacenamiento_global()
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -143,9 +187,11 @@ def bloquear_publicacion(request, pk):
                 file = File(f)
                 archivo.publicacion = publicacion
                 archivo.tipo = "IMG"
-                archivo.almacenamiento_utilizado = round(os.path.getsize(ruta) * 0.001, 2)
+                archivo.almacenamiento_utilizado = Decimal(str(round(os.path.getsize(ruta) * 0.001, 2)))
                 archivo.archivo.save(f'reportado_{publicacion.id}_{publicacion.usuario.id}.jpg', file)
                 archivo.save()
+                archivo.aumentar_almacenamiento_usuario(publicacion.usuario)
+                archivo.aumentar_almacenamiento_global()
 
             publicacion.save()
             messages.success(request, 'Operacion realizada con exito.')

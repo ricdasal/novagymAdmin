@@ -11,6 +11,6 @@ urlpatterns = [
 
      path('publicacion_novagym/', ListaPublicacionNovagym.as_view(), name='publicacion_novagym'),
      path('crear-publicacion/', CrearPublicacion.as_view(), name='crear-publicacion'),
-     path('editar-publicacion/<int:pk>/', aceptar_publicacion, name='editar-publicacion'),
+     path('editar-publicacion/<int:pk>/', EditarPublicacion.as_view(), name='editar-publicacion'),
      path('eliminar-publicacion/<int:pk>/', eliminar_publicacion, name='eliminar-publicacion'),
 ]

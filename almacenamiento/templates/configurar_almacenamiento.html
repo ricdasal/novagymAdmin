@@ -1,0 +1,40 @@
+{% extends "main.html" %}
+{% load static %}
+{% load almacenamiento_filters %}
+
+{% block main %}
+    <div class="row mt-4">
+        <div class="col">
+            <h2 class="text-left">Configurar Almacenamiento</h2>
+        </div>
+        <hr>
+    </div>
+    <hr>
+    <div class="mt-5">
+        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:configurar_almacenamiento' %}" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3" style="width: 35%;">
+                <label for="servidor" class="form-label">Almacenamiento del Servidor</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="form-control text-center" id="servidor" name="servidor" value="{{ almacenamiento_global.servidor|to_mb }}" min="-1" step=".01">
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <div class="mb-3" style="width: 35%;">
+                <label for="capacidad_max" class="form-label">Capacidad máxima por usuarios</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="form-control text-center" id="capacidad_max" name="capacidad_max" value="{{ almacenamiento_global.capacidad_max|to_mb }}" min="-1" step=".01">
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <div class="mb-3" style="width: 35%;">
+                <label for="peso_archivo_max" class="form-label">Límite de peso por archivo</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="form-control text-center" id="peso_archivo_max" name="peso_archivo_max" value="{{ almacenamiento_global.peso_archivo_max|to_mb }}" min="-1" step=".01">
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Actualizar">
+        </form>
+    </div>
+{% endblock main %}

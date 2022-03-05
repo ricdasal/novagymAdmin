@@ -5,11 +5,12 @@
 {% block main %}
     <div class="row my-4">
         <div class="col">
-            <h2 class="text-left">Nueva Publicación</h2>
+            <h2 class="text-left">{% if crear %} Nueva {% else %} Editar {% endif %} Publicación</h2>
         </div>
         <hr>
     </div>
-    <form method="POST" novalidate enctype="multipart/form-data">
+    <form id="form-publicacion" method="POST" action="{% if crear %} {% url 'comunidad:crear-publicacion' %} {% else %} {% url 'comunidad:editar-publicacion' publicacion %} {% endif %}" 
+        novalidate enctype="multipart/form-data">
         {% csrf_token %}
         {{ formset.management_form }}
         {% crispy form %}

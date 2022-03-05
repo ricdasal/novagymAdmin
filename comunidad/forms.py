@@ -2,6 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column, Layout, Row
 
 from django import forms
+from django.forms.widgets import FileInput
 from django.forms.models import inlineformset_factory
 
 from .models import Publicacion, ArchivoPublicacion
@@ -20,6 +21,7 @@ class PublicacionForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['texto'].required = True
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
@@ -30,6 +32,16 @@ class PublicacionForm(forms.ModelForm):
         )
     
 
+class ArchivoPublicacionForm(forms.ModelForm):
+    class Meta:
+        model = ArchivoPublicacion
+        fields = ['archivo']
+        widgets = {
+            'archivo': forms.FileInput(attrs={'multiple': True, 'accept': 'image/*, audio/*, video/*'}),
+        }
+
+    
+        
 
 
-ArchivoFormSet = inlineformset_factory(Publicacion, ArchivoPublicacion, fields=('archivo',), extra=1, can_delete=False)
+ArchivoFormSet = inlineformset_factory(Publicacion, ArchivoPublicacion, form=ArchivoPublicacionForm, fields=('archivo',), extra=1, can_delete=False)

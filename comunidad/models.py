@@ -90,8 +90,8 @@ class Publicacion(models.Model):
     visible = models.BooleanField(default=True)
     motivo = models.TextField(blank=True, default="")
 
-    # def __str__(self):
-    #     return f'{str(self.usuario)}: {self.pk}'
+    def __str__(self):
+        return f'{str(self.usuario)}: {self.pk}'
 
     def biografia_info(self, usuario):
         biografia = Biografia.objects.get(usuario=usuario)
