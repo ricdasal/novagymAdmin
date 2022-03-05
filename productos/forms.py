@@ -59,11 +59,11 @@ class ProductoForm(forms.ModelForm):
 
 class InventarioForm(forms.ModelForm):
     class Meta:
-        fields = ('precio','stock')
+        fields = ('precio','stock','usaNovacoins')
         model = Inventario  
 
         precio=forms.DecimalField(min_value=0)
-
+        usaNovacoins = forms.IntegerField(widget=forms.HiddenInput(), initial=0) 
         
 
     def __init__(self, *args, **kwargs):
@@ -74,6 +74,29 @@ class InventarioForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column('precio', css_class='col-6')
+            ),
+            Row(
+                Column('stock', css_class='col-6')
+            )
+        )
+
+class InventarioFormNC(forms.ModelForm):
+    class Meta:
+        fields = ('novacoins','stock','usaNovacoins')
+        model = Inventario  
+        usaNovacoins = forms.IntegerField(widget=forms.HiddenInput(), initial=1) 
+        novacoins=forms.IntegerField(min_value=0)
+
+        
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('novacoins', css_class='col-6')
             ),
             Row(
                 Column('stock', css_class='col-6')
@@ -112,4 +135,5 @@ class DescuentoForm(forms.ModelForm):
         )
 
 ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
+ProductoMetaNC=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=1,can_delete=False)
 DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)

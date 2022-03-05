@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from firebase_admin import initialize_app
 
 import environ
 
@@ -48,6 +49,8 @@ INSTALLED_APPS = [
     'django_filters',
     'knox',
     'crispy_forms',
+    'fcm_django',
+    #APPS
     'seguridad',
     'novagym',
     'gimnasio',
@@ -55,8 +58,10 @@ INSTALLED_APPS = [
     'contactenos',
     'sponsor',
     'comunidad',
-    'notificaciones'
+    'notificaciones',
+    'push_notifications',
     # 'novagym.cliente',
+    'membresia',
 ]
 
 MIDDLEWARE = [
@@ -174,6 +179,7 @@ FORMAT_MODULE_PATH = 'backend.formats'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
+    Path.joinpath(BASE_DIR, "staticfiles"),
     Path.joinpath(BASE_DIR, "static"),
 ]
 STATIC_ROOT = Path.joinpath(BASE_DIR, "static_root")
@@ -197,3 +203,8 @@ EMAIL_HOST_USER=""
 EMAIL_HOST_PASSWORD=""
 EMAIL_USE_TLS=False
 #EMAIL_USE_SSL=False
+PUSH_NOTIFICATIONS_SETTINGS = {
+        "FCM_API_KEY": "a key",
+}
+
+SOUTH_MIGRATION_MODULES = {"push_notifications": "push_notifications.south_migrations"}

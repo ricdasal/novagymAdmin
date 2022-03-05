@@ -11,10 +11,14 @@
 {% block main %}
 <div class="row mt-4">
   <div class="col">
-    <h2 class="text-left">{{title}}</h2>
+    <h2 class="text-left">{{title|upper}}</h2>
   </div>
   <div class="col">
-    <a href="{% url 'seguridad:agregar' %}" class="btn btn-primary float-right">Agregar usuarios <i
+    {% if view.kwargs.type == 'E' %}
+    <a href="{% url 'seguridad:agregar_rol' %}" class="btn btn-primary float-right">Agregar roles <i
+      class="fas fa-plus-circle"> </i></a>
+    {% endif %}
+    <a href="{% url 'seguridad:agregar' %}?type={{view.kwargs.type}}" class="btn btn-primary float-right">Agregar usuarios <i
         class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
@@ -56,13 +60,13 @@
             <p>Email: {{usuario.usuario.email}}</p>
           </td>
           <td>
-            <a href="{% url 'seguridad:editar' usuario.pk %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'seguridad:editar' pk=usuario.pk %}?type={{usuario.tipo}}" class="btn btn-sm btn-primary">
               Ver perfil <i class="fas fa-edit "></i>
             </a>
           </td>
           <td>
-            <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} data-toggle="toggle" data-on="Habilitado" 
-              data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" class="use-modal" data-target="#mainModal"
+            <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} class="use-modal" data-toggle="toggle" data-type="checkbox"
+              data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" data-target="#mainModal" 
               data-url-activar="{%url 'seguridad:activar' usuario.pk%}" data-url-eliminar="{%url 'seguridad:eliminar' usuario.pk%}"
             >
           </td>

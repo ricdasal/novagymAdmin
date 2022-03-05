@@ -17,7 +17,7 @@ class UserDetails(models.Model):
         CLI = 'C', 'Cliente'
         EMP = 'E', 'Empleado'
 
-    usuario = models.ForeignKey(
+    usuario = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="detalles")
     codigo = models.CharField(max_length=255, blank=True)
     cedula = models.CharField(max_length=13)
@@ -32,4 +32,4 @@ class UserDetails(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cedula + ' - ' + self.apellidos
+        return self.cedula + ' - ' + self.apellidos + ' - ' + self.tipo

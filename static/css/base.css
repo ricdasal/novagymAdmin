@@ -190,3 +190,8 @@ input:focus {
   font-weight: 400;
   padding-left: 25px;
 }
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+}

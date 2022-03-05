@@ -1,0 +1,35 @@
+<div class="form-row mt-4">
+  <div class="col-12">
+    <b><label for="tabla-permisos">Permisos del rol</label></b>
+  </div>
+</div>
+<table class="table table-hover" id="tabla-permisos">
+  <thead>
+    <tr class="text-center">
+      <th></th>
+      <th>Ver</th>
+      <th>Crear</th>
+      <th>Editar</th>
+      <th>Eliminar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for app, app_details in apps.items %}
+    <tr id="{{app}}">
+      <th>
+        {% if not readonly %}
+        <input type="checkbox" onchange="allPermissions(this,'{{app}}')" name="apps" value="{{app}}"
+          class="checkbox">
+        {% endif %}
+        <label>{{app_details.label}}</label>
+      </th>
+      {% for perm, value in app_details.permissions.items %}
+      <td class="text-center">
+        <input type="checkbox" name="apps_permissions" id="{{perm}}" class="checkbox" {%if readonly%}disabled{%endif%}
+          onchange="checkPermissions('{{app}}')" {%if value%}checked{%endif%} value="{{perm}}">
+      </td>
+      {% endfor %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>

@@ -17,27 +17,63 @@
         </a>
       </div>
     </div>
-
-    <div class="row menu-container {% if request.resolver_match.namespace == 'seguridad' %}menu-container--active{% endif %}">
+    <div
+      class="row  menu-container menu menu--collapsable {% if request.resolver_match.namespace == 'seguridad' %}menu-container--active{% endif %}"
+      data-toggle="collapse"
+      data-target="#collaps-user"
+      aria-expanded="true"
+      aria-controls="collaps-user"
+    >
       <div class="col-12">
-        <a class="menu" href="{% url 'seguridad:listar' %}">
-          <div class="row">
+        <div class="row">
+          <img
+            src="{% static 'images/no_image.png'%}"
+            alt="usuarios"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Usuarios</span>
+            <span class="px-4">
+              <i class="fas fa-angle-down"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="collaps-user" class="collapse row menu menu--collapsable {% if request.resolver_match.namespace == 'seguridad' %}show{% endif %} ">
+      <div class="col-12">
+        <a class="menu" href="{% url 'seguridad:listar' type='E'%}">
+          <div class="row menu-container {% if view.kwargs.type == 'E' %}menu-container--active{% endif %}">
             <img
               src="{% static 'images/no_image.png'%}"
-              alt="usuarios"
+              alt="empleados"
               class="menu__image"
             />
             <div class="d-flex align-items-center">
-              <span class="menu__title">Usuarios</span>
+              <span class="menu__title">Empleados</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-12">
+        <a class="menu" href="{% url 'seguridad:listar' type='C' %}">
+          <div class="row menu-container {% if view.kwargs.type == 'C' %}menu-container--active{% endif %}">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="clientes"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Clientes</span>
             </div>
           </div>
         </a>
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'notificaciones:listar' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'notificaciones:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
@@ -120,17 +156,54 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.namespace == 'productos' %}menu-container--active{% endif %}">
+      <div
+      class="row  menu-container menu menu--collapsable {% if request.resolver_match.view_name == 'productos:listarProductos' or request.resolver_match.view_name == 'productos:listarProductosNC'%} menu-container--active{% endif %}"
+      data-toggle="collapse"
+      data-target="#collapsewo2"
+      aria-expanded="true"
+      aria-controls="collapsewo2"
+    >
+      <div class="col-12">
+        <div class="row">
+          <img
+            src="{% static 'images/no_image.png'%}"
+            alt="productos"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Productos</span>
+            <span class="px-4">
+              <i class="fas fa-angle-down"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="collapsewo2" class="collapse row menu menu--collapsable">
       <div class="col-12">
         <a class="menu" href="{% url 'productos:listarProductos' %}">
-          <div class="row">
+          <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductos' %}menu-container--active{% endif %}">
             <img
               src="{% static 'images/no_image.png'%}"
-              alt="productos"
+              alt="repo-ventas"
               class="menu__image"
             />
             <div class="d-flex align-items-center">
-              <span class="menu__title">Productos</span>
+              <span class="menu__title">En dólares ($)</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-12 ">
+        <a class="menu" href="{% url 'productos:listarProductosNC' %}">
+          <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductosNC' %}menu-container--active{% endif %}">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="repo-nc"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">en NovaCoins (NC)</span>
             </div>
           </div>
         </a>
@@ -208,9 +281,9 @@
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'gimnasio:listar' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'gimnasio:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
