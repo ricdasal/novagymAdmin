@@ -296,6 +296,7 @@ class ListarProductosNC(FilterView):
         #context['combo'] = combo
         inventario = Inventario.objects.filter(usaNovacoins=1)
         context['combo'] = inventario
+        context['nc'] = 1
         return context
         
     def post(self, request, *args, **kwargs):
@@ -431,7 +432,7 @@ class CrearProductoNC(CreateView):
         for meta in descuento_metas:
             meta.producto = self.object
             meta.save()
-        return redirect(reverse("productos:listarProductos"))
+        return redirect(reverse("productos:listarProductosNC"))
     def form_invalid(self, form, product_meta_formset):
         return self.render_to_response(
             self.get_context_data(form=form,
@@ -474,7 +475,7 @@ class UpdateProductoNC(UpdateView):
         for meta in descuento_metas:
             meta.producto = self.object
             meta.save()
-        return redirect(reverse("productos:listarProductos"))
+        return redirect(reverse("productos:listarProductosNC"))
     def form_invalid(self, form, product_meta_formset):
         return self.render_to_response(
             self.get_context_data(form=form,
@@ -487,9 +488,14 @@ def deleteProducto(request,id):
     inventario = Inventario.objects.get(id=id)
     descuento = ProductoDescuento.objects.get(id=id)
     if request.POST:
+        nc=inventario.usaNovacoins
         descuento.delete()
         inventario.delete()
         producto.delete()
-        messages.success(request, "Producto eliminado con éxito.")
-        return redirect('productos:listarProductos')
+        if nc==0:
+            messages.success(request, "Producto eliminado con éxito.")
+            return redirect('productos:listarProductos')
+        else:
+            messages.success(request, "Producto eliminado con éxito.")
+            return redirect('productos:listarProductosNC')
     return render(request, "ajax/producto_confirmar_elminar.html", {"producto": producto})
