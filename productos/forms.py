@@ -140,3 +140,7 @@ class DescuentoForm(forms.ModelForm):
 ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
 ProductoMetaNC=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=1,can_delete=False)
 DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)
+
+ProductoMetaU=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=0,can_delete=False)
+ProductoMetaNCU=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=0,can_delete=False)
+DescuentoMetaU=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=0,can_delete=False)
