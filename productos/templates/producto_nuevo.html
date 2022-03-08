@@ -32,6 +32,9 @@
         {{ product_meta_formset.management_form }}
         {{ product_meta_formset.media }}
         {% for form2 in product_meta_formset %}
+        {% for hidden in form2.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
         {% crispy form2 %}
         {% endfor %}
         
@@ -39,6 +42,9 @@
         {{ descuento_meta_formset.management_form }}
         {{ descuento_meta_formset.media }}
         {% for form3 in descuento_meta_formset %}
+        {% for hidden in form3.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
         {% crispy form3 %}
         {% endfor %}
 
