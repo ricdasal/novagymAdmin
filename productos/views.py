@@ -439,47 +439,46 @@ class CrearProductoNC(CreateView):
         )
 
 class UpdateProductoNC(UpdateView):
-    model=Producto
-    form_class =ProductoForm
-    template_name = 'producto_nuevo.html'
-    title = "ACTUALIZAR PRODUCTO"
-    
-    def get_context_data(self, **kwargs):
-        context = super(UpdateProductoNC, self).get_context_data(**kwargs)
-        context['product_meta_formset'] = ProductoMetaNC()
-        context['descuento_meta_formset'] = DescuentoMeta()
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        product_meta_formset = ProductoMetaNC(self.request.POST)
-        descuento_meta_formset = DescuentoMeta(self.request.POST)
-        if form.is_valid() and product_meta_formset.is_valid() and descuento_meta_formset.is_valid():
-            return self.form_valid(form, product_meta_formset,descuento_meta_formset)
-        else:
-            return self.form_invalid(form, product_meta_formset)
-        
-    def form_valid(self, form, product_meta_formset,descuento_meta_formset):
-        self.object = form.save(commit=False)
-        self.object.save()
-        # saving ProductMeta Instances
-        product_metas = product_meta_formset.save(commit=False)
-        for meta in product_metas:
-            meta.producto = self.object
-            meta.save()
-        descuento_metas = descuento_meta_formset.save(commit=False)
-        for meta in descuento_metas:
-            meta.producto = self.object
-            meta.save()
+    template_name = "producto_nuevo.html"
+    model = Producto
+    form_class = ProductoForm
+    context_object_name = "first_obj"
+    def get_success_url(self):
         return redirect(reverse("productos:listarProductosNC"))
-    def form_invalid(self, form, product_meta_formset):
-        return self.render_to_response(
-            self.get_context_data(form=form,
-                                product_meta_formset=product_meta_formset
-                                )
-        )
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            context['product_meta_formset'] = ProductoMetaNCU(self.request.POST,instance=self.object)
+            context['descuento_meta_formset'] = DescuentoMetaU(self.request.POST,instance=self.object)
+        else:
+            context['product_meta_formset'] = ProductoMetaNCU(instance=self.object)
+            context['descuento_meta_formset'] = DescuentoMetaU(instance=self.object)
+        return context
+
+    def forms_valid(self, first, seconds,third):
+        try:      
+            seconds.save()
+            third.save()
+            first.save()
+            messages.success(self.request, "Actualización exitosa!")
+
+        except DatabaseError as err:
+            print(err)
+            messages.error(self.request, "Ooops!  Algo salio mal...")
+        return redirect(reverse("productos:listarProductosNC"))
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        first_form = self.get_form(form_class)
+        second_forms = ProductoMetaNCU(self.request.POST,instance=self.object)
+        third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
+        if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
+                    return self.forms_valid(first_form , second_forms,third_forms)
+        else:
+            messages.error(self.request, "Ooops! Algo salio mal...")
+            return redirect(reverse("productos:listarProductos"))
     
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)
