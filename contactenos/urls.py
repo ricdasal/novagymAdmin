@@ -8,6 +8,6 @@ urlpatterns = [
      #Gimnasio-Contacto
      
     path('', contact, name='contact'),
-
+    path('demo/', sendEmail, name='demo')
 
 ]
