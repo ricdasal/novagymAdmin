@@ -8,6 +8,9 @@ urlpatterns = [
      #Gimnasio-Contacto
      
     path('', contact, name='contact'),
-    path('demo/', sendEmail, name='demo')
-
+    path('sendEmail/', sendEmail, name='sendEmail'),
+    path('buzon/', ShowBuzon.as_view(), name='buzon'),
+    path('markAsRead/<int:id>', markAsRead, name='markAsRead'),
+    path('eliminar/<int:id>', deleteMail, name='eliminar'),
+    path('leer/<int:id>', readMail, name='leer')
 ]
