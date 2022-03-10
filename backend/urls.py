@@ -33,4 +33,5 @@ urlpatterns = [
     path('sponsor/', include('sponsor.urls')),
     path('notificaciones/', include('notificaciones.urls')),
     path('api/', include(comunidad_api)),
+    path('calendario/', include('calendario.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
