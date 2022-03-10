@@ -44,8 +44,14 @@
             {% endif %}
           </td>
           <td>
-            <p>{{usuario.codigo}} - {{usuario.nombres}} {{usuario.apellidos}}</p>
-            <p>CI: {{usuario.cedula}}</p>
+            <p>{{usuario.nombres}} {{usuario.apellidos}}</p>
+            <p>
+              <span class="mr-3">CI: {{usuario.cedula}}</span>
+              {% if view.kwargs.type == 'C'%}
+              <span>CU: {{usuario.codigo}}</span>
+              {% endif %}
+            </p>
+            {% if view.kwargs.type == 'E'%}
             <p>Rol:             
               {% if usuario.usuario.groups.all %}
                 {% for grupo in usuario.usuario.groups.all %}
@@ -53,6 +59,7 @@
                 {% endfor %}
               {% endif %}
             </p>
+            {% endif %}
             <p>Fecha de registro: {{usuario.created_at}}</p>
           </td>
           <td>
@@ -65,9 +72,10 @@
             </a>
           </td>
           <td>
-            <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} class="use-modal" data-toggle="toggle" data-type="checkbox"
-              data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" data-target="#mainModal" 
-              data-url-activar="{%url 'seguridad:activar' usuario.pk%}" data-url-eliminar="{%url 'seguridad:eliminar' usuario.pk%}"
+            <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+              data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+              data-target="#mainModal" data-url-activar="{%url 'seguridad:activar' usuario.pk%}?type={{usuario.tipo}}" 
+              data-url-eliminar="{%url 'seguridad:eliminar' usuario.pk%}?type={{usuario.tipo}}"
             >
           </td>
         </tr>
