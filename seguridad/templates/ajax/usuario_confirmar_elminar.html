@@ -6,45 +6,28 @@
 </div>
 <form method="POST" action="{% url 'seguridad:eliminar' usuario.pk %}">
   {% csrf_token %}
-
+  <input type="hidden" name="type" value="{{request.GET.type}}" />
   <div class="modal-body">
     ¿Desea deshabilitar el siguiente usuario?
     <div class="row">
-      <div class="col-3">
-        Cédula
-      </div>
-      <div class="col">
-        {{usuario.cedula}}
-      </div>
+      <div class="col-3">Cédula</div>
+      <div class="col">{{usuario.cedula}}</div>
     </div>
     <div class="row">
-      <div class="col-3">
-        Correo
-      </div>
-      <div class="col">
-        {{usuario.usuario.email}}
-      </div>
+      <div class="col-3">Correo</div>
+      <div class="col">{{usuario.usuario.email}}</div>
     </div>
     <div class="row">
-      <div class="col-3">
-        Nombre
-      </div>
-      <div class="col">
-        {{usuario.nombres}}
-      </div>
+      <div class="col-3">Nombre</div>
+      <div class="col">{{usuario.nombres}}</div>
     </div>
     <div class="row">
-      <div class="col-3">
-        Apellidos
-      </div>
-      <div class="col">
-        {{usuario.apellidos}}
-      </div>
+      <div class="col-3">Apellidos</div>
+      <div class="col">{{usuario.apellidos}}</div>
     </div>
-  </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    <button id="anular" class="btn btn-danger mr-3" type="submit"> Desactivar </button>
+    <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
   </div>
 </form>

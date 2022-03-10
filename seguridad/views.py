@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import (AccessMixin, LoginRequiredMixin,
                                         PermissionRequiredMixin)
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Group, Permission
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
@@ -16,7 +16,7 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 
-from seguridad.filters import UsuarioFilter
+from seguridad.filters import ClienteFilter, UsuarioFilter
 from seguridad.forms import (RolUsuarioForm, UsuarioDetallesForm,
                              UsuarioEditarForm, UsuarioForm)
 
@@ -42,21 +42,19 @@ def login_user(request):
         next_page = request.POST.get('next', None)
         user = authenticate(username=username, password=password)
         if user:
-            if not user.is_admin or user.detalles.tipo != 'E':
-                messages.error(request, 'Solo empleados pueden ingresar.')
-                return redirect('seguridad:login_admin')
-            if user.is_active:
+            if user.is_superuser or (user.is_active and user.detalles.tipo == 'E'):
                 login(request, user)
                 if next_page:
                     return redirect(next_page)
                 else:
                     return redirect('novagym:principal')
-            else:
-                messages.error(request, 'Esta cuenta ha sido desactivada.')
-                return redirect('seguridad:login_admin')
+            if not user.is_active:
+              messages.error(request, 'Esta cuenta ha sido desactivada.')
+            if not user.detalles.tipo == 'E':
+              messages.error(request, 'Solo admin/empleados pueden ingresar.')
+            return redirect('seguridad:login_admin')
         else:
-            messages.error(
-                request, 'Nombre de usuario o contraseña incorrecto.')
+            messages.error(request, 'Nombre de usuario o contraseña incorrecto.')
             return redirect('seguridad:login_admin')
     else:
         if request.user and request.user.is_authenticated:
@@ -102,7 +100,11 @@ class ListarUsuarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Filter
     context_object_name = 'usuarios'
     template_name = "lista_usuarios.html"
     permission_required = 'seguridad.view_userdetails'
-    filterset_class = UsuarioFilter
+    filterset_class_emp = UsuarioFilter
+    filterset_class_cli = ClienteFilter
+
+    def get_filterset_class(self):
+        return self.filterset_class_emp if self.kwargs['type'] == "E" else self.filterset_class_cli
 
     def get_queryset(self):
         return self.model.objects.filter(tipo=self.kwargs['type'])
@@ -120,12 +122,11 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
     form_class = UsuarioDetallesForm
     user_form_class = UsuarioForm
     template_name = 'usuario_nuevo.html'
-    title = "Crear usuario"
-    success_url = reverse_lazy('seguridad:listar')
+    success_url = 'seguridad:listar'
     permission_required = 'seguridad.add_userdetails'
 
     def get_success_url(self):
-        return reverse_lazy('seguridad:listar', kwargs={'type': self.request.GET['type']})
+        return reverse_lazy(self.success_url, kwargs={'type': self.request.GET['type']})
 
     def get_success_message(self):
         return "{} creado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
@@ -163,7 +164,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response({"form": usuario_detalles_form, "user_form": usuario_form,
-                                            "title": self.title})
+                                            "title": self.get_title})
 
 
 class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateView):
@@ -171,10 +172,11 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
     form_class = UsuarioDetallesForm
     user_form_class = UsuarioEditarForm
     template_name = 'usuario_nuevo.html'
+    success_url = 'seguridad:listar'
     permission_required = 'seguridad.change_userdetails'
 
     def get_success_url(self):
-        return reverse_lazy('seguridad:listar', kwargs={'type': self.request.GET['type']})
+        return reverse_lazy(self.success_url, kwargs={'type': self.request.GET['type']})
 
     def get_success_message(self):
         return "{} editado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
@@ -208,7 +210,7 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.render_to_response({"form": usuario_detalles_form, "user_form": usuario_form,
-                                            "title": self.title})
+                                            "title": self.get_title()})
 
 
 @login_required
@@ -216,11 +218,13 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
 def usuario_confirmar_eliminacion(request, pk):
     detalles = UserDetails.objects.get(id=pk)
     if request.POST:
+        success_url = reverse_lazy('seguridad:listar', kwargs={
+                                   'type': request.POST['type']})
         usuario = detalles.usuario
         usuario.is_active = False
         usuario.save()
         messages.success(request, "Usuario deshabilitado con éxito.")
-        return redirect('seguridad:listar')
+        return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
 
 
@@ -229,11 +233,13 @@ def usuario_confirmar_eliminacion(request, pk):
 def usuario_confirmar_activar(request, pk):
     detalles = UserDetails.objects.get(id=pk)
     if request.POST:
+        success_url = reverse_lazy('seguridad:listar', kwargs={
+                                   'type': request.POST['type']})
         usuario = detalles.usuario
         usuario.is_active = True
         usuario.save()
         messages.success(request, "Usuario habilitado con éxito.")
-        return redirect('seguridad:listar')
+        return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_activar.html", {"usuario": detalles})
 
 
@@ -242,8 +248,11 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
     form_class = RolUsuarioForm
     template_name = 'grupo_nuevo.html'
     title = 'Crear Rol'
-    success_url = reverse_lazy('seguridad:listar')
+    success_url = 'seguridad:listar'
     permission_required = 'seguridad.add_userdetails'
+
+    def get_success_url(self):
+        return reverse_lazy(self.success_url, kwargs={'type': 'E'})
 
     def get_permissions_template(self, app_name, model):
         permissions = ['view', 'add', 'change', 'delete']
@@ -292,7 +301,7 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
                 if next_page:
                     return HttpResponseRedirect(next_page)
                 else:
-                    return HttpResponseRedirect(self.success_url)
+                    return HttpResponseRedirect(self.get_success_url())
         messages.error(
             request, "Por favor, verifique los datos del rol ingresado.")
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -303,9 +312,12 @@ class EditarRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Upda
     form_class = RolUsuarioForm
     template_name = 'grupo_nuevo.html'
     title = 'Editar Rol'
-    success_url = reverse_lazy('seguridad:listar')
+    success_url = 'seguridad:listar'
     permission_required = 'seguridad.change_userdetails'
     context_object_name = 'rol'
+
+    def get_success_url(self):
+        return reverse_lazy(self.success_url, kwargs={'type': 'E'})
 
     def get_permissions_template(self, app_name, model):
         permissions = ['view', 'add', 'change', 'delete']
@@ -358,7 +370,7 @@ class EditarRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Upda
                 if next_page:
                     return HttpResponseRedirect(next_page)
                 else:
-                    return HttpResponseRedirect(self.success_url)
+                    return HttpResponseRedirect(self.get_success_url())
         messages.error(
             request, "Por favor, seleccione los permisos del rol a crear.")
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -370,8 +382,9 @@ def rol_confirmar_eliminacion(request, pk):
     rol = Group.objects.get(id=pk)
     if request.POST:
         rol.delete()
+        next_page = request.POST.get('next')
         messages.info(request, "Rol eliminado con éxito.")
-        return redirect('seguridad:listar')
+        return redirect(next_page)
     return render(request, "ajax/rol_confirmar_elminar.html", {"rol": rol})
 
 
@@ -379,7 +392,7 @@ def rol_confirmar_eliminacion(request, pk):
 @permission_required('seguridad.view_userdetails')
 def rol_permisos_template(request, pk):
     rol = Group.objects.get(id=pk)
-    
+
     def get_permissions_template(app_name, model):
         permissions = ['view', 'add', 'change', 'delete']
         app_permissions = []
