@@ -27,7 +27,7 @@
                     <div class="form-group row">
                         <label for="staticEmail" class="col-sm-5 col-form-label">Peso máximo de archivos: </label>
                         <div class="col-sm-5 d-flex align-items-center">
-                            <input type="number" class="form-control text-center" id="peso_archivo_asignado" name="peso_archivo_asignado" value="{{ almacenamiento.peso_archivo_asignado|to_mb }}" min="-1" step=".01">
+                            <input type="number" class="form-control text-center" id="peso_archivo_asignado" name="peso_archivo_asignado" value="{{ almacenamiento.peso_archivo_asignado|to_mb }}" min="-1" step=".01" {% if almacenamiento_sin_limite %} disabled {% endif %}>
                             <h5 class="mb-0 ml-3">MB</h5>
                         </div>
                     </div>
@@ -41,12 +41,12 @@
                     <div class="form-group row">
                         <label for="staticEmail" class="col-sm-5 col-form-label">Espacio asignado: </label>
                         <div class="col-sm-5 d-flex align-items-center">
-                            <input type="number" class="form-control text-center" id="asignado" name="asignado" value="{{ almacenamiento.asignado|to_mb }}" min="-1" step=".01">
+                            <input type="number" class="form-control text-center" id="asignado" name="asignado" value="{{ almacenamiento.asignado|to_mb }}" min="-1" step=".01" {% if almacenamiento_sin_limite %} disabled {% endif %}>
                             <h5 class="mb-0 ml-3">MB</h5>
                         </div>
                     </div>
                     <div class="col-sm-12 text-right mb-4">
-                        <input type="submit" class="btn btn-primary" value="Actualizar">
+                        <input type="submit" class="btn btn-primary" value="Actualizar" {% if almacenamiento_sin_limite %} disabled {% endif %}>
                     </div>
                 </form>
             </div>

@@ -8,10 +8,11 @@ def tamanio_archivos(archivos):
    return tamanio
 
 def almacenamiento_disponible_user(user, archivos):
-   almacenamiento = AlmacenamientoUsuario.objects.get(usuario=user)
-   if almacenamiento.asignado == -1: #-1 significa que no hay un limite de almacenamiento
+   almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
+   if almacenamiento_global.sin_limite:
       return True
 
+   almacenamiento = AlmacenamientoUsuario.objects.get(usuario=user)
    tamanio = tamanio_archivos(archivos)   
    if (Decimal(tamanio) + almacenamiento.usado) > (almacenamiento.asignado + almacenamiento.comprado):
       return False
@@ -19,7 +20,7 @@ def almacenamiento_disponible_user(user, archivos):
 
 def almacenamiento_disponible_servidor(archivos):
    almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
-   if almacenamiento.capacidad_max == -1 and almacenamiento.servidor == -1:
+   if almacenamiento.sin_limite:
       return True
    tamanio = tamanio_archivos(archivos)
    almacenamiento_actual = Decimal(tamanio) + almacenamiento.total_usado
@@ -28,4 +29,16 @@ def almacenamiento_disponible_servidor(archivos):
    elif Decimal(tamanio) > almacenamiento.capacidad_max:
       return False
    return True
+
+def peso_archivo_permitido(user, peso_archivo):
+   almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
+   if almacenamiento_global.sin_limite:
+      return True
+
+   almacenamiento = AlmacenamientoUsuario.objects.get(usuario=user)
+   if Decimal(peso_archivo) > almacenamiento.peso_archivo_asignado:
+      return False
+   return True
+
+
    

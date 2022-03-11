@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django_filters.views import FilterView
+from django.views.generic import UpdateView
 from django.contrib import messages
 
 from decimal import Decimal
@@ -29,33 +30,42 @@ class AlmacenamientoUsuarioView(FilterView):
 
 def configurar_almacenamiento(request):
     almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
+    context = {
+        'almacenamiento_global': almacenamiento_global
+    }
 
     if request.POST:
-        servidor = round(Decimal(request.POST.get('servidor')) * 1000, 2)
-        nueva_capacidad_max = round(Decimal(request.POST.get('capacidad_max')) * 1000, 2)
-        nuevo_peso_archivo_max = round(Decimal(request.POST.get('peso_archivo_max')) * 1000, 2)
+        sin_limite = request.POST.get('sin_limite')
+        if sin_limite:
+            almacenamiento_global.sin_limite = True
+        else:
+            try:
+                servidor = round(Decimal(request.POST.get('servidor')) * 1000, 2)
+                nueva_capacidad_max = round(Decimal(request.POST.get('capacidad_max')) * 1000, 2)
+                nuevo_peso_archivo_max = round(Decimal(request.POST.get('peso_archivo_max')) * 1000, 2)
+            except:
+                messages.error(request, 'Error al guardar los valores.')
+                return render(request, 'configurar_almacenamiento.html', context)
 
-        #modificar el almacenamiento asignado a los usuarios
-        almacenamiento_usuarios = AlmacenamientoUsuario.objects.all()
-        for almacenamiento_user in almacenamiento_usuarios:
-            if not almacenamiento_user.es_excepcion:
-                if almacenamiento_user.asignado == almacenamiento_global.capacidad_max:
-                    almacenamiento_user.asignado = nueva_capacidad_max
-                if almacenamiento_user.peso_archivo_asignado == almacenamiento_global.peso_archivo_max:
-                    almacenamiento_user.peso_archivo_asignado = nuevo_peso_archivo_max
-                almacenamiento_user.save()
+            #modificar el almacenamiento asignado a los usuarios
+            almacenamiento_usuarios = AlmacenamientoUsuario.objects.all()
+            for almacenamiento_user in almacenamiento_usuarios:
+                if not almacenamiento_user.es_excepcion:
+                    if almacenamiento_user.asignado == almacenamiento_global.capacidad_max:
+                        almacenamiento_user.asignado = nueva_capacidad_max
+                    if almacenamiento_user.peso_archivo_asignado == almacenamiento_global.peso_archivo_max:
+                        almacenamiento_user.peso_archivo_asignado = nuevo_peso_archivo_max
+                    almacenamiento_user.save()
 
-        almacenamiento_global.servidor = servidor
-        almacenamiento_global.capacidad_max = nueva_capacidad_max
-        almacenamiento_global.peso_archivo_max = nuevo_peso_archivo_max
+            almacenamiento_global.servidor = servidor
+            almacenamiento_global.capacidad_max = nueva_capacidad_max
+            almacenamiento_global.peso_archivo_max = nuevo_peso_archivo_max
+            almacenamiento_global.sin_limite = False
         almacenamiento_global.save()
 
         messages.success(request, 'Operacion realizada con exito.')
         return redirect('almacenamiento:almacenamiento_usuario')
 
-    context = {
-        'almacenamiento_global': almacenamiento_global
-    }
     return render(request, 'configurar_almacenamiento.html', context)
 
 
@@ -88,8 +98,10 @@ def configurar_usuario(request, user):
 
 def administrar_excepciones(request):
     almacenamiento_usuario = AlmacenamientoUsuario.objects.filter(es_excepcion=True).all()
+    almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
 
     context = {
-        'almacenamiento_usuario': almacenamiento_usuario
+        'almacenamiento_usuario': almacenamiento_usuario,
+        'almacenamiento_sin_limite': almacenamiento_global.sin_limite,
     }
     return render(request, 'administrar_excepciones.html', context)

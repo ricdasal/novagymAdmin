@@ -6,10 +6,10 @@ from seguridad.models import UserDetails
 
 class AlmacenamientoUsuario(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    asignado = models.DecimalField(max_digits=10, decimal_places=2 ,default=-1)
+    asignado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
     usado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
     comprado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
-    peso_archivo_asignado = models.DecimalField(max_digits=10, decimal_places=2 ,default=-1)
+    peso_archivo_asignado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
     es_excepcion = models.BooleanField(default=False)
 
     @property
@@ -29,8 +29,9 @@ class AlmacenamientoUsuario(models.Model):
 
 
 class AlmacenamientoGlobal(models.Model):
-    servidor = models.DecimalField(max_digits=10, decimal_places=2 ,default=-1)
-    capacidad_max = models.DecimalField(max_digits=10, decimal_places=2 ,default=-1)#lo max que puede tener un usuario de almacenamiento
-    peso_archivo_max = models.DecimalField(max_digits=10, decimal_places=2 ,default=-1)
+    servidor = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
+    capacidad_max = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)#lo max que puede tener un usuario de almacenamiento
+    peso_archivo_max = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
     total_usado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
+    sin_limite = models.BooleanField(default=True)
 

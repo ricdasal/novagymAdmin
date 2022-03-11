@@ -11,30 +11,50 @@
     </div>
     <hr>
     <div class="mt-5">
-        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:configurar_almacenamiento' %}" novalidate enctype="multipart/form-data">
+        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:configurar_almacenamiento' %}" novalidate>
             {% csrf_token %}
             <div class="mb-3" style="width: 35%;">
                 <label for="servidor" class="form-label">Almacenamiento del Servidor</label>
                 <div class="d-flex align-items-center">
-                    <input type="number" class="form-control text-center" id="servidor" name="servidor" value="{{ almacenamiento_global.servidor|to_mb }}" min="-1" step=".01">
+                    <input type="number" class="form-control text-center" id="servidor" name="servidor" value="{{ almacenamiento_global.servidor|to_mb }}" min="0" step=".01"
+                        {% if almacenamiento_global.sin_limite %} disabled {% endif %}}>
                     <h5 class="mb-0 ml-3">megabytes</h5>
                 </div>
             </div>
             <div class="mb-3" style="width: 35%;">
                 <label for="capacidad_max" class="form-label">Capacidad máxima por usuarios</label>
                 <div class="d-flex align-items-center">
-                    <input type="number" class="form-control text-center" id="capacidad_max" name="capacidad_max" value="{{ almacenamiento_global.capacidad_max|to_mb }}" min="-1" step=".01">
+                    <input type="number" class="form-control text-center" id="capacidad_max" name="capacidad_max" value="{{ almacenamiento_global.capacidad_max|to_mb }}" min="0" step=".01"
+                        {% if almacenamiento_global.sin_limite %} disabled {% endif %}>
                     <h5 class="mb-0 ml-3">megabytes</h5>
                 </div>
             </div>
             <div class="mb-3" style="width: 35%;">
                 <label for="peso_archivo_max" class="form-label">Límite de peso por archivo</label>
                 <div class="d-flex align-items-center">
-                    <input type="number" class="form-control text-center" id="peso_archivo_max" name="peso_archivo_max" value="{{ almacenamiento_global.peso_archivo_max|to_mb }}" min="-1" step=".01">
+                    <input type="number" class="form-control text-center" id="peso_archivo_max" name="peso_archivo_max" value="{{ almacenamiento_global.peso_archivo_max|to_mb }}" min="0"  step=".01" {% if almacenamiento_global.sin_limite %} disabled {% endif %}>
                     <h5 class="mb-0 ml-3">megabytes</h5>
                 </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input id="flexCheckChecked" type="checkbox" name="sin_limite" class="form-check-input" value="{{ almacenamiento_global.sin_limite }}" {% if almacenamiento_global.sin_limite %} checked {% endif %}>
+                <label class="form-check-label" for="flexCheckChecked">Sin Límites</label>
             </div>
             <input type="submit" class="btn btn-primary" value="Actualizar">
         </form>
     </div>
 {% endblock main %}
+
+{% block specific_scripts %}
+<script>
+    var checkbox = document.querySelector("input[name=sin_limite]");
+    checkbox.addEventListener('change', function() {
+        this.value = this.checked;
+        var inputs = document.getElementsByClassName("form-control");
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].disabled = this.checked;
+        }
+    });
+</script>
+{% endblock %}
+

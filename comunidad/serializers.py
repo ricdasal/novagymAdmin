@@ -35,17 +35,19 @@ class PublicacionSerializer(serializers.ModelSerializer):
         archivos = validated_data.pop('archivos')
         publicacion = Publicacion.objects.create(**validated_data)
         for archivo in archivos:
-            archivo = ArchivoPublicacion.objects.create(publicacion=publicacion, **archivo)
-            archivo.aumentar_almacenamiento_usuario(publicacion.usuario)
-            archivo.aumentar_almacenamiento_global()
+            archivo_publicacion = ArchivoPublicacion.objects.create(publicacion=publicacion, **archivo)
+            archivo_publicacion.aumentar_almacenamiento(publicacion.usuario)
+
         return publicacion
     
     def update(self, instance, validated_data):
         archivos = validated_data.pop('archivos')
-        instance.texto = validated_data.get('texto', instance.texto)
+        if 'texto' in validated_data:
+            instance.texto = validated_data.get('texto', instance.texto)
         instance.save()
         for archivo in archivos:
-            ArchivoPublicacion.objects.create(publicacion=instance, **archivo)
+            archivo_publicacion = ArchivoPublicacion.objects.create(publicacion=instance, **archivo)
+            archivo_publicacion.aumentar_almacenamiento(instance.usuario)
         return instance
 
 
@@ -58,9 +60,25 @@ class ComentarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comentario
         fields = ['id', 'texto', 'publicacion', 'usuario', 
-                'usuario_info', 'fecha_creacion', 'imagen', 
-                'nivel_comentario', 'comentario_padre', 'es_padre',
-                'comentarios_hijo']
+                'usuario_info', 'fecha_creacion', 'imagen',
+                'almacenamiento_utilizado', 'nivel_comentario', 
+                'comentario_padre', 'es_padre', 'comentarios_hijo']
+    
+    def create(self, validated_data):
+        comentario = Comentario.objects.create(**validated_data)
+        if comentario.imagen:
+            comentario.aumentar_almacenamiento()
+        return comentario
+    
+    def update(self, instance, validated_data):
+        if 'texto' in validated_data:
+            instance.texto = validated_data.get('texto', instance.texto)
+        if 'imagen' in validated_data:
+            instance.imagen = validated_data.get('imagen', instance.imagen)
+            instance.almacenamiento_utilizado = validated_data.get('almacenamiento_utilizado', instance.almacenamiento_utilizado)
+            instance.aumentar_almacenamiento()
+        instance.save()
+        return instance
 
 
 class SeguidorSerializer(serializers.ModelSerializer):
@@ -87,6 +105,12 @@ class SeguidosSerializer(serializers.ModelSerializer):
 class HistoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Historia
-        fields = ['id', 'usuario', 'texto', 
-                'fecha_creacion', 'archivo', 'tipo_archivo']
+        fields = ['id', 'usuario', 'texto', 'fecha_creacion', 
+                'archivo', 'tipo_archivo', 'almacenamiento_utilizado']
         extra_kwargs = {"usuario": {"write_only": True, 'required': True}}
+
+    def create(self, validated_data):
+        historia = Historia.objects.create(**validated_data)
+        if historia.archivo:
+            historia.aumentar_almacenamiento()
+        return historia

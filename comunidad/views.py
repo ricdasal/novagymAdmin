@@ -7,6 +7,7 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from django.conf import settings
 from django.core.files.base import File
+from almacenamiento.models import AlmacenamientoUsuario
 
 from novagym.utils import calculate_pages_to_render
 from comunidad.utils import enum_media
@@ -47,6 +48,7 @@ class CrearPublicacion(CreateView):
             data['archivos'] = ArchivoFormSet(self.request.POST, self.request.FILES)
         else:
             data['archivos'] = ArchivoFormSet()
+            data['peso_archivo_asignado'] = AlmacenamientoUsuario.objects.get(usuario=self.request.user).peso_archivo_asignado
         return data
     
     def form_valid(self, form):
@@ -64,8 +66,7 @@ class CrearPublicacion(CreateView):
                     return redirect('comunidad:publicacion_novagym')
                 archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
                     tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
-                archivo.aumentar_almacenamiento_usuario(self.request.user)
-                archivo.aumentar_almacenamiento_global()
+                archivo.aumentar_almacenamiento(self.request.user)
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -85,6 +86,7 @@ class EditarPublicacion(UpdateView):
             data['archivos'] = ArchivoFormSet(self.request.POST, self.request.FILES, instance=self.object)
         else:
             data['archivos'] = ArchivoFormSet()
+            data['peso_archivo_asignado'] = AlmacenamientoUsuario.objects.get(usuario=self.request.user).peso_archivo_asignado
         return data
 
     def form_valid(self, form):
@@ -92,8 +94,7 @@ class EditarPublicacion(UpdateView):
         
         archivos = ArchivoPublicacion.objects.filter(publicacion=context['publicacion'])
         for archivo in archivos:
-            archivo.reducir_almacenamiento_usuario(self.request.user)
-            archivo.reducir_almacenamiento_global()
+            archivo.reducir_almacenamiento(self.request.user)
             archivo.delete()
 
         nuevos_archivos = self.request.FILES.getlist('archivos-0-archivo')
@@ -108,8 +109,7 @@ class EditarPublicacion(UpdateView):
                     return redirect('comunidad:publicacion_novagym')
                 archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
                     tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
-                archivo.aumentar_almacenamiento_usuario(self.request.user)
-                archivo.aumentar_almacenamiento_global()
+                archivo.aumentar_almacenamiento(self.request.user)
         return super().form_valid(form)
     
     def get_success_url(self):
@@ -122,8 +122,7 @@ def eliminar_publicacion(request, pk):
             publicacion = Publicacion.objects.get(pk=pk)
             archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
             for archivo in archivos:
-                archivo.reducir_almacenamiento_usuario(publicacion.usuario)
-                archivo.reducir_almacenamiento_global()
+                archivo.reducir_almacenamiento(publicacion.usuario)
                 archivo.delete()
             publicacion.delete()
             messages.success(request, "La publicación ha sido eliminada.")
@@ -177,8 +176,7 @@ def bloquear_publicacion(request, pk):
 
             archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
             for archivo in archivos:
-                archivo.reducir_almacenamiento_usuario(publicacion.usuario)
-                archivo.reducir_almacenamiento_global()
+                archivo.reducir_almacenamiento(publicacion.usuario)
                 archivo.delete()
 
             archivo = ArchivoPublicacion()
@@ -190,8 +188,7 @@ def bloquear_publicacion(request, pk):
                 archivo.almacenamiento_utilizado = Decimal(str(round(os.path.getsize(ruta) * 0.001, 2)))
                 archivo.archivo.save(f'reportado_{publicacion.id}_{publicacion.usuario.id}.jpg', file)
                 archivo.save()
-                archivo.aumentar_almacenamiento_usuario(publicacion.usuario)
-                archivo.aumentar_almacenamiento_global()
+                archivo.aumentar_almacenamiento(publicacion.usuario)
 
             publicacion.save()
             messages.success(request, 'Operacion realizada con exito.')

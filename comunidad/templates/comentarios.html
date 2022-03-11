@@ -7,6 +7,11 @@
         <div class="pt-2 px-3 mb-2 w-auto bg-light" style="border-radius: 25px; max-width: 90%;">
             <span>{{ comentario.usuario_info.nombre }} {{ comentario.usuario_info.apellido }}</span>
             <p>{{ comentario.texto }}</p>
+            {% if comentario.imagen %}
+                <div class="text-center mb-3">
+                    <img src="{{ comentario.imagen }}" alt="" style="width: 70%; height: auto;" />
+                </div>
+            {% endif %}
         </div>
     </div>
     {% if comentario.es_padre %}

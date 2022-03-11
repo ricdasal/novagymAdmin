@@ -11,6 +11,35 @@ def usuario_detalle(usuario):
     detalle = UserDetails.objects.get(usuario=usuario)
     return { "nombre": detalle.nombres, "apellido": detalle.apellidos }
 
+def aumentar_almacenamiento_usuario(usuario, almacenamiento_utilizado):
+    almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
+    almacenamiento.usado += almacenamiento_utilizado
+    almacenamiento.save()
+    
+def aumentar_almacenamiento_global(almacenamiento_utilizado):
+    almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
+    almacenamiento.total_usado += almacenamiento_utilizado
+    almacenamiento.save()
+
+def reducir_almacenamiento_usuario(usuario, almacenamiento_utilizado):
+    almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
+    actual = almacenamiento.usado - almacenamiento_utilizado
+    if actual > 0:
+        almacenamiento.usado = actual
+    else:
+        almacenamiento.usado = 0
+    almacenamiento.save()
+
+def reducir_almacenamiento_global(almacenamiento_utilizado):
+    almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
+    actual = almacenamiento.total_usado - almacenamiento_utilizado
+    if actual > 0:
+        almacenamiento.total_usado = actual
+    else:
+        almacenamiento.total_usado = 0
+    almacenamiento.save()
+
+
 class Biografia(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
     foto_perfil = models.ImageField(upload_to='perfil/', default='avatar.png')
@@ -136,34 +165,13 @@ class ArchivoPublicacion(models.Model):
             os.remove(self.archivo.path)
         super(ArchivoPublicacion, self).delete(*args, **kwargs)
     
-    #aumentar el almacenamiento ocupado por el usuario
-    def aumentar_almacenamiento_usuario(self, usuario):
-        almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
-        almacenamiento.usado += self.almacenamiento_utilizado
-        almacenamiento.save()
+    def aumentar_almacenamiento(self, usuario):
+        aumentar_almacenamiento_usuario(usuario, self.almacenamiento_utilizado)
+        aumentar_almacenamiento_global(self.almacenamiento_utilizado)
     
-    def aumentar_almacenamiento_global(self):
-        almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
-        almacenamiento.total_usado += self.almacenamiento_utilizado
-        almacenamiento.save()
-    
-    def reducir_almacenamiento_usuario(self, usuario):
-        almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
-        actual = almacenamiento.usado - self.almacenamiento_utilizado
-        if actual > 0:
-            almacenamiento.usado = actual
-        else:
-            almacenamiento.usado = 0
-        almacenamiento.save()
-    
-    def reducir_almacenamiento_global(self):
-        almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
-        actual = almacenamiento.total_usado - self.almacenamiento_utilizado
-        if actual > 0:
-            almacenamiento.total_usado = actual
-        else:
-            almacenamiento.total_usado = 0
-        almacenamiento.save()
+    def reducir_almacenamiento(self, usuario):
+        reducir_almacenamiento_usuario(usuario, self.almacenamiento_utilizado)
+        reducir_almacenamiento_global(self.almacenamiento_utilizado)
 
 
 class Like(models.Model):
@@ -197,6 +205,7 @@ class Comentario(models.Model):
     imagen = models.ImageField(upload_to='comentario/', blank=True, null=True)
     comentario_padre = models.ForeignKey('self', on_delete=models.CASCADE,
         blank=True, null=True, related_name='padre')
+    almacenamiento_utilizado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
     
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
@@ -205,6 +214,14 @@ class Comentario(models.Model):
         if self.imagen and os.path.isfile(self.imagen.path):
             os.remove(self.imagen.path)
         super(Comentario, self).delete(*args, **kwargs)
+    
+    def aumentar_almacenamiento(self):
+        aumentar_almacenamiento_usuario(self.usuario, self.almacenamiento_utilizado)
+        aumentar_almacenamiento_global(self.almacenamiento_utilizado)
+    
+    def reducir_almacenamiento(self):
+        reducir_almacenamiento_usuario(self.usuario, self.almacenamiento_utilizado)
+        reducir_almacenamiento_global(self.almacenamiento_utilizado)
 
     def count_comentarios_hijos(self):
         return Comentario.objects.filter(comentario_padre=self).all().count()
@@ -262,3 +279,11 @@ class Historia(models.Model):
         if self.archivo and os.path.isfile(self.archivo.path):
             os.remove(self.archivo.path)
         super(Historia, self).delete(*args, **kwargs)
+    
+    def aumentar_almacenamiento(self):
+        aumentar_almacenamiento_usuario(self.usuario, self.almacenamiento_utilizado)
+        aumentar_almacenamiento_global(self.almacenamiento_utilizado)
+    
+    def reducir_almacenamiento(self):
+        reducir_almacenamiento_usuario(self.usuario, self.almacenamiento_utilizado)
+        reducir_almacenamiento_global(self.almacenamiento_utilizado)

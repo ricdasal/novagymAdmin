@@ -24,12 +24,13 @@ def conversion(kylobytes):
 
 @register.filter(name="calculate_percentage")
 def calculate_percentage(used, total):
-    return round((used / total) * 100, 0)
+    division = used / total
+    if division >= 1:
+        return 100
+    return round(division * 100, 0)
 
 
 @register.filter(name="to_mb")
 def to_mb(kylobytes):
-    if kylobytes == -1.00:
-        return str(kylobytes)
     mb = kylobytes * Decimal(str(0.001))
-    return str(round(mb, 2))
+    return str(round(mb, 0))
