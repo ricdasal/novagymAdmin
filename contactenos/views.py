@@ -5,7 +5,6 @@ from django_filters.views import FilterView
 from contactenos.models import Buzon
 from contactenos.filters import BuzonFilter
 from novagym.utils import calculate_pages_to_render
-from seguridad.models import UserDetails
 from .forms import *
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
@@ -14,6 +13,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from backend.settings import env
 from django.contrib import messages
+from seguridad.models import UserDetails
+from rest_framework.viewsets import ViewSet
+from rest_framework.response import Response
+from .serializers import BuzonSerializer
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 
 
@@ -61,6 +66,17 @@ def sendEmail(request):
             return Response(status=status.HTTP_503_SERVICE_UNAVAILABLE)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+
+class SendMail(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        file_serializer = BuzonSerializer(data=request.data)
+        if file_serializer.is_valid():
+            file_serializer.save()
+            return Response(file_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ShowBuzon(FilterView):
     paginate_by = 20
@@ -77,6 +93,49 @@ class ShowBuzon(FilterView):
         context['title'] = "BUZÓN"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class ShowBuzonNoLeidos(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Buzon
+    exclude = ['imagen']
+    context_object_name = 'mail'
+    template_name = "buzonFilter.html"
+    permission_required = 'seguridad.view_userdetails'
+    filterset_class = BuzonFilter
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "BUZÓN"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        context['theMail'] = Buzon.objects.filter(leido=0)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class ShowBuzonLeidos(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Buzon
+    exclude = ['imagen']
+    context_object_name = 'mail'
+    template_name = "buzonFilter.html"
+    permission_required = 'seguridad.view_userdetails'
+    filterset_class = BuzonFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "BUZÓN"
+        
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        context['theMail'] = Buzon.objects.filter(leido=1)
         return context
 
     def get(self, request, *args, **kwargs):

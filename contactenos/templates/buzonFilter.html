@@ -32,8 +32,8 @@
     <div class="row">
       <table id="mailTable" class="table table-hover">
         {% csrf_token %}
-        {% if page_obj %}
-        {% for mail in page_obj %}
+        {% if theMail %}
+        {% for mail in theMail %}
 
 
         {% if mail.leido == 0 %}
