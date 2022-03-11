@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     # 'novagym.cliente',
     'membresia',
     'calendario',
+    'almacenamiento',
 ]
 
 MIDDLEWARE = [
