@@ -1,5 +1,7 @@
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.db import models
+
+from seguridad import validators
 
 # Create your models here.
 
@@ -20,11 +22,13 @@ class UserDetails(models.Model):
     usuario = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="detalles")
     codigo = models.CharField(max_length=255, blank=True)
-    cedula = models.CharField(max_length=13)
+    cedula = models.CharField(max_length=13, validators=[
+                              validators.validate_ci])
     nombres = models.CharField(max_length=255)
     apellidos = models.CharField(max_length=255)
     imagen = models.ImageField(upload_to='usuario/', null=True, blank=True)
-    telefono = models.CharField(max_length=12)
+    telefono = models.CharField(max_length=12, validators=[
+                                validators.validate_phone])
     sexo = models.CharField(max_length=2, choices=Sex.choices)
     tipo = models.CharField(max_length=2, choices=Tipo.choices, default='E')
     fecha_nacimiento = models.DateField()

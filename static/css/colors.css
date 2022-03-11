@@ -22,7 +22,6 @@
   --secondary-color-light: #d0ff00;
   --secondary-color-lighter: #d0ff00;
 
-  --bg-color: var(--primary-color);
   --navbar-color: var(--white-color);
   
   --btn-primary-color: var(--primary-color);
@@ -36,11 +35,12 @@
   --btn-secondary-color-active: var(--secondary-color-darker);
 
   /* Login Section*/
+  --login-bg-color: var(--primary-color);
   --login-panel-color: var(--black-color);
   --login-panel-color-border: var(--light-gray-color);
-  --login-btn-color: var(--red-color);
-  --login-btn-color-hover: var(--red-color-dark);
-  --login-btn-color-active: var(--red-color-darker);
+  --login-btn-color: var(--primary-color);
+  --login-btn-color-hover: var(--primary-color-dark);
+  --login-btn-color-active: var(--primary-color-darker);
 
   --pagination-color: var(--secondary-color);
   --pagination-color-border: var(--secondary-color-darker);

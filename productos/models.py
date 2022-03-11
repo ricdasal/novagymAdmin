@@ -22,7 +22,7 @@ class Producto(models.Model):
         LARGE = 'L', 'Large'
         EXTRA_LARE = 'XL', 'Extra Large'
     id = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=255)
+    codigo = models.CharField(max_length=255,unique=True)
     nombre = models.CharField(max_length=24)
     descripcion = models.CharField(max_length=255)
     precio_referencial = models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
@@ -40,8 +40,8 @@ class Inventario(models.Model):
     producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
     precio = models.DecimalField(max_digits=4, decimal_places=2,default=0)
     stock = models.PositiveIntegerField()
-    novacoins=models.PositiveIntegerField()
-    usaNovacoins=models.BooleanField(default=0)
+    novacoins=models.PositiveIntegerField(default=0)
+    usaNovacoins=models.BooleanField()
     def __str__(self):
         return self.nombre
 

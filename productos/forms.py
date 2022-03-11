@@ -82,13 +82,14 @@ class InventarioForm(forms.ModelForm):
 
 class InventarioFormNC(forms.ModelForm):
     class Meta:
-        fields = ('novacoins','stock','usaNovacoins')
         model = Inventario  
-        usaNovacoins = forms.IntegerField(widget=forms.HiddenInput(), initial=1) 
+        fields = ('novacoins','stock','usaNovacoins')
+
+        widgets = {
+            "usaNovacoins":forms.CheckboxInput(attrs={'checked':True})
+        }
         novacoins=forms.IntegerField(min_value=0)
-
-        
-
+            
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -96,7 +97,8 @@ class InventarioFormNC(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('novacoins', css_class='col-6')
+                Column('novacoins', css_class='col-6'),
+                Column('usaNovacoins', css_class='col-6 invisible')
             ),
             Row(
                 Column('stock', css_class='col-6')
@@ -109,7 +111,8 @@ class DescuentoForm(forms.ModelForm):
         
         fields = ('porcentaje_descuento', 'fecha_hora_desde','fecha_hora_hasta','estado')
         labels = {
-            "estado": "Descuento activo"
+            "estado": "Descuento activo",
+            'porcentaje_descuento':"Valor de descuento (Sin descuento: 0)"
         }
         
         widgets={
@@ -137,3 +140,7 @@ class DescuentoForm(forms.ModelForm):
 ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
 ProductoMetaNC=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=1,can_delete=False)
 DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)
+
+ProductoMetaU=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=0,can_delete=False)
+ProductoMetaNCU=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=0,can_delete=False)
+DescuentoMetaU=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=0,can_delete=False)
