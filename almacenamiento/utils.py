@@ -31,10 +31,6 @@ def almacenamiento_disponible_servidor(archivos):
    return True
 
 def peso_archivo_permitido(user, peso_archivo):
-   almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
-   if almacenamiento_global.sin_limite:
-      return True
-
    almacenamiento = AlmacenamientoUsuario.objects.get(usuario=user)
    if Decimal(peso_archivo) > almacenamiento.peso_archivo_asignado:
       return False

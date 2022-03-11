@@ -404,12 +404,11 @@ class HistoriaView(viewsets.ViewSet):
 
     def usuario_detalle(self, usuario):
         detalle = UserDetails.objects.get(usuario=usuario)
-        biografia = Biografia.objects.get(usuario=usuario)
         return {
             "usuario": usuario,
             "nombres": detalle.nombres,
             "apellidos": detalle.apellidos,
-            "foto_perfil": biografia.foto_perfil.url,
+            "foto_perfil": detalle.imagen.url,
         }
 
     def list(self, request):
