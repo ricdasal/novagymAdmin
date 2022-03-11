@@ -32,4 +32,4 @@ class UserDetails(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cedula + ' - ' + self.apellidos + ' - ' + self.tipo
+        return str(self.pk) + ' - ' + self.cedula + ' - ' + self.apellidos + ' - ' + self.tipo

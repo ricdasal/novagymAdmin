@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from .routers import *
+from .routers import novagym_api, seguridad_api
 from comunidad.urls import comunidad_api
 
 urlpatterns = [
@@ -26,7 +26,7 @@ urlpatterns = [
     path('', include('novagym.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(seguridad_api)),
-    path('api/', include(neymatex_api.urls)),
+    path('api/', include(novagym_api)),
     path('productos/', include('productos.urls')),
     path('gimnasio/', include('gimnasio.urls')),
     path('contacto/', include('contactenos.urls')),
