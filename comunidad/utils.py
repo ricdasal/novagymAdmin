@@ -11,9 +11,11 @@ tipo_archivo = {
     'ogg': 'opus',
     'x-ms-wma': "wma",
     'mpeg': 'mp3',
+    'x-wav': 'wav',
     'x-msvideo': 'avi',
     'x-ms-wmv': 'wmv',
-    'x-flv': 'flv'
+    'x-flv': 'flv',
+    'mp4': 'mp4'
 }
 
 enum_media = {

@@ -81,6 +81,23 @@
               class="menu__image"
             />
             <div class="d-flex align-items-center">
+              <span class="menu__title">Membresías</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="row menu-container {% if request.resolver_match.view_name == 'notificaciones:listar' %}menu-container--active{% endif %}">
+      <div class="col-12">
+        <a class="menu" href="{% url 'notificaciones:listar' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="notificaciones"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
               <span class="menu__title">Notificaciones</span>
             </div>
           </div>
@@ -313,5 +330,39 @@
         </a>
       </div>
     </div>
+
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="{% url 'comunidad:publicacion_novagym' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="comunidad"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Comunidad</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="row menu-container">
+      <div class="col-12">
+        <a class="menu" href="{% url 'almacenamiento:almacenamiento_usuario' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="almacenamiento"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Almacenamiento</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
   </div>
 </div>

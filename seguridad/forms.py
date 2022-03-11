@@ -4,6 +4,7 @@ from crispy_forms.layout import Column, Div, Field, Layout, Row
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from seguridad.models import *
+from django.contrib.auth.models import Group
 
 
 class UsuarioForm(UserCreationForm):
@@ -139,6 +140,41 @@ class UsuarioFilterForm(forms.Form):
             ),
         )
 
+class ClienteFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.fields['usuario__email'].label = "Email del usuario"
+        self.fields['cedula'].label = "Cédula"
+        self.fields['nombres'].label = "Nombres"
+        self.fields['apellidos'].label = "Apellidos"
+        self.fields['sexo'].label = "Sexo"
+        self.fields['created_at'].label = "Fecha de ingreso"
+        self.helper.layout = Layout(
+            Row(
+                Column('usuario__email',
+                       css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    'cedula', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('apellidos', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    'nombres', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column(
+                    Field('created_at', template="forms/fields/range-filter.html",
+                          css_class="form-control"), css_class='col-12 col-md-6 col-lg-3'
+                ),
+                Column('sexo', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
 
 class RolUsuarioForm(forms.ModelForm):
     class Meta:

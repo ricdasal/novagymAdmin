@@ -60,9 +60,9 @@ INSTALLED_APPS = [
     'comunidad',
     'notificaciones',
     'push_notifications',
-    # 'novagym.cliente',
     'membresia',
     'calendario',
+    'almacenamiento',
 ]
 
 MIDDLEWARE = [

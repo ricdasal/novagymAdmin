@@ -20,19 +20,19 @@ class Membresia(models.Model):
     meses_duracion = models.IntegerField()
     beneficios = models.ManyToManyField(Beneficio, related_name='membresia')
     estado = models.BooleanField(default=True)
-    
+
     def __str__(self):
         return self.nombre
 
 
 class Descuento(models.Model):
     membresia = models.ForeignKey(
-        Membresia, on_delete=models.SET_NULL, null=True)
+        Membresia, related_name='descuentos', on_delete=models.SET_NULL, null=True)
     porcentaje_descuento = models.PositiveIntegerField()
     fecha_hora_desde = models.DateTimeField()
     fecha_hora_hasta = models.DateTimeField()
     activo = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.membresia.nombre + ' - %' + str(self.porcentaje_descuento)
 
@@ -46,6 +46,6 @@ class Historial(models.Model):
     fecha_fin = models.DateTimeField()
     costo = models.DecimalField(max_digits=12, decimal_places=2)
     activa = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.usuario.nombres + ' - ' + self.membresia.nombre

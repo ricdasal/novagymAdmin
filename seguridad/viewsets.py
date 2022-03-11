@@ -13,7 +13,6 @@ from .serializers import *
 
 
 class RegistrarAPI(generics.GenericAPIView):
-    # permission_classes = (permissions.IsAuthenticated,)
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegistrarSerializer
 
@@ -52,12 +51,11 @@ class LoginAPI(KnoxLoginView):
         return super(LoginAPI, self).post(request, format=None)
 
 
-class DetallesView(viewsets.ModelViewSet):
-    # permission_classes = (permissions.IsAuthenticated,)
+class DetallesViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = DetalleSerializer
+    serializer_class = UsuarioDetallesSerializer
     queryset = UserDetails.objects.all()
-
+    http_method_names = ['get', 'put', 'patch' ,'head']
 
 class TokenValidatorAPI(APIView):
     permission_classes = (permissions.AllowAny,)
