@@ -37,7 +37,7 @@
 
 
         {% if mail.leido == 0 %}
-        <tr class="mailBoxItem use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:leer' mail.id %}">
+        <tr">
           <td id="center">
             <i class="fa fa-envelope fa-2x"></i>
           </td>
@@ -50,7 +50,7 @@
             <p class="unread">{{ mail.fecha }}</p>
           </td>
           {% else %}
-        <tr class="use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:leer' mail.id %}">
+        <tr>
           <td id="center">
             <i class="fa fa-envelope-open fa-2x"></i>
           </td>
@@ -64,9 +64,14 @@
           </td>
           {% endif %}
           <td id="center">
+            <a id="leer" class="btn btn-sm btn-warning use-modal" title="leer" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:leer' mail.id %}"
+              href="#">
+              <i class="fas fa-book-reader fa-1x "></i> Leer correo</a>
+          </td>
+          <td id="center">
             <a class="btn btn-sm btn-warning use-modal" title="eliminar" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:eliminar' mail.id %}"
               href="#">
-              <i class="fas fa-trash fa-1x "></i></a>
+              <i class="fas fa-trash fa-1x "></i> Eliminar correo</a>
           </td>
         </tr>
         {% endfor %}
@@ -99,8 +104,8 @@
     })
   </script>
   <script>
-    $(document).on('click', '.mailBoxItem', function(){
-      $('.mailBoxItem').load(' .mailBoxItem')
+    $(document).on('click', '#leer', function(){
+      $('#mailTable').load(' #mailTable')
     })
   </script>
 <!--   <script>
