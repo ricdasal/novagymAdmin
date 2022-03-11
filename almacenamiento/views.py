@@ -19,7 +19,8 @@ class AlmacenamientoUsuarioView(FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['almacenamiento_global'] = AlmacenamientoGlobal.objects.get(id=1)
+        almacenamiento_global, created = AlmacenamientoGlobal.objects.get_or_create(id=1, peso_archivo_max=5000.00)
+        context['almacenamiento_global'] = almacenamiento_global
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
