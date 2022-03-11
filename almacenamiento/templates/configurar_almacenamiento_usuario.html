@@ -1,0 +1,47 @@
+{% extends "main.html" %}
+{% load static %}
+{% load almacenamiento_filters %}
+
+{% block main %}
+    <div class="row mt-4">
+        <div class="col">
+            <h2 class="text-left">Información de Almacenamiento de {{ almacenamiento_usuario.usuario_detalle }}</h2>
+        </div>
+        <hr>
+    </div>
+    <hr>
+    <div class="mt-5">
+        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:configurar_usuario' almacenamiento_usuario.usuario.id %}" novalidate enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3" style="width: 35%;">
+                <label for="servidor" class="form-label">Almacenamiento Usado</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control text-center" value="{{ almacenamiento_usuario.usado|to_mb }}" min="-1" disabled>
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <div class="mb-3" style="width: 35%;">
+                <label for="capacidad_max" class="form-label">Almacenamiento Asignado</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="form-control text-center" id="asignado" name="asignado" value="{{ almacenamiento_usuario.asignado|to_mb }}" min="-1" step=".01">
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <div class="mb-3" style="width: 35%;">
+                <label for="peso_archivo_max" class="form-label">Almacenamiento Comprado</label>
+                <div class="d-flex align-items-center">
+                    <input type="text" class="form-control text-center" value="{{ almacenamiento_usuario.comprado|to_mb }}" min="-1" disabled>
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <div class="mb-3" style="width: 35%;">
+                <label for="peso_archivo_max" class="form-label">Peso máximo de archivos</label>
+                <div class="d-flex align-items-center">
+                    <input type="number" class="form-control text-center" id="peso_archivo_asignado" name="peso_archivo_asignado" value="{{ almacenamiento_usuario.peso_archivo_asignado|to_mb }}" min="-1" step=".01">
+                    <h5 class="mb-0 ml-3">megabytes</h5>
+                </div>
+            </div>
+            <input type="submit" class="btn btn-primary" value="Actualizar">
+        </form>
+    </div>
+{% endblock main %}

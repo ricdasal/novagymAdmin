@@ -19,7 +19,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 from .routers import *
-from comunidad.urls import comunidad_api
+from comunidad.routers import comunidad_api
+from almacenamiento.routers import almacenamiento_api
 
 urlpatterns = [
     path('', include('seguridad.urls')),
@@ -33,5 +34,8 @@ urlpatterns = [
     path('sponsor/', include('sponsor.urls')),
     path('notificaciones/', include('notificaciones.urls')),
     path('api/', include(comunidad_api)),
+    path('api/', include(almacenamiento_api)),
+    path('comunidad/', include('comunidad.urls')),
+    path('almacenamiento/', include('almacenamiento.urls')),
     path('calendario/', include('calendario.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
