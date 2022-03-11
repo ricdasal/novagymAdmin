@@ -1,16 +1,16 @@
-from rest_framework import routers
-from .viewsets import *
+from django.urls import path
+from .views import *
+from .apps import ComunidadConfig
 
-comunidad = routers.DefaultRouter()
+app_name = ComunidadConfig.name
 
-comunidad.register(r'biografia', BiografiaView, 'biografia')
-comunidad.register(r'publicacion', PublicacionView, 'publicacion')
-comunidad.register(r'publicacionUsuario', PublicacionUsuarioView, 'publicacionUsuario')
-comunidad.register(r'reportarPublicacion', ReportarPublicacionView, 'reportarPublicacion')
-comunidad.register(r'publicacionLike', LikeView, 'publicacionLike')
-comunidad.register(r'comentario', ComentarioView, 'comentario')
-comunidad.register(r'seguidor', SeguidorView, 'seguidor')
-comunidad.register(r'recomendacionAmigo', RecomendacionAmigoView, 'recomendacionAmigo')
-comunidad.register(r'historia', HistoriaView, 'historia')
+urlpatterns = [
+     path('publicacion_reportada/', ListaPublicacionReportada.as_view(), name='publicacion_reportada'),
+     path('aceptar-publicacion/<int:pk>/', aceptar_publicacion, name='aceptar-publicacion'),
+     path('bloquear-publicacion/<int:pk>/', bloquear_publicacion, name='bloquear-publicacion'),
 
-comunidad_api = comunidad.urls
+     path('publicacion_novagym/', ListaPublicacionNovagym.as_view(), name='publicacion_novagym'),
+     path('crear-publicacion/', CrearPublicacion.as_view(), name='crear-publicacion'),
+     path('editar-publicacion/<int:pk>/', EditarPublicacion.as_view(), name='editar-publicacion'),
+     path('eliminar-publicacion/<int:pk>/', eliminar_publicacion, name='eliminar-publicacion'),
+]

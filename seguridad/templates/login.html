@@ -11,7 +11,7 @@
       <form name="loginForm" class="m-0" method="post">
         {% csrf_token %}
         <div class="login-header m-0 py-3 text-center">
-          <img src="{% static 'images/logo.png' %}" alt="logo" class="img-fluid w-75" />
+          <img src="{% static 'images/logo.png' %}" alt="logo" class="img-fluid" />
         </div>
         <div class="login-container">
           {% if messages%}
@@ -27,8 +27,12 @@
             <input type="password" class="form-control {%if messages%}is-invalid{%endif%}" id="password" name="password"
               placeholder="Contraseña" />
           </div>
+          <div>
+            <input type="checkbox" onclick="mostrarPassword(this)" id="show-pass">
+            <label for="show-pass" class="white-text">Mostrar contraseña</label>
+          </div>
           <div class="mt-4 mb-2">
-            <button type="submit" class="btn btn-primary center btn-block">INICIAR SESIÓN</button>
+            <button type="submit" class="btn btn-login">INICIAR SESIÓN</button>
           </div>
           {% if request.GET.next %}
           <input type="hidden" name="next" value="{{ request.GET.next }}" />
@@ -40,3 +44,16 @@
   </div>
 </div>
 {% endblock content %}
+{% block specific_scripts %}
+<script>
+  const mostrarPassword = (e) => {
+    var passField = document.getElementById("password");
+    if (e.checked) {
+      passField.type = 'text';
+    }
+    else {
+      passField.type = 'password';
+    }
+  }
+</script>
+{% endblock specific_scripts %}

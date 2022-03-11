@@ -1,0 +1,37 @@
+{% load static %}
+{% load comunidad_filters %}
+
+{% block specific_head %} 
+<link href="{% static 'css/carousel.css' %}" rel="stylesheet" />
+{% endblock specific_head%}
+
+<div class="carousel card-img-top w-auto" data-carousel>
+    {% if archivos|length > 1 %}
+        <button class="carousel-button prev" data-carousel-button="prev">&#8656;</button>
+        <button class="carousel-button next" data-carousel-button="next">&#8658;</button>
+    {% endif %}
+    <ul data-slides>
+        {% for archivo in archivos %}
+            {% if archivo.tipo == 'IMG' %}
+                <li class="slide" data-active>
+                    <img src="{{ archivo.archivo.url }}" alt="">
+                </li>
+            {% elif archivo.tipo == 'AUD' %}
+                <li class="slide d-flex flex-column align-items-center justify-content-end" style="background: black"  data-active>
+                    <h4 class="" style="color: white">Audio</h4>
+                    <audio style="width: 25rem; margin: 6rem 0" controls>
+                        <source src="{{ archivo.archivo.url }}" type="audio/{{ archivo.archivo.url|mime_type }}">
+                        Your browser does not support the audio element.
+                    </audio>
+                </li>
+            {% else %}
+                <li class="slide" data-active>
+                    <video width="320" height="240" controls>
+                        <source src="{{ archivo.archivo.url }}" type="video/{{ archivo.archivo.url|mime_type }}"> 
+                        Your browser does not support the video tag.
+                    </video>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>

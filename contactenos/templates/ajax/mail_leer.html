@@ -1,0 +1,40 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+<form method="POST" action="{% url 'contactenos:leer' mail.id %}">
+  {% csrf_token %}
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-12">
+        <h5>Remitente</h5>
+        <p>{{mail.sender.nombres}} {{mail.sender.apellidos}}</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12">
+        <h5>Título</h5>
+        <p>{{mail.titulo}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <h5>Descripción</h5>
+        <p>{{mail.descripcion}}</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-3">
+        <h5>Imagen</h5>
+        <div>
+          <img src="{{mail.imagen}}" style="width: 200px;height: 200px;" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
