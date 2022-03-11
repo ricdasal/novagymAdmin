@@ -27,7 +27,7 @@ urlpatterns = [
     path('', include('novagym.urls')),
     path('admin/', admin.site.urls),
     path('api/', include(seguridad_api)),
-    path('api/', include(neymatex_api.urls)),
+    path('api/', include(novagym_api)),
     path('productos/', include('productos.urls')),
     path('gimnasio/', include('gimnasio.urls')),
     path('contacto/', include('contactenos.urls')),
