@@ -37,7 +37,7 @@
 
 
         {% if mail.leido == 0 %}
-        <tr class="use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:leer' mail.id %}">
+        <tr class="mailBoxItem use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:leer' mail.id %}">
           <td id="center">
             <i class="fa fa-envelope fa-2x"></i>
           </td>
@@ -66,8 +66,6 @@
           <td id="center">
             <a class="btn btn-sm btn-warning use-modal" title="eliminar" data-toggle='modal' data-target="#mainModal" data-url="{% url 'contactenos:eliminar' mail.id %}"
               href="#">
-              <i class="fas fa-trash fa-1x "></i></a>
-            <a class="btn btn-sm btn-success" href="{% url 'contactenos:markAsRead' mail.id %}">
               <i class="fas fa-trash fa-1x "></i></a>
           </td>
         </tr>
@@ -98,6 +96,11 @@
     });
     $('button[type="submit"]').click(function (e) {
       $("#export").val('');
+    })
+  </script>
+  <script>
+    $(document).on('click', '.mailBoxItem', function(){
+      $('.mailBoxItem').load(' .mailBoxItem')
     })
   </script>
 <!--   <script>

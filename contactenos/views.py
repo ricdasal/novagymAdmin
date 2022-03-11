@@ -1,21 +1,19 @@
 import json
 from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from contactenos.models import Buzon
+from contactenos.filters import BuzonFilter
 from novagym.utils import calculate_pages_to_render
 from seguridad.models import UserDetails
 from .forms import *
 from django.core.mail import send_mail, BadHeaderError
 from django.http import HttpResponse
-from seguridad import views
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from backend.settings import env
 from django.contrib import messages
-
 # Create your views here.
 
 
@@ -68,9 +66,11 @@ class ShowBuzon(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Buzon
+    exclude = ['imagen']
     context_object_name = 'mail'
     template_name = "buzon.html"
     permission_required = 'seguridad.view_userdetails'
+    filterset_class = BuzonFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
