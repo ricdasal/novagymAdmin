@@ -9,8 +9,9 @@ import os
 
 def usuario_detalle(usuario):
     detalle = UserDetails.objects.get(usuario=usuario)
-    return { "nombre": detalle.nombres, "apellido": detalle.apellidos,
-            "foto_perfil": detalle.imagen.url }
+    data = { "nombre": detalle.nombres, "apellido": detalle.apellidos,
+            "foto_perfil": detalle.imagen.url if detalle.imagen else None }
+    return data
 
 def aumentar_almacenamiento_usuario(usuario, almacenamiento_utilizado):
     almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
@@ -212,11 +213,7 @@ class Comentario(models.Model):
 
     def count_comentarios_hijos(self):
         return Comentario.objects.filter(comentario_padre=self).all().count()
-    
-    def biografia_info(self, usuario):
-        biografia = Biografia.objects.get(usuario=usuario)
-        return { "foto_perfil": biografia.foto_perfil.url }
-
+   
     @property
     def usuario_info(self):
         return usuario_detalle(self.usuario)

@@ -408,7 +408,7 @@ class HistoriaView(viewsets.ViewSet):
             "usuario": usuario,
             "nombres": detalle.nombres,
             "apellidos": detalle.apellidos,
-            "foto_perfil": detalle.imagen.url,
+            "foto_perfil": detalle.imagen.url if detalle.imagen else None,
         }
 
     def list(self, request):
