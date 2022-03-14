@@ -1,6 +1,7 @@
 from django.urls import path
 from knox import views as knox_views
-from membresia.viewsets import DescuentoViewSet, MembresiaViewSet
+from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet,
+                                MembresiaViewSet)
 from rest_framework import routers
 from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
                                 TokenValidatorAPI)
@@ -12,6 +13,7 @@ novagym = routers.DefaultRouter()
 novagym.register('usuarios', DetallesViewSet, 'usuario')
 novagym.register('membresias', MembresiaViewSet, 'membresia')
 novagym.register('descuentos', DescuentoViewSet, 'descuento')
+novagym.register('beneficios', BeneficioViewSet, 'beneficio')
 novagym_api = novagym.urls
 
 """

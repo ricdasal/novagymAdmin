@@ -223,7 +223,7 @@ def usuario_confirmar_eliminacion(request, pk):
         usuario = detalles.usuario
         usuario.is_active = False
         usuario.save()
-        messages.success(request, "Usuario deshabilitado con éxito.")
+        messages.info(request, "Usuario deshabilitado con éxito.")
         return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
 

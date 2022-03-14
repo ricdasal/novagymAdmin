@@ -1,0 +1,24 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="membresiaTitle">Deshabilitar membresía</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form method="POST" action="{% url 'membresia:eliminar' membresia.pk %}">
+  {% csrf_token %}
+  <div class="modal-body">
+    ¿Desea deshabilitar la siguiente membresía?
+    <div class="row">
+      <div class="col-3">Nombre</div>
+      <div class="col">{{membresia.nombre}}</div>
+    </div>
+    <div class="row">
+      <div class="col-3">Descripción</div>
+      <div class="col">{{membresia.descripcion}}</div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
+  </div>
+</form>
