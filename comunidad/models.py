@@ -9,7 +9,9 @@ import os
 
 def usuario_detalle(usuario):
     detalle = UserDetails.objects.get(usuario=usuario)
-    return { "nombre": detalle.nombres, "apellido": detalle.apellidos }
+    data = { "nombre": detalle.nombres, "apellido": detalle.apellidos,
+            "foto_perfil": detalle.imagen.url if detalle.imagen else None }
+    return data
 
 def aumentar_almacenamiento_usuario(usuario, almacenamiento_utilizado):
     almacenamiento = AlmacenamientoUsuario.objects.get(usuario=usuario)
@@ -84,21 +86,13 @@ class Seguidor(models.Model):
     def __str__(self):
         return f'{str(self.usuario)} - {str(self.seguidor)}'
 
-    def biografia_info(self, usuario):
-        biografia = Biografia.objects.get(usuario=usuario)
-        return { "foto_perfil": biografia.foto_perfil.url }
-
     @property
     def seguidos_info(self):
-        data = usuario_detalle(self.usuario)
-        data.update(self.biografia_info(self.usuario))
-        return data
+        return usuario_detalle(self.usuario)
 
     @property
     def seguidor_info(self):
-        data = usuario_detalle(self.seguidor)
-        data.update(self.biografia_info(self.seguidor))
-        return data
+        return usuario_detalle(self.seguidor)
     
     @property
     def siguiendo(self):
@@ -122,15 +116,9 @@ class Publicacion(models.Model):
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
 
-    def biografia_info(self, usuario):
-        biografia = Biografia.objects.get(usuario=usuario)
-        return { "foto_perfil": biografia.foto_perfil.url }
-
     @property
     def usuario_info(self):
-        data = usuario_detalle(self.usuario)
-        data.update(self.biografia_info(self.usuario))
-        return data
+        return usuario_detalle(self.usuario)
 
     @property
     def num_comentarios(self):
@@ -225,16 +213,10 @@ class Comentario(models.Model):
 
     def count_comentarios_hijos(self):
         return Comentario.objects.filter(comentario_padre=self).all().count()
-    
-    def biografia_info(self, usuario):
-        biografia = Biografia.objects.get(usuario=usuario)
-        return { "foto_perfil": biografia.foto_perfil.url }
-
+   
     @property
     def usuario_info(self):
-        data = usuario_detalle(self.usuario)
-        data.update(self.biografia_info(self.usuario))
-        return data
+        return usuario_detalle(self.usuario)
 
     @property
     def comentarios_hijo(self):

@@ -71,9 +71,9 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'notificaciones:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'membresia' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="{% url 'notificaciones:listar' %}">
+        <a class="menu" href="{% url 'membresia:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
