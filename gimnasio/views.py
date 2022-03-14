@@ -7,6 +7,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
+
+from gimnasio.filters import GimnasioFilter
 from .forms import *
 from .serializers import *
 from django.core.mail import send_mail
@@ -66,7 +68,7 @@ class ListarGimnasio(FilterView):
     context_object_name = 'gimnasio'
     template_name = "lista_gimnasio.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=GimnasioFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "GIMNASIOS"

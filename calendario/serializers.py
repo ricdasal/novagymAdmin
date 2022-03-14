@@ -11,4 +11,4 @@ class CalendarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Calendario
-        fields = ('id','dia','nombre', 'descripcion','horario_inicio', 'horario_fin')
+        fields = ('id','dia','nombre', 'descripcion','horario_inicio', 'horario_fin','gimnasio')

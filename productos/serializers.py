@@ -14,8 +14,8 @@ class InventarioSerializer(serializers.ModelSerializer):
         fields = ('id','precio','producto_id', 'stock')
 
 class CategoriaSerializer(serializers.ModelSerializer):
-    nombre = models.CharField(max_length=24)
-    imagen = models.CharField(max_length=255)
+    nombre = serializers.CharField(max_length=24)
+    imagen = serializers.FileField(required=False)
     class Meta:
         model = Categoria
         fields = ('id','nombre','imagen')
@@ -25,7 +25,7 @@ class ProductoSerializer(serializers.ModelSerializer):
     nombre = serializers.CharField(max_length=24)
     descripcion = serializers.CharField(max_length=255)
     precio_referencial = serializers.DecimalField(max_digits=4, decimal_places=2)
-    imagen = serializers.CharField(max_length=255)
+    imagen = serializers.FileField(required=False)
     categoria_id=serializers.IntegerField()
     valor_presentacion=serializers.DecimalField(max_digits=4, decimal_places=2)
     talla = serializers.CharField(max_length=3)

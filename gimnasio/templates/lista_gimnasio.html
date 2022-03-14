@@ -57,7 +57,7 @@
         {% if page_obj %}
         {% for gimnasio in page_obj %}
         <tr class="text-center">
-          <td scope="row"><img style="width: 80px; height: 80px;" src="{{gimnasio.imagen}}" alt=""></td>
+          <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{gimnasio.imagen}}" alt=""></td>
           <td>{{gimnasio.nombre}}</td>
           <!-- <td>{{gimnasio.tipo}}</td> -->
           <td>{{gimnasio.telefono}}</td>

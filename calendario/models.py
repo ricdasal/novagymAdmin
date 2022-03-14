@@ -1,5 +1,7 @@
 from django.db import models
 
+from gimnasio.models import Gimnasio
+
 # Create your models here.
 
 class Calendario(models.Model):
@@ -17,6 +19,6 @@ class Calendario(models.Model):
     descripcion = models.CharField(max_length=255)
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)
-
+    gimnasio=models.ForeignKey(Gimnasio, on_delete=models.CASCADE)
     def __str__(self):
         return self.nombre

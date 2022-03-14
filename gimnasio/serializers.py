@@ -4,7 +4,7 @@ from rest_framework import serializers
 class GimnasioSerializer(serializers.ModelSerializer):
     tipo = serializers.CharField(max_length=24)
     nombre = serializers.CharField(max_length=24)
-    imagen = serializers.CharField(max_length=24)
+    imagen = serializers.FileField(required=False)
     telefono = serializers.CharField(max_length=24)
     ubicacion = serializers.CharField(max_length=24)
     horario_inicio = serializers.TimeField()
