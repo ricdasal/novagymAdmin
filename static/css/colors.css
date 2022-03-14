@@ -35,7 +35,7 @@
   --btn-secondary-color-active: var(--secondary-color-darker);
 
   /* Login Section*/
-  --login-bg-color: var(--primary-color);
+  --login-bg-color: var(--black-color);
   --login-panel-color: var(--black-color);
   --login-panel-color-border: var(--light-gray-color);
   --login-btn-color: var(--primary-color);
