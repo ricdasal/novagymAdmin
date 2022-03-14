@@ -37,7 +37,9 @@
                <div>
                   <div class="d-flex align-items-center">
                      {% if tipo == 'reporte' %}
-                        <img class="mr-3" src="{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
+                        {% if publicacion.usuario_info.foto_perfil %}
+                           <img class="mr-3" src="{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
+                        {% endif %}
                      {% endif %}
                      <h5 class="card-title mb-0">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
                   </div>

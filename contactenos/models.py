@@ -8,7 +8,7 @@ class Buzon(models.Model):
     titulo=models.CharField(max_length=255)
     descripcion=models.CharField(max_length=255)
     fecha=models.DateTimeField(auto_now_add=True)
-    imagen=models.CharField(max_length=255)
+    imagen=models.ImageField(upload_to="mail/", null=True, blank=True)
     leido=models.BooleanField(default=False)
     def __str__(self):
         return self.titulo
