@@ -1,0 +1,90 @@
+{% extends "main.html" %}
+{% load static %}
+{% load almacenamiento_filters %}
+
+{% block specific_head %}
+<link href="{% static 'css/almacenamiento/almacenamiento_usuario.css' %}" rel="stylesheet" />
+{% endblock specific_head %}
+
+{% block main %}
+    <div class="row my-4">
+      <div class="col">
+        <h2 class="text-left">Almacenamiento</h2>
+      </div>
+        <div class="col">
+            <a href="{% url 'almacenamiento:configurar_almacenamiento' %}" class="btn btn-primary float-right">Configurar almacenamiento <i
+                    class="fas fa-plus-circle"> </i></a>
+        </div>
+      <hr>
+   </div>
+   {% with servidor=almacenamiento_global.servidor total_usado=almacenamiento_global.total_usado  %}
+    <div class="d-flex justify-content-around align-items-center">
+        {% if total_usado >= 0 and not almacenamiento_global.sin_limite %}
+        <div class="almacenamiento-global-usado text-center" 
+            style="background: linear-gradient(to right, springgreen {{ total_usado|calculate_percentage:servidor }}%, white 0%);">
+            <span style="line-height: 50px">{{ total_usado|calculate_percentage:servidor }} %</span>
+        </div>
+        {% endif %}
+        <h4>Capacidad máxima por usuario: 
+            <b>{% if almacenamiento_global.sin_limite %} Sin Límites {% else %} {{ almacenamiento_global.capacidad_max|conversion }} {% endif %}</b>
+        </h4>
+    </div>
+    <div class="text-center mt-3 mb-5">
+        <h5 class="mb-0">{{ total_usado|conversion }} / {{ servidor|conversion }}</h5>
+    </div>
+    <div class="col-12 table-container">
+        <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Max peso archivo</th>
+                    <th scope="col">Asignado</th>
+                    <th scope="col">Comprado</th>
+                    <th scope="col">Utilizado</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Acción</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% if page_obj %}
+            {% for almacenamiento in page_obj %}
+            <tr class="text-center">
+                <td>{{ almacenamiento.usuario_detalle }}</td>
+                {% if almacenamiento_global.sin_limite %}
+                    <td>Sin Límites</td>
+                    <td>Sin Límites</td>
+                {% else %}
+                    <td>{{ almacenamiento.peso_archivo_asignado|conversion }}</td>
+                    <td>{{ almacenamiento.asignado|conversion }}</td>
+                {% endif %}
+                <td>{{ almacenamiento.comprado|conversion }}</td>
+                <td>{{ almacenamiento.usado|conversion }}</td>
+                <td>{{ almacenamiento.usado|conversion }} / {% if almacenamiento_global.sin_limite %} Sin Límites {% else %} {{ almacenamiento.asignado|add:almacenamiento.comprado|conversion }} {% endif %}</td>
+                <td>
+                    <a href="{% url 'almacenamiento:configurar_usuario' almacenamiento.usuario.id %}" title="Administrar" class="btn btn-sm btn-primary">
+                        <i class="fas fa-edit "></i>
+                    </a>                    
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <h4> No se encontraron datos.</h4>
+            {% endif %}
+        </tbody>
+    </table>
+    {% endwith %}
+    <div class="row my-5">
+      <div class="col">
+        <h5 class="text-left">Limite de peso por archivo: 
+            <b>{% if almacenamiento_global.sin_limite %} Sin Límites {% else %} {{ almacenamiento_global.peso_archivo_max|conversion }} {% endif %}</b>
+        </h5>
+      </div>
+        <div class="col">
+            <a href="{% url 'almacenamiento:administrar_excepciones' %}" class="btn btn-primary float-right">Administrar Excepciones <i
+                    class="fas fa-plus-circle"> </i></a>
+        </div>
+      <hr>
+    </div>
+    {% include "pagination.html" %}
+    </div>
+{% endblock main %}

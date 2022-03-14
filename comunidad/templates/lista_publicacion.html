@@ -1,0 +1,114 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block main %}
+   <div class="row my-4">
+      <div class="col">
+      <h2 class="text-left">COMUNIDAD</h2>
+      </div>
+      <div class="col">
+      <a href="{% url 'comunidad:crear-publicacion' %}" class="btn btn-primary float-right">Crear Publicación <i
+            class="fas fa-plus-circle"> </i></a>
+      </div>
+      <hr>
+   </div>
+
+   <ul class="nav nav-tabs my-5">
+      <li class="nav-item">
+        <a class="nav-link {% if tipo == 'novagym' %} active {% endif %}" aria-current="page" href="{% url 'comunidad:publicacion_novagym' %}">Publicaciones Novagym</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link {% if tipo == 'reporte' %} active {% endif %}" href="{% url 'comunidad:publicacion_reportada' %}">Publicaciones Reportadas</a>
+      </li>
+    </ul>
+
+   {% if page_obj %}
+      {% for publicacion in page_obj %}
+         {% if tipo == 'reporte' %}
+            <div class="card mx-auto mb-1" class="card" style="width: 45rem;">
+               <div class="card-body">
+                  <h5 class="card-subtitle text-muted">Motivo del reporte:</h5>
+                  <p class="card-text">{{ publicacion.motivo }}</p>
+               </div>
+            </div>
+         {% endif %}
+         <div class="card mx-auto mb-5 p-3" style="width: 45rem; height: auto;">
+            <div class="d-flex justify-content-between mb-3">
+               <div>
+                  <div class="d-flex align-items-center">
+                     {% if tipo == 'reporte' %}
+                        {% if publicacion.usuario_info.foto_perfil %}
+                           <img class="mr-3" src="{{ publicacion.usuario_info.foto_perfil }}" style="width: 35px; height: 35px; border-radius: 50%">
+                        {% endif %}
+                     {% endif %}
+                     <h5 class="card-title mb-0">{{ publicacion.usuario_info.nombre }} {{ publicacion.usuario_info.apellido }}</h5>
+                  </div>
+                  <span>{{ publicacion.fecha_creacion|date:"D d M Y P" }}</span>
+               </div>
+               {% if tipo == 'novagym' %}   
+                  <div class="d-flex justify-content-between align-items-center">
+                     <a class="mr-2" title="Editar Publicación" href="{% url 'comunidad:editar-publicacion' publicacion.pk %}">
+                        <i class="fas fa-edit"></i>
+                     </a>
+                     <a class="use-modal ml-2" title="Eliminar Publicación" data-toggle='modal' data-target='#mainModal' 
+                        href='#' data-url="{% url 'comunidad:eliminar-publicacion' publicacion.pk %}">
+                        <i class="fas fa-trash"></i>
+                     </a>
+                  </div>
+               {% endif %}
+            </div>
+            {% if publicacion.archivos_publicacion|length > 0 %}
+               {% include "util/carousel.html" with archivos=publicacion.archivos_publicacion %}
+            {% endif %}
+            {% if tipo == 'novagym' %}
+               <div class="d-flex">
+                  <span class="mr-4"><i class="fas fa-heart"></i> Le gusta a {{ publicacion.num_likes }} personas</span>
+                  <a class="ver-comentarios-{{ publicacion.id }}" style="text-decoration: underline; cursor: pointer;">
+                     <i class="fas fa-comment"></i> {{ publicacion.num_comentarios }} comentarios
+                  </a>
+               </div>
+            {% endif %}
+            <div class="card-body py-3 px-0">
+               <p class="card-text">{{ publicacion.texto }}</p> 
+               {% if tipo == 'novagym' %}
+                  <div class="comentarios-{{ publicacion.id }} mt-4" style="display: none">
+                     {% include "comentarios.html" with comentarios=publicacion.comentarios %}
+                  </div>
+               {% endif %}
+               {% if tipo == 'reporte' %}   
+                  <a class="btn btn-primary use-modal" data-toggle='modal' data-target='#mainModal' 
+                     href='#' role="button" data-url="{% url 'comunidad:aceptar-publicacion' publicacion.pk %}">Aceptar</a>
+                  <a class="btn btn-danger use-modal" data-toggle='modal' data-target='#mainModal' 
+                  href='#' role="button" data-url="{% url 'comunidad:bloquear-publicacion' publicacion.pk %}">Bloquear</a>
+               {% endif %}
+            </div>
+         </div>
+      {% endfor %}
+   {% else %}
+      <h4>
+         No se encontraron datos.
+      </h4>
+   {% endif %}
+   {% include "pagination.html" %}
+
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/carousel.js' %}"></script>
+<script>
+    $('a').click(function (e) {
+      clase_actual = e.currentTarget.className.split("-")
+      div_comentarios = document.getElementsByClassName(`comentarios-${clase_actual[2]}`)[0];
+      if (div_comentarios) {
+         if (div_comentarios.style.display == "none")
+            div_comentarios.style.display = "block";
+         else
+            div_comentarios.style.display = "none";
+      }
+   })
+</script>
+{% endblock %}
+

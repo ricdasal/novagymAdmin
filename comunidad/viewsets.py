@@ -5,8 +5,11 @@ from rest_framework import status, viewsets, permissions
 from .serializers import *
 from .models import Publicacion
 
+from almacenamiento.utils import almacenamiento_disponible_user, almacenamiento_disponible_servidor, peso_archivo_permitido
 from .utils import fileb64decode, eliminar_archivo
 import random
+from django.utils import timezone
+import datetime
 
 class BiografiaView(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
@@ -60,11 +63,19 @@ class PublicacionView(viewsets.ViewSet):
             return Response({"message": "Publicación no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
-        publicaciones = Publicacion.objects.filter(visible=True).all()
+        start = timezone.now().replace(hour=0, minute=0, second=0)
+        end = timezone.now().replace(hour=23, minute=59, second=59)
+        publicaciones_admin = Publicacion.objects.filter(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
+        publicaciones = Publicacion.objects.filter(visible=True).order_by('-fecha_creacion')
+        data = []
+        if len(publicaciones_admin) > 0:
+            data = list(publicaciones_admin) + list(publicaciones.exclude(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end))
+        else:
+            data = publicaciones
 
         paginator = PageNumberPagination()
         paginator.page_size = 10
-        result = paginator.paginate_queryset(publicaciones, request)
+        result = paginator.paginate_queryset(data, request)
 
         serializer = PublicacionSerializer(result, many=True)
         paginated_response = paginator.get_paginated_response(serializer.data)
@@ -82,15 +93,24 @@ class PublicacionView(viewsets.ViewSet):
                 return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             archivos[i]['tipo'] = resultado[0]
             archivos[i]['archivo'] = resultado[1]
+            archivos[i]['almacenamiento_utilizado'] = round(archivos[i]['almacenamiento_utilizado'], 2)
+
+            if not peso_archivo_permitido(request.user, archivos[i]['almacenamiento_utilizado']):
+                return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
 
         data['archivos'] = archivos
         data['usuario'] = request.user.id
+
+        if not almacenamiento_disponible_user(request.user, data['archivos']):
+            return Response({"message": "Publicación supera la capacidad maxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+        if not almacenamiento_disponible_servidor(data['archivos']):
+            return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = PublicacionSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
-        return Response({"message": "Error al crear la publicación"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def partial_update(self, request, pk):
         data = request.data
@@ -103,6 +123,7 @@ class PublicacionView(viewsets.ViewSet):
                     if 'id' in archivo:
                         archivo_db = ArchivoPublicacion.objects.get(id=archivo['id'])
                         if archivo['archivo'] == None:
+                            archivo_db.reducir_almacenamiento(publicacion.usuario)
                             archivo_db.delete()
                     else:
                         resultado = fileb64decode(archivo['archivo'], request.user.id)
@@ -110,8 +131,19 @@ class PublicacionView(viewsets.ViewSet):
                             return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
                         archivos[i]['tipo'] = resultado[0]
                         archivos[i]['archivo'] = resultado[1]
+                        archivos[i]['almacenamiento_utilizado'] = round(archivos[i]['almacenamiento_utilizado'], 2)
+
+                        if not peso_archivo_permitido(request.user, archivos[i]['almacenamiento_utilizado']):
+                            return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
+
                         nuevos_archivos.append(archivos[i])
                 data['archivos'] = nuevos_archivos
+                
+                if not almacenamiento_disponible_user(request.user, data['archivos']):
+                    return Response({"message": "Publicación supera la capacidad máxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+                if not almacenamiento_disponible_servidor(data['archivos']):
+                    return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
+
                 serializer = PublicacionSerializer(publicacion, data=data, partial=True)
                 if serializer.is_valid():
                     serializer.save()
@@ -128,6 +160,7 @@ class PublicacionView(viewsets.ViewSet):
             if publicacion.usuario == request.user:
                 archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
                 for archivo in archivos:
+                    archivo.reducir_almacenamiento(publicacion.usuario)
                     archivo.delete()
                 publicacion.delete()
                 return Response(status=status.HTTP_200_OK)
@@ -180,8 +213,17 @@ class ComentarioView(viewsets.ViewSet):
             if "message" in resultado:
                 return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             data['imagen'] = resultado[1]
+            data['almacenamiento_utilizado'] = round(data['almacenamiento_utilizado'], 2)
+
+            if not peso_archivo_permitido(request.user, data['almacenamiento_utilizado']):
+                return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
+            if not almacenamiento_disponible_user(request.user, [data]):
+                return Response({"message": "El comentario supera la capacidad máxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+            if not almacenamiento_disponible_servidor([data]):
+                return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
+
         data['usuario'] = request.user.id
-        
+
         serializer = ComentarioSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -198,17 +240,33 @@ class ComentarioView(viewsets.ViewSet):
             comentario = Comentario.objects.get(pk=pk)
             if comentario.usuario == request.user:
                 if 'imagen' not in data:
+                    comentario.reducir_almacenamiento()
                     eliminar_archivo(comentario.imagen)
                     comentario.imagen = None
+                    comentario.almacenamiento_utilizado = 0.00
                 else:
                     if ';base64,' in data['imagen']:
                         resultado = fileb64decode(data['imagen'], request.user.id)
                         if "message" in resultado:
                             return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
                         data['imagen'] = resultado[1]
-                        eliminar_archivo(comentario.imagen)
+                        data['almacenamiento_utilizado'] = round(data['almacenamiento_utilizado'], 2)
+
+                        if not peso_archivo_permitido(request.user, data['almacenamiento_utilizado']):
+                            return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
+                        if not almacenamiento_disponible_user(request.user, [data]):
+                            return Response({"message": "El comentario supera la capacidad máxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+                        if not almacenamiento_disponible_servidor([data]):
+                            return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
+
+                        if comentario.imagen:
+                            comentario.reducir_almacenamiento()
+                            eliminar_archivo(comentario.imagen)
                     else:
-                        data['imagen'] = comentario.imagen
+                        data.pop('imagen')
+                        if 'almacenamiento_utilizado' in data:
+                            data.pop('almacenamiento_utilizado')
+
                 serializer = ComentarioSerializer(comentario, data=data, partial=True)
                 if serializer.is_valid():
                     serializer.save()
@@ -224,7 +282,10 @@ class ComentarioView(viewsets.ViewSet):
             if comentario.usuario == request.user:
                 comentarios_hijos = Comentario.objects.filter(comentario_padre=comentario.id).all()
                 for c_hijo in comentarios_hijos:
-                    eliminar_archivo(c_hijo.imagen)
+                    if c_hijo.imagen:
+                        c_hijo.reducir_almacenamiento()
+                        eliminar_archivo(c_hijo.imagen)
+                comentario.reducir_almacenamiento()
                 comentario.delete()
                 return Response(status=status.HTTP_200_OK)
             else:
@@ -343,12 +404,11 @@ class HistoriaView(viewsets.ViewSet):
 
     def usuario_detalle(self, usuario):
         detalle = UserDetails.objects.get(usuario=usuario)
-        biografia = Biografia.objects.get(usuario=usuario)
         return {
             "usuario": usuario,
             "nombres": detalle.nombres,
             "apellidos": detalle.apellidos,
-            "foto_perfil": biografia.foto_perfil.url,
+            "foto_perfil": detalle.imagen.url if detalle.imagen else None,
         }
 
     def list(self, request):
@@ -380,6 +440,15 @@ class HistoriaView(viewsets.ViewSet):
                 return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             data['tipo_archivo'] = resultado[0]
             data['archivo'] = resultado[1]
+            data['almacenamiento_utilizado'] = round(data['almacenamiento_utilizado'], 2)
+
+            if not peso_archivo_permitido(request.user, data['almacenamiento_utilizado']):
+                return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
+            if not almacenamiento_disponible_user(request.user, [data]):
+                return Response({"message": "La historia supera la capacidad máxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
+            if not almacenamiento_disponible_servidor([data]):
+                return Response({"message": "Almacenamiento superado"}, status=status.HTTP_400_BAD_REQUEST)
+
         data['usuario'] = request.user.id
         
         serializer = HistoriaSerializer(data=data)
@@ -393,6 +462,7 @@ class HistoriaView(viewsets.ViewSet):
         try:
             historia = Historia.objects.get(pk=pk)
             if historia.usuario == request.user:
+                historia.reducir_almacenamiento()
                 historia.delete()
                 return Response(status=status.HTTP_200_OK)
             else:

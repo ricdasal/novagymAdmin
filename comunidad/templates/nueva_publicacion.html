@@ -1,0 +1,50 @@
+{% extends "main.html" %}
+{% load static %}
+{% load almacenamiento_filters %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+    <div class="row my-4">
+        <div class="col">
+            <h2 class="text-left">{% if crear %} Nueva {% else %} Editar {% endif %} Publicación</h2>
+        </div>
+        <hr>
+    </div>
+    <form id="form-publicacion" method="POST" action="{% if crear %} {% url 'comunidad:crear-publicacion' %} {% else %} {% url 'comunidad:editar-publicacion' publicacion %} {% endif %}" 
+        novalidate enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        {% crispy form %}
+        <hr>
+        {{ archivos|crispy }}
+        <p id="peso_maximo" data-peso-maximo="{{ peso_archivo_asignado }}" style="display: none; color: red;">
+            **Archivo supera el limite permitido de {{ peso_archivo_asignado|conversion }}
+        </p>
+        <hr>
+        <input type="submit" class="btn btn-primary" value="Guardar">
+    </form>
+{% endblock main %}
+
+{% block specific_scripts %}
+<script>
+    var msg = document.getElementById("peso_maximo");
+    var peso_maximo = parseInt(msg.dataset.pesoMaximo);
+    var submit = document.querySelector('input[type=submit]')
+    const fileSelector = document.querySelector('input[type=file]')
+    fileSelector.addEventListener('change', (event) => {
+        const fileList = event.target.files;
+        for(var file of fileList){
+            console.log(file.size/1000)
+            console.log(peso_maximo < (file.size/1000))
+            if((file.size / 1000) > peso_maximo){
+                msg.style.display = "block"
+                submit.disabled = true
+                fileSelector.value = ""
+            }else{
+                msg.style.display = "none"
+                submit.disabled = false
+            }
+        }
+    });
+</script>
+{% endblock %}
