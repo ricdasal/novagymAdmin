@@ -9,7 +9,7 @@ class SponsorSerializer(serializers.ModelSerializer):
     telefono = serializers.CharField(max_length=12)
     nombre_contacto = serializers.CharField(max_length=24)
     url = serializers.CharField(max_length=255)
-    imagen = serializers.CharField(max_length=255)
+    imagen = serializers.FileField(required=False)
     fecha_inicio=serializers.DateField()
     fecha_fin=serializers.DateField()
     activo=serializers.BooleanField()

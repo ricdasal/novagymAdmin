@@ -7,7 +7,7 @@ from rest_framework import serializers
 class NotificacionSerializer(serializers.ModelSerializer):
     titulo = serializers.CharField(max_length=24)
     cuerpo = serializers.CharField(max_length=255)
-    imagen = serializers.CharField(max_length=255)
+    imagen = serializers.FileField(required=False)
     created_at = serializers.DateTimeField()
     class Meta:
         model = Notificacion

@@ -33,7 +33,7 @@
       {% if page_obj %}
       {% for notificacion in page_obj %}
       <tr>
-        <td><img style="width: 150px; height: 150px;" src="{{notificacion.imagen}}" alt=""></td>
+        <td><img style="width: 150px; height: 150px;" src="/media/{{notificacion.imagen}}" alt=""></td>
         <td>
           {{ notificacion.titulo }}
         </td>

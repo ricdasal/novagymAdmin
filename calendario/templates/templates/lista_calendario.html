@@ -15,8 +15,32 @@
   </div>
   <hr>
 </div>
+<div class="col-3">
+  
+  <form action="{% url 'calendario:listar' %}" method="get">
+    <select class="form-control" name="sucursales" id="sucursales">
+      <option value="inicial" selected disabled>Seleccione un gimnasio</option>
+      {% if gimnasios %}
+      {% for gimnasio in gimnasios %}
+      <option value="{{ gimnasio.id }}">{{ gimnasio.nombre }} - {{ gimnasio.ciudad }}</option>
+      {% endfor %}
+      {% else %}
+      <option value="Sin datos" selected disabled>Sin datos</option>
+      {% endif %}
+    </select>
+    <div class="d-flex justify-content-end">
+    <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
+    </div>
+    </form>
+
+    
+</div>
+<div class="col-12 d-flex justify-content-end">
+    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
+      <i class="fa fa-calendar-plus"></i> Agregar actividad</a>
+      </div>
 <div class="row mt-4">
-  <div class="col-12 table-container">
+  <div class="col-12 table-container" id="accordionContainer">
     {% csrf_token %}
     <div class="accordion" id="accordionExample">
       <div class="card">
@@ -31,28 +55,19 @@
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
-              <thead class="thead-light">
-                <tr>
-                  <th scope="col">Nombre</th>
-                  <th scope="col">Descripción</th>
-                  <th scope="col">Horario</th>
-                  <th scope="col">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
+              <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "LUNES" %}
                 <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
                   <td>{{calendario.nombre}}</td>
                   <td>{{calendario.descripcion}}</td>
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-
                   <td>
-                    <a href="" class="btn btn-sm btn-primary">
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
                       <i class="fas fa-edit "></i></a>
                     <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="" href="#">
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
                       <i class="fas fa-times "></i></a>
                   </td>
                 </tr>
@@ -61,12 +76,12 @@
                 {% else %}
                 <td>
                   <h4>
-                  No se encontraron datos.
+                  Seleccione un gimnasio para mostrar información.
                 </h4>
                 </td>
                 
                 {% endif %}
-              </tbody>
+              </tr>
             </table>
           </div>
         </div>
@@ -81,7 +96,35 @@
         </div>
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
           <div class="card-body">
-            Some placeholder content for the second accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "MARTES" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -95,7 +138,35 @@
         </div>
         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
           <div class="card-body">
-            And lastly, the placeholder content for the third and final accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "MIERCOLES" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -109,7 +180,35 @@
         </div>
         <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
           <div class="card-body">
-            And lastly, the placeholder content for the third and final accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "JUEVES" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -123,7 +222,35 @@
         </div>
         <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
           <div class="card-body">
-            And lastly, the placeholder content for the third and final accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "VIERNES" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -137,7 +264,35 @@
         </div>
         <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordionExample">
           <div class="card-body">
-            And lastly, the placeholder content for the third and final accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "SABADO" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -151,7 +306,35 @@
         </div>
         <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordionExample">
           <div class="card-body">
-            And lastly, the placeholder content for the third and final accordion panel. This panel is hidden by default.
+            <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <tr>
+                {% if page_obj %}
+                {% for calendario in page_obj %}
+                {% if calendario.dia == "DOMINGO" %}
+                <tr class="text-center">
+                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                  <td>{{calendario.nombre}}</td>
+                  <td>{{calendario.descripcion}}</td>
+                  <td>
+                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit "></i></a>
+                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                      <i class="fas fa-times "></i></a>
+                  </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                <td>
+                  <h4>
+                    Seleccione un gimnasio para mostrar información.
+                </h4>
+                </td>
+                
+                {% endif %}
+              </tr>
+            </table>
           </div>
         </div>
       </div>
@@ -175,4 +358,5 @@
     $("#export").val('');
   })
 </script>
+
 {% endblock %}

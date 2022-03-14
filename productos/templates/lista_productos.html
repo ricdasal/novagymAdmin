@@ -40,12 +40,13 @@
       {% if page_obj %}
       {% for inventario in combo %}
       <tr>
-        <td><img style="width: 150px; height: 150px;" src="{{producto.imagen}}" alt=""></td>
+        <td><img style="width: 150px; height: 150px;" src="/media/{{inventario.producto.imagen}}" alt=""></td>
         <td>
           <p>Código: {{ inventario.producto.codigo }}</p>
           <p>Nombre: {{ inventario.producto.nombre }}</p>
           <p>Descripción: {{ inventario.producto.descripcion }}</p>
           <p>Talla: {{ inventario.producto.talla }}</p>
+          <p>Categoria: {{ inventario.producto.categoria.nombre }}</p>
         </td>
         <td>
 

@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
+from productos.filters import CategoriaFilter, ProductoFilter
 from productos.forms import *
 from .serializers import *
 from django.core.mail import send_mail
@@ -242,6 +243,7 @@ class ListarCategoria(FilterView):
     context_object_name = 'categoria'
     template_name = "lista_categoria.html"
     permission_required = 'novagym.view_empleado'
+    filterset_class=CategoriaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Categorias"
@@ -259,7 +261,7 @@ class ListarProductos(FilterView):
     context_object_name = 'producto'
     template_name = "lista_productos.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=ProductoFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productos"
@@ -286,7 +288,7 @@ class ListarProductosNC(FilterView):
     context_object_name = 'producto'
     template_name = "lista_productos.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=ProductoFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productos"
