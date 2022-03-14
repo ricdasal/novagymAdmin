@@ -20,6 +20,10 @@ class Membresia(models.Model):
     meses_duracion = models.IntegerField()
     beneficios = models.ManyToManyField(Beneficio, related_name='membresia')
     estado = models.BooleanField(default=True)
+    imagen = models.ImageField(upload_to='membresia/', null=True, blank=True)
+    
+    class Meta:
+      ordering = ['-estado']
 
     def __str__(self):
         return self.nombre
