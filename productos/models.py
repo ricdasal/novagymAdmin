@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator
 class Categoria(models.Model):
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=24)
-    imagen=models.ImageField(upload_to="categoriasProductos/", null=True, blank=True)
+    imagen=models.ImageField(upload_to="categoriasProductos/", null=True, blank=True,default="images/no_image.png")
 
     def __str__(self):
         return self.nombre
@@ -23,10 +23,10 @@ class Producto(models.Model):
         EXTRA_LARE = 'XL', 'Extra Large'
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=255,unique=True)
-    nombre = models.CharField(max_length=24)
+    nombre = models.CharField(max_length=24,unique=True)
     descripcion = models.CharField(max_length=255)
     precio_referencial = models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
-    imagen=models.ImageField(upload_to="productos/", null=True, blank=True)
+    imagen=models.ImageField(upload_to="productos/", null=True, blank=True,default="images/no_image.png")
     categoria=models.ForeignKey(Categoria, on_delete=models.CASCADE)
     valor_presentacion=models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
     talla = models.CharField(max_length=3, choices=Talla.choices)

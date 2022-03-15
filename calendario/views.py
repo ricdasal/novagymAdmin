@@ -89,3 +89,24 @@ def deleteCalendario(request,id):
         messages.success(request, "Actividad eliminada con éxito.")
         return redirect('calendario:listar')
     return render(request, "templates/ajax/calendario_confirmar_elminar.html", {"calendario": query})
+
+def getHorarios(request):
+    urls={}
+    horarios=Calendario.objects.all()
+    for horario in horarios:
+        if horario.gimnasio.nombre not in urls.keys():
+            urls[horario.gimnasio.nombre]={
+                "lunes":{},
+                "martes":{},
+                "miercoles":{},
+                "jueves":{},
+                "viernes":{},
+                "sabado":{},
+                "domingo":{}
+                }
+        urls[horario.gimnasio.nombre][str(horario.dia).lower()][horario.nombre]={
+                "descripcion":horario.descripcion,
+                "horaInicio":str(horario.horario_inicio),
+                "horaFin":str(horario.horario_fin)
+            }
+    return HttpResponse(json.dumps(urls))

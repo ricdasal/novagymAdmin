@@ -13,4 +13,5 @@ urlpatterns = [
     path('crear/',CrearCalendario.as_view(),name="crear"),
     path('editar/<int:pk>',UpdateCalendario.as_view(),name="editar"),
     path('eliminar/<int:id>',deleteCalendario,name="eliminar"),
+    path('getHorarios/',getHorarios,name="getHorarios"),
 ]

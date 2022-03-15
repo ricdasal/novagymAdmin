@@ -1,6 +1,7 @@
+import json
 from django.db import DatabaseError
 from django.forms import formset_factory, inlineformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -498,3 +499,27 @@ def deleteProducto(request,id):
             messages.success(request, "Producto eliminado con éxito.")
             return redirect('productos:listarProductosNC')
     return render(request, "ajax/producto_confirmar_elminar.html", {"producto": producto})
+
+
+def getAllProducts(request):
+    urls={}
+    productos=Inventario.objects.all()
+    for producto in productos:
+        id=producto.id
+        descuento=ProductoDescuento.objects.get(id=id)
+        urls[producto.producto.nombre]={
+                            "codigo":producto.producto.codigo,
+                            "descripcion":producto.producto.descripcion,
+                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(producto.producto.imagen),
+                            "categoria":str(producto.producto.categoria),
+                            "talla":str(producto.producto.talla),
+                            "precio":float(producto.precio),
+                            "stock":producto.stock,
+                            "novacoins":producto.novacoins,
+                            "usaNovacoins":producto.usaNovacoins,
+                            "porcentajeDescuento":str(descuento.porcentaje_descuento)+"%",
+                            "fechaHoraDesde":str(descuento.fecha_hora_desde),
+                            "fechaHoraHasta":str(descuento.fecha_hora_hasta),
+                            "descuentoActivo":descuento.estado
+                            }
+    return HttpResponse(json.dumps(urls))

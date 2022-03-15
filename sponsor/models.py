@@ -11,7 +11,7 @@ class Sponsor(models.Model):
     telefono = models.CharField(max_length=12)
     nombre_contacto = models.CharField(max_length=24)
     url = models.CharField(max_length=255)
-    imagen = models.ImageField(upload_to="anunciantes/", null=True, blank=True)
+    imagen = models.ImageField(upload_to="anunciantes/", null=True, blank=True,default="images/no_image.png")
     fecha_inicio=models.DateField()
     fecha_fin=models.DateField()
     activo=models.BooleanField(default=True)
