@@ -17,5 +17,5 @@ urlpatterns = [
      path('gimnasio-create/', gimnasioCreate, name='gimnasio-create'),
      path('gimnasio-update/<str:id>', gimnasioUpdate, name='gimnasio-update'),
      path('gimnasio-delete/<str:id>', gimnasioDelete, name='gimnasio-delete'),
-
+     path('getGimnasios/', getGimnasios, name='getGimnasios'),
 ]

@@ -14,7 +14,7 @@ class Notificacion(models.Model):
     id = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=24)
     cuerpo = models.CharField(max_length=255)
-    imagen=models.ImageField(upload_to="notificaciones/", null=True, blank=True)
+    imagen=models.ImageField(upload_to="notificaciones/", null=True, blank=True,default="images/no_image.png")
     fecha_hora_inicio= models.DateTimeField()
     fecha_hora_fin= models.DateTimeField()
     frecuencia = models.CharField(max_length=3, choices=Frecuencia.choices)

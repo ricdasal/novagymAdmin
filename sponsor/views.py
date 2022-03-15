@@ -119,9 +119,17 @@ def ChangeState(request,pk):
     query.save()
     return redirect('sponsor:listar')
 
-def getAllSponsorImages(request):
+def getAllSponsors(request):
     urls={}
     sponsors=Sponsor.objects.all()
     for sponsor in sponsors:
-        urls[sponsor.nombre]=sponsor.imagen
+        urls[sponsor.nombre]={
+                            "codigo":sponsor.codigo,
+                            "descripcion":sponsor.descripcion,
+                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(sponsor.imagen),
+                            "fechaInicio":str(sponsor.fecha_inicio),
+                            "fechaFin":str(sponsor.fecha_fin),
+                            "url":sponsor.url,
+                            "activo":sponsor.activo
+                            }
     return HttpResponse(json.dumps(urls))

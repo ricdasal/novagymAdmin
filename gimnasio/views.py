@@ -118,3 +118,20 @@ def changeAforo(request):
             gimnasio.aforo=aforoGlobal
             gimnasio.save()
     return redirect('gimnasio:listar')
+
+def getGimnasios(request):
+    urls={}
+    gimnasios=Gimnasio.objects.all()
+    for gimnasio in gimnasios:
+        urls[gimnasio.nombre]={
+                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(gimnasio.imagen),
+                            "horaApertura":str(gimnasio.horario_inicio),
+                            "horaCierre":str(gimnasio.horario_fin),
+                            "telefono":gimnasio.telefono,
+                            "ubicacion":gimnasio.ubicacion,
+                            "activo":gimnasio.estado,
+                            "ciudad":gimnasio.ciudad,
+                            "aforo":gimnasio.aforo,
+                            "coordenadas":[float(gimnasio.latitud),float(gimnasio.longitud)]
+                            }
+    return HttpResponse(json.dumps(urls))
