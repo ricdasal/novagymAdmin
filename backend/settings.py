@@ -19,13 +19,12 @@ from firebase_admin import credentials, initialize_app
 env = environ.Env()
 environ.Env.read_env()
 
-# Firebase Admin SDK. Used in Push notification
-cred = credentials.Certificate(env('FCM_CREDENTIALS'))
-initialize_app(cred)
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Firebase Admin SDK. Used in Push notification
+cred = credentials.Certificate(Path.joinpath(BASE_DIR, env('FCM_CREDENTIALS')))
+initialize_app(cred)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
