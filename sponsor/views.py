@@ -126,7 +126,7 @@ def getAllSponsors(request):
         urls[sponsor.nombre]={
                             "codigo":sponsor.codigo,
                             "descripcion":sponsor.descripcion,
-                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(sponsor.imagen),
+                            "imagen":request.build_absolute_uri('/media/')+str(sponsor.imagen),
                             "fechaInicio":str(sponsor.fecha_inicio),
                             "fechaFin":str(sponsor.fecha_fin),
                             "url":sponsor.url,

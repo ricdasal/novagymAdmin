@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
+from backend.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
 
 from gimnasio.filters import GimnasioFilter
 from .forms import *
@@ -124,7 +125,7 @@ def getGimnasios(request):
     gimnasios=Gimnasio.objects.all()
     for gimnasio in gimnasios:
         urls[gimnasio.nombre]={
-                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(gimnasio.imagen),
+                            "imagen":request.build_absolute_uri('/media/')+str(gimnasio.imagen),
                             "horaApertura":str(gimnasio.horario_inicio),
                             "horaCierre":str(gimnasio.horario_fin),
                             "telefono":gimnasio.telefono,
