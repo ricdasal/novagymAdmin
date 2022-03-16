@@ -510,7 +510,7 @@ def getAllProducts(request):
         urls[producto.producto.nombre]={
                             "codigo":producto.producto.codigo,
                             "descripcion":producto.producto.descripcion,
-                            "imagen":"https://devsnovagym.pythonanywhere.com/media/"+str(producto.producto.imagen),
+                            "imagen":request.build_absolute_uri('/media/')+str(producto.producto.imagen),
                             "categoria":str(producto.producto.categoria),
                             "talla":str(producto.producto.talla),
                             "precio":float(producto.precio),
