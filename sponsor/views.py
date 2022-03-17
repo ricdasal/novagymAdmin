@@ -1,4 +1,3 @@
-from django.forms import BooleanField
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
@@ -9,14 +8,13 @@ from rest_framework.response import Response
 from django_filters.views import FilterView
 from .forms import *
 from .serializers import *
-from django.core.mail import send_mail
 from novagym.utils import calculate_pages_to_render
-from datetime import date
 from .models import *
 from django.contrib import messages
 import json
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
+from .filters import SponsorFilter
 # Create your views here.
 #SPONSOR
 
@@ -75,7 +73,7 @@ class ListarSponsors(FilterView):
     context_object_name = 'sponsor'
     template_name = "lista_sponsor.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=SponsorFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "ANUNCIANTES"
@@ -121,9 +119,17 @@ def ChangeState(request,pk):
     query.save()
     return redirect('sponsor:listar')
 
-def getAllSponsorImages(request):
+def getAllSponsors(request):
     urls={}
     sponsors=Sponsor.objects.all()
     for sponsor in sponsors:
-        urls[sponsor.nombre]=sponsor.imagen
+        urls[sponsor.nombre]={
+                            "codigo":sponsor.codigo,
+                            "descripcion":sponsor.descripcion,
+                            "imagen":request.build_absolute_uri('/media/')+str(sponsor.imagen),
+                            "fechaInicio":str(sponsor.fecha_inicio),
+                            "fechaFin":str(sponsor.fecha_fin),
+                            "url":sponsor.url,
+                            "activo":sponsor.activo
+                            }
     return HttpResponse(json.dumps(urls))

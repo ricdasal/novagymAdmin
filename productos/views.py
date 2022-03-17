@@ -1,6 +1,7 @@
+import json
 from django.db import DatabaseError
 from django.forms import formset_factory, inlineformset_factory
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -10,6 +11,7 @@ from rest_framework.response import Response
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
+from productos.filters import CategoriaFilter, ProductoFilter
 from productos.forms import *
 from .serializers import *
 from django.core.mail import send_mail
@@ -242,6 +244,7 @@ class ListarCategoria(FilterView):
     context_object_name = 'categoria'
     template_name = "lista_categoria.html"
     permission_required = 'novagym.view_empleado'
+    filterset_class=CategoriaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Categorias"
@@ -259,7 +262,7 @@ class ListarProductos(FilterView):
     context_object_name = 'producto'
     template_name = "lista_productos.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=ProductoFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productos"
@@ -286,7 +289,7 @@ class ListarProductosNC(FilterView):
     context_object_name = 'producto'
     template_name = "lista_productos.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=ProductoFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productos"
@@ -496,3 +499,27 @@ def deleteProducto(request,id):
             messages.success(request, "Producto eliminado con éxito.")
             return redirect('productos:listarProductosNC')
     return render(request, "ajax/producto_confirmar_elminar.html", {"producto": producto})
+
+
+def getAllProducts(request):
+    urls={}
+    productos=Inventario.objects.all()
+    for producto in productos:
+        id=producto.id
+        descuento=ProductoDescuento.objects.get(id=id)
+        urls[producto.producto.nombre]={
+                            "codigo":producto.producto.codigo,
+                            "descripcion":producto.producto.descripcion,
+                            "imagen":request.build_absolute_uri('/media/')+str(producto.producto.imagen),
+                            "categoria":str(producto.producto.categoria),
+                            "talla":str(producto.producto.talla),
+                            "precio":float(producto.precio),
+                            "stock":producto.stock,
+                            "novacoins":producto.novacoins,
+                            "usaNovacoins":producto.usaNovacoins,
+                            "porcentajeDescuento":str(descuento.porcentaje_descuento)+"%",
+                            "fechaHoraDesde":str(descuento.fecha_hora_desde),
+                            "fechaHoraHasta":str(descuento.fecha_hora_hasta),
+                            "descuentoActivo":descuento.estado
+                            }
+    return HttpResponse(json.dumps(urls))

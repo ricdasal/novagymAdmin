@@ -24,7 +24,7 @@ urlpatterns = [
      path('producto-create/', productoCreate, name='producto-create'),
      path('producto-update/<str:id>', productoUpdate, name='producto-update'),
      path('producto-delete/<str:id>', productoDelete, name='producto-delete'),
-
+     path('getProducts/', getAllProducts, name='getProducts'),
      #Categoria
      
      path('deleteCategoria/<int:id>', deleteCategoria, name='deleteCategoria'),

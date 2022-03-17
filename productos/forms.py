@@ -53,6 +53,7 @@ class ProductoForm(forms.ModelForm):
                 Column('valor_presentacion', css_class='col-6'),
                 Column('unidad_presentacion', css_class='col-6'),
                 Column('precio_referencial', css_class='col-6'),
+                Column('imagen', css_class='col-6'),
             ),
         )
 

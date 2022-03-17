@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+<div class="row mt-4 justify-content-center">
+  <div class="col-12 col-lg-8">
+    <h2>
+      <div class="row">
+        <div class="col-12 col-lg-6">{{title|upper}}</div>
+      </div>
+    </h2>
+    <hr>
+    {% if form.imagen.value %}
+      <img src="{{form.imagen.value.url}}" alt="perfil-empleado" width="120" height="120" class="mb-3 img-thumbnail">
+    {% endif %}
+    <form method="POST" novalidate enctype="multipart/form-data">
+      {% csrf_token %}
+      {% crispy form %}
+      <div class="d-none" id="img-cont">
+        <img id="img-id" src="#" alt="imagen cargada" class="img-thumbnail w-50" />
+      </div>
+      <hr>
+      <input type="submit" class="btn btn-primary" value="Guardar">
+    </form>
+  </div>
+</div>
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript">
+  var callbacks = {
+    success: function (res) {
+      $('#id_beneficios').select2({
+        ajax: {
+          url: '/api/beneficios/',
+          processResults: function (res) {
+            let results = [];
+            res.forEach(beneficio => results.push({'id': beneficio.id, 'text': beneficio.nombre}));
+            return {results: results};
+          }
+        }
+      });
+    },
+    error: function (error) {
+      console.log(error);
+    }
+  }
+</script>
+<script type="text/javascript" src="{% static 'js/utilsSelect2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsImages.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+{% endblock specific_scripts %}

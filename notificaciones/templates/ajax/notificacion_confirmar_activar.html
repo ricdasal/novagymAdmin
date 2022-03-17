@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Habilitar notificación</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form method="POST" action="{%url 'notificaciones:change' notificacion.id%}">
+  {% csrf_token %}
+  <div class="modal-body">
+    ¿Desea habilitar la siguiente notificación?
+    <div class="row">
+      <div class="col-3">
+        Título
+      </div>
+      <div class="col">
+        {{notificacion.titulo}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Frecuencia
+      </div>
+      <div class="col">
+        {{notificacion.get_frecuencia_display}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Imagen
+      </div>
+      <div class="col">
+        <img src="{{notificacion.imagen.url}}" alt="" class="img-thumbnail">
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    <button class="btn btn-danger mr-3" type="submit"> Habilitar </button>
+  </div>
+</form>

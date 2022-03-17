@@ -6,3 +6,7 @@
 .table p {
   margin-bottom: 5px;
 }
+
+.table td {
+  vertical-align: middle;
+}

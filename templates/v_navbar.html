@@ -71,9 +71,9 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'notificaciones:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'membresia' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="{% url 'notificaciones:listar' %}">
+        <a class="menu" href="{% url 'membresia:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
@@ -105,9 +105,9 @@
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'contactenos:buzon' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'contactenos:buzon' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
@@ -139,9 +139,9 @@
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'calendario:listar' %}menu-container--active{% endif %}">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'calendario:listar' %}">
           <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
@@ -308,7 +308,7 @@
               class="menu__image"
             />
             <div class="d-flex align-items-center">
-              <span class="menu__title">Horarios</span>
+              <span class="menu__title">Gimnasios</span>
             </div>
           </div>
         </a>

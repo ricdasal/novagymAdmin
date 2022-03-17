@@ -1,45 +1,37 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar gimnasio</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar horario</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% csrf_token %}
-<form method="POST" action="{% url 'gimnasio:eliminar' gimnasio.id %}">
+<form method="POST" action="{% url 'calendario:eliminar' calendario.id %}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente gimnasio?
+    ¿Desea eliminar el siguiente horario?
     <div class="row">
       <div class="col-3">
         Nombre
       </div>
       <div class="col">
-        {{gimnasio.nombre}}
+        {{calendario.nombre}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Ciudad
+        Día
       </div>
       <div class="col">
-        {{gimnasio.ciudad}}
+        {{calendario.dia}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Ubicación
+        Horario
       </div>
       <div class="col">
-        {{gimnasio.ubicacion}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3">
-        Imagen
-      </div>
-      <div class="col">
-        <img src="{{gimnasio.imagen}}" style="width: 100px;height: 100px;" alt="">
+        {{calendario.horario_inicio}} - {{calendario.horario_fin}}
       </div>
     </div>
   </div>

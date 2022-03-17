@@ -1,0 +1,21 @@
+{% load crispy_forms_tags %}
+
+<div class="modal-header">
+  <h5 class="modal-title" id="membresiaTitle">{{title}}</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form method="post" class="do-post" data-url="{{url}}">
+  {% csrf_token %}
+  <div class="modal-body">
+    {{form | crispy}}
+  </div>
+  <div class="modal-footer">
+    <a href="#" data-url="{% url 'membresia:listar_beneficio' %}" data-target="#mainModal"
+      class="btn btn-secondary use-modal go-back">
+      Regresar
+    </a>
+    <button type="submit" class="btn btn-primary do-post">Guardar</button>
+  </div>
+</form>

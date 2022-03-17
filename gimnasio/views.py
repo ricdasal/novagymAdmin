@@ -7,6 +7,9 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
+from backend.settings import BASE_DIR, MEDIA_ROOT, MEDIA_URL
+
+from gimnasio.filters import GimnasioFilter
 from .forms import *
 from .serializers import *
 from django.core.mail import send_mail
@@ -66,7 +69,7 @@ class ListarGimnasio(FilterView):
     context_object_name = 'gimnasio'
     template_name = "lista_gimnasio.html"
     permission_required = 'novagym.view_empleado'
-
+    filterset_class=GimnasioFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "GIMNASIOS"
@@ -116,3 +119,20 @@ def changeAforo(request):
             gimnasio.aforo=aforoGlobal
             gimnasio.save()
     return redirect('gimnasio:listar')
+
+def getGimnasios(request):
+    urls={}
+    gimnasios=Gimnasio.objects.all()
+    for gimnasio in gimnasios:
+        urls[gimnasio.nombre]={
+                            "imagen":request.build_absolute_uri('/media/')+str(gimnasio.imagen),
+                            "horaApertura":str(gimnasio.horario_inicio),
+                            "horaCierre":str(gimnasio.horario_fin),
+                            "telefono":gimnasio.telefono,
+                            "ubicacion":gimnasio.ubicacion,
+                            "activo":gimnasio.estado,
+                            "ciudad":gimnasio.ciudad,
+                            "aforo":gimnasio.aforo,
+                            "coordenadas":[float(gimnasio.latitud),float(gimnasio.longitud)]
+                            }
+    return HttpResponse(json.dumps(urls))
