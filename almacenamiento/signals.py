@@ -8,4 +8,5 @@ from django.dispatch import receiver
 def post_save_create_profile(sender, instance, created, **kwargs):
     if created:
         almacenamiento = AlmacenamientoGlobal.objects.get(id=1)
-        AlmacenamientoUsuario.objects.create(usuario=instance, asignado=almacenamiento.capacidad_max)
+        AlmacenamientoUsuario.objects.create(usuario=instance, asignado=almacenamiento.capacidad_max, 
+            peso_archivo_asignado=almacenamiento.peso_archivo_max)

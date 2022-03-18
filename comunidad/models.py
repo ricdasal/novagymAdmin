@@ -57,7 +57,7 @@ def reducir_almacenamiento_global(almacenamiento_utilizado):
 #     notificacionUsuario.sender = sender
 #     notificacionUsuario.receiver = receiver
 #     notificacionUsuario.save()
-
+#     return notificacion
 
 class Biografia(models.Model):
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -106,7 +106,7 @@ class Seguidor(models.Model):
     # def nueva_notificacion(self, msg):
     #     user = usuario_detalle(self.seguidor)
     #     cuerpo = f"{user['nombre']} {user['apellido']} {msg}."
-    #     guardar_notificacion("Seguidor", cuerpo, None, self.seguidor, self.usuario)
+    #     return guardar_notificacion("Seguidor", cuerpo, None, self.seguidor, self.usuario)
 
     @property
     def seguidos_info(self):
@@ -137,6 +137,11 @@ class Publicacion(models.Model):
 
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
+
+    # def notificacion_reportar_publicacion(self, sender):
+    #     user = usuario_detalle(self.usuario)
+    #     cuerpo = f"Tu publicación ha sido bloqueda por contenido inapropiado."
+    #     return guardar_notificacion("Publicación Reportada", cuerpo, None, sender, self.publicacion.usuario)
 
     @property
     def usuario_info(self):
@@ -204,7 +209,7 @@ class Like(models.Model):
     # def nueva_notificacion(self):
     #     user = usuario_detalle(self.usuario)
     #     cuerpo = f"A {user['nombre']} {user['apellido']} le gusta tu publicación."
-    #     guardar_notificacion("Me Gusta", cuerpo, None, self.usuario, self.publicacion.usuario)
+    #     return guardar_notificacion("Me Gusta", cuerpo, None, self.usuario, self.publicacion.usuario)
 
 class Comentario(models.Model):
 
@@ -244,7 +249,7 @@ class Comentario(models.Model):
     # def nueva_notificacion(self):
     #     user = usuario_detalle(self.usuario)
     #     cuerpo = f"{user['nombre']} {user['apellido']} comentó tu publicación."
-    #     guardar_notificacion("Comentario", cuerpo, None, self.usuario, self.publicacion.usuario)
+    #     return guardar_notificacion("Comentario", cuerpo, None, self.usuario, self.publicacion.usuario)
    
     @property
     def usuario_info(self):
