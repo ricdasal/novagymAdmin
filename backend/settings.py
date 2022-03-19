@@ -182,7 +182,7 @@ STATIC_ROOT = Path.joinpath(BASE_DIR, "static_root")
 
 # Media files
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 
@@ -205,5 +205,6 @@ EMAIL_USE_SSL = False
 # We are using FCM for both iOS and Android
 PUSH_NOTIFICATIONS_SETTINGS = {
     "FCM_API_KEY": env('FCM_API_KEY'),
+    "FCM_MAX_RECIPIENTS": 500,
     "UPDATE_ON_DUPLICATE_REG_ID": True
 }
