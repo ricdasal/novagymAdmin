@@ -159,6 +159,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
                 sec = '0001'
             detalles.codigo = sec
             detalles.usuario = user
+            detalles.added_by = request.user
             detalles.save()
             messages.success(request, self.get_success_message())
             return HttpResponseRedirect(self.get_success_url())
