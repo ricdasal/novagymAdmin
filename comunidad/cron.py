@@ -1,6 +1,16 @@
-from datetime import datetime, timedelta
+import os
+import sys
 
-from models import Historia
+path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.append(path)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+
+import django
+django.setup()
+
+from datetime import datetime, timedelta
+from comunidad.models import Historia
 
 def eliminar_historias():
     historias = list(Historia.objects.all())
