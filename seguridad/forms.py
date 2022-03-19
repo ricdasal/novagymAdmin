@@ -3,8 +3,9 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column, Div, Field, Layout, Row
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from seguridad.models import *
 from django.contrib.auth.models import Group
+
+from seguridad.models import *
 
 
 class UsuarioForm(UserCreationForm):
@@ -89,6 +90,7 @@ class UsuarioDetallesForm(forms.ModelForm):
         self.helper.layout = Layout(
             'codigo',
             Row(
+                Column('created_from', css_class='d-none'),
                 Column('imagen', css_class='col-6'),
             ),
             Row(
@@ -140,6 +142,7 @@ class UsuarioFilterForm(forms.Form):
             ),
         )
 
+
 class ClienteFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -175,6 +178,7 @@ class ClienteFilterForm(forms.Form):
                 )
             ),
         )
+
 
 class RolUsuarioForm(forms.ModelForm):
     class Meta:
