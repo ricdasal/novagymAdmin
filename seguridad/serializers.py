@@ -13,13 +13,12 @@ class UsuarioDetallesSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetails
         fields = ['id', 'email', 'codigo', 'cedula', 'membresia', 'nombres', 'apellidos', 'imagen',
-                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'created_at', 'updated_at']
+                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'added_by', 'created_at', 'updated_at']
 
     def get_membresia(self, object):
         try:
-            historial = object.historial_membresia.get(activa=True)
             membresia_serializer = HistorialSerializer(
-                historial, context={'request': self.context['request']}).data
+                object.membresia, context={'request': self.context['request']}).data
             return membresia_serializer
         except:
             return None
@@ -38,7 +37,7 @@ class UsuarioDetallesSerializer(serializers.ModelSerializer):
 class DetalleSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetails
-        exclude = ['usuario']
+        exclude = ['usuario', 'imagen']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -52,10 +51,12 @@ class RegistrarSerializer(serializers.ModelSerializer):
     email = serializers.CharField(required=True, validators=[
                                   UniqueValidator(queryset=User.objects.all())])
     password2 = serializers.CharField(write_only=True, required=True)
+    imagen = serializers.ImageField(
+        allow_empty_file=True, required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'password', 'password2', 'detalles')
+        fields = ('id', 'email', 'password', 'password2', 'imagen', 'detalles')
         extra_kwargs = {
             'password': {'write_only': True}}
 
@@ -68,6 +69,9 @@ class RegistrarSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles')
+        # extract imagen from data and readd to detalles_data.
+        imagen = validated_data.pop('imagen')
+        detalles_data['imagen'] = imagen
         user = User.objects.create(
             username=validated_data['email'], email=validated_data['email'])
         user.set_password(validated_data['password'])

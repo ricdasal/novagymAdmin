@@ -141,20 +141,22 @@ def changeState(request, pk):
     return render(request, "ajax/notificacion_confirmar_activar.html", {"notificacion": notificacion})
 
 
-#TODO: Enviar por batches, no uno por uno
+# Ref: https://github.com/jazzband/django-push-notifications#sending-messages-in-bulk
 def enviarNotificacionGlobal(request, id_notificacion):
     notificacion = Notificacion.objects.get(id=id_notificacion)
-    dispositivos = GCMDevice.objects.all()
-    for dispositivo in dispositivos:
-        dispositivo.send_message(notificacion.cuerpo, extra={
-                                 "title": notificacion.titulo, "image": notificacion.imagen})
+    imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+    GCMDevice.objects.all().send_message(notificacion.cuerpo, extra={
+        "title": notificacion.titulo, "image": imagen})
+    report = NotificacionUsuario(notificacion=notificacion,
+                                 sender=request.user, grupo_usuarios=Group.objects.get_or_create(name='Todos')[0])
+    report.save()
     messages.success(request, "Notificación enviada a todos los usuarios.")
     return redirect('notificaciones:listar')
 
 
 def enviarNotificacionIndividual(request, id_notificacion, usuario):
     notificacion = Notificacion.objects.get(id=id_notificacion)
-    dispositivos = GCMDevice.objects.filter(user=usuario).send_message(
-        notificacion.cuerpo, extra={"title": notificacion.titulo, "image": notificacion.imagen})
+    GCMDevice.objects.filter(user=usuario).send_message(
+        notificacion.cuerpo, extra={"title": notificacion.titulo, "image": notificacion.imagen.url})
     messages.success(request, "Notificación enviada al usuario "+usuario+".")
     return redirect('notificaciones:listar')

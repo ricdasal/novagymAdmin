@@ -1,9 +1,14 @@
+from django.contrib.auth.models import Group, User
 from django.db import models
+from django.dispatch import receiver
 
 # Create your models here.
 
 
 class Notificacion(models.Model):
+    class Meta:
+        ordering = ['-created_at']
+
     class Frecuencia(models.TextChoices):
         D1 = 'D1', 'Una vez al dia'
         S1 = 'S1', 'Una vez a la semana'
@@ -28,9 +33,20 @@ class Notificacion(models.Model):
 
 
 class NotificacionUsuario(models.Model):
-    id = models.AutoField(primary_key=True)
-    sender_id = models.IntegerField()
-    receiver_id = models.IntegerField()
+    class Meta:
+        ordering = ['-created_at']
+
+    notificacion = models.ForeignKey(
+        Notificacion, on_delete=models.SET_NULL, null=True)
+    sender = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='emisor')
+    receiver = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='receptor', blank=True, null=True)
+    grupo_usuarios = models.ForeignKey(
+        Group, blank=True, on_delete=models.SET_NULL, null=True, related_name="receptores")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.sender_id) + "-" + str(self.receiver_id)
+        receptor = self.receiver.username if self.receiver else self.grupo_usuarios.name
+        return self.sender.username + "-> " + receptor
