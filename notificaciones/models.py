@@ -1,6 +1,5 @@
 from django.contrib.auth.models import Group, User
 from django.db import models
-from django.dispatch import receiver
 
 # Create your models here.
 
@@ -15,16 +14,26 @@ class Notificacion(models.Model):
         S2 = 'S2', 'Dos veces a la semana'
         M1 = 'M1', 'Una vez al mes'
         M2 = 'M2', 'Dos veces al mes'
-    id = models.AutoField(primary_key=True)
+        NA = 'NA', 'Sin Frecuencia'
+
+    class Tipo(models.TextChoices):
+        Admin = "ADM", 'Admin',
+        # Varias son cualquier tipo de notificacion no creadas desde el admin. por default es esta
+        Varias = "OTH", "Varias",
+
+    nombre = models.CharField(max_length=25)
     titulo = models.CharField(max_length=255)
     cuerpo = models.TextField()
     imagen = models.ImageField(
         upload_to='notificacion/', null=True, blank=True)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
+    fecha_inicio = models.DateField(blank=True, null=True)
+    fecha_fin = models.DateField(blank=True, null=True)
+    hora = models.TimeField(blank=True, null=True)
     frecuencia = models.CharField(
-        max_length=3, choices=Frecuencia.choices, default="S1")
+        max_length=3, choices=Frecuencia.choices, default=Frecuencia.D1)
     activo = models.BooleanField(default=True)
+    tipo = models.CharField(
+        max_length=4, choices=Tipo.choices, default=Tipo.Varias)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,13 +46,13 @@ class NotificacionUsuario(models.Model):
         ordering = ['-created_at']
 
     notificacion = models.ForeignKey(
-        Notificacion, on_delete=models.SET_NULL, null=True)
+        Notificacion, on_delete=models.SET_NULL, null=True, related_name='notificacion')
     sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='emisor')
+        User, on_delete=models.CASCADE, related_name='notificacion_emisor')
     receiver = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='receptor', blank=True, null=True)
+        User, on_delete=models.CASCADE, related_name='notificacion_receptor', blank=True, null=True)
     grupo_usuarios = models.ForeignKey(
-        Group, blank=True, on_delete=models.SET_NULL, null=True, related_name="receptores")
+        Group, blank=True, on_delete=models.SET_NULL, null=True, related_name="notificacion_receptores")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
