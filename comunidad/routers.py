@@ -12,5 +12,6 @@ comunidad.register(r'comentario', ComentarioView, 'comentario')
 comunidad.register(r'seguidor', SeguidorView, 'seguidor')
 comunidad.register(r'recomendacionAmigo', RecomendacionAmigoView, 'recomendacionAmigo')
 comunidad.register(r'historia', HistoriaView, 'historia')
+comunidad.register(r'notificacionComunidad', NotificacionComunidad, 'notificacionComunidad')
 
 comunidad_api = comunidad.urls

@@ -7,8 +7,6 @@ app_name = ContactenosConfig.name
 urlpatterns = [
      #Gimnasio-Contacto
      
-    path('', contact, name='contact'),
-    path('sendEmail/', sendEmail, name='sendEmail'),
     path('SendMail/', SendMail.as_view(), name='SendMail'),
     path('buzon/', ShowBuzon.as_view(), name='buzon'),
     path('buzon/leidos', ShowBuzonLeidos.as_view(), name='buzonLeidos'),

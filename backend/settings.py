@@ -182,7 +182,7 @@ STATIC_ROOT = Path.joinpath(BASE_DIR, "static_root")
 
 # Media files
 
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'
 
 MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 
@@ -192,18 +192,19 @@ MEDIA_ROOT = Path.joinpath(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = "587"
+EMAIL_PORT = 587
 EMAIL_HOST_USER = env("E_MAIL")
 EMAIL_HOST_PASSWORD = env("E_MAIL_PASS")
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-
+#EMAIL_USE_SSL = False
+ADMINS=[x.split(':') for x in env.list('DJANGO_ADMINS')]
 
 # Push notifications settings. For multiple apps check https://github.com/jazzband/django-push-notifications/wiki/Multiple-Application-Support
 # We are using FCM for both iOS and Android
 PUSH_NOTIFICATIONS_SETTINGS = {
     "FCM_API_KEY": env('FCM_API_KEY'),
+    "FCM_MAX_RECIPIENTS": 500,
     "UPDATE_ON_DUPLICATE_REG_ID": True
 }

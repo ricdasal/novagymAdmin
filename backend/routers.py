@@ -2,6 +2,7 @@ from django.urls import path
 from knox import views as knox_views
 from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet,
                                 MembresiaViewSet)
+from notificaciones.viewsets import NotificacionUsuarioViewSet
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 from rest_framework import routers
 from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
@@ -12,6 +13,7 @@ from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
 """
 novagym = routers.DefaultRouter()
 novagym.register('usuarios', DetallesViewSet, 'usuario')
+novagym.register('notificacion-usuario', NotificacionUsuarioViewSet, 'notificacion-usuario')
 novagym.register('membresias', MembresiaViewSet, 'membresia')
 novagym.register('descuentos', DescuentoViewSet, 'descuento')
 novagym.register('beneficios', BeneficioViewSet, 'beneficio')
