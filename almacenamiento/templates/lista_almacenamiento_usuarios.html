@@ -19,12 +19,10 @@
    </div>
    {% with servidor=almacenamiento_global.servidor total_usado=almacenamiento_global.total_usado  %}
     <div class="d-flex justify-content-around align-items-center">
-        {% if total_usado >= 0 and not almacenamiento_global.sin_limite %}
         <div class="almacenamiento-global-usado text-center" 
             style="background: linear-gradient(to right, springgreen {{ total_usado|calculate_percentage:servidor }}%, white 0%);">
             <span style="line-height: 50px">{{ total_usado|calculate_percentage:servidor }} %</span>
         </div>
-        {% endif %}
         <h4>Capacidad máxima por usuario: 
             <b>{% if almacenamiento_global.sin_limite %} Sin Límites {% else %} {{ almacenamiento_global.capacidad_max|conversion }} {% endif %}</b>
         </h4>

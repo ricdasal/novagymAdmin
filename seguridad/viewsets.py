@@ -1,4 +1,5 @@
 from django.contrib.auth import login
+from django.contrib.auth.models import Group
 from knox.models import AuthToken
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics, permissions, status, viewsets
@@ -20,8 +21,9 @@ class RegistrarAPI(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        user.groups.add(Group.objects.get_or_create(name='Todos')[0])
         return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "user": DetalleSerializer(user.detalles, context=self.get_serializer_context()).data,
             "token": AuthToken.objects.create(user)[1]
         })
 
@@ -55,7 +57,8 @@ class DetallesViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
     serializer_class = UsuarioDetallesSerializer
     queryset = UserDetails.objects.all()
-    http_method_names = ['get', 'put', 'patch' ,'head']
+    http_method_names = ['get', 'put', 'patch', 'head']
+
 
 class TokenValidatorAPI(APIView):
     permission_classes = (permissions.AllowAny,)
