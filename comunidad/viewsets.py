@@ -84,8 +84,12 @@ class PublicacionView(viewsets.ViewSet):
         result = paginator.paginate_queryset(data, request)
 
         serializer = PublicacionSerializer(result, many=True)
-        paginated_response = paginator.get_paginated_response(serializer.data)
+        data = serializer.data
+        for i, publicacion in enumerate(data):
+            like = Like.objects.filter(publicacion_id=publicacion['id'], usuario=request.user)
+            data[i]['me_gusta'] = True if len(list(like)) == 1 else False
 
+        paginated_response = paginator.get_paginated_response(data)
         return Response(paginated_response.data, status=status.HTTP_200_OK)
 
     def create(self, request):
