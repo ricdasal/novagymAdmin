@@ -1,9 +1,12 @@
+from django.dispatch import receiver
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 
 
 from push_notifications.models import GCMDevice
+
+from notificaciones.serializers import NotificacionSerializer
 from .models import Publicacion
 from .serializers import *
 
@@ -202,6 +205,7 @@ class ReportarPublicacionView(viewsets.ViewSet):
                 publicacion.motivo = data['motivo']
                 publicacion.visible = False
                 publicacion.save()
+                publicacion.notificacion_reportar_publicacion(request.user)
                 return Response(status=status.HTTP_200_OK)
             return Response({"message": "No puedes reportar tu propia publicación."} , status=status.HTTP_403_FORBIDDEN)
         except Publicacion.DoesNotExist:
@@ -232,9 +236,9 @@ class ComentarioView(viewsets.ViewSet):
         serializer = ComentarioSerializer(data=data)
         if serializer.is_valid():
             comentario = serializer.save()
-            # notificacion = comentario.nueva_notificacion()
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            notificacion = comentario.nueva_notificacion()
+            GCMDevice.objects.filter(user=request.user).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             publicacion = Publicacion.objects.get(id=data['publicacion'])
             comentarios = publicacion.comentario.filter(comentario_padre=None).all()
@@ -317,9 +321,9 @@ class LikeView(viewsets.ViewSet):
                 return Response({"message": "No puede dar like a su publicación."}, status=status.HTTP_400_BAD_REQUEST)
             like = Like.objects.create(publicacion=publicacion, usuario=usuario)
             like.incrementar_publicacion_likes()
-            # notificacion = like.nueva_notificacion()
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            notificacion = like.nueva_notificacion()
+            GCMDevice.objects.filter(user=request.user).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             return Response(status=status.HTTP_201_CREATED)
     
@@ -364,9 +368,9 @@ class SeguidorView(viewsets.ViewSet):
                 biografia_seguido.incrementar_seguidores()
 
                 seguidor = serializer.save()
-                # notificacion = seguidor.nueva_notificacion("empezó a seguirte")
-                # GCMDevice.objects.filter(user=request.user).send_message(
-                #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+                notificacion = seguidor.nueva_notificacion("empezó a seguirte")
+                GCMDevice.objects.filter(user=request.user).send_message(
+                    notificacion.cuerpo, extra={"title": notificacion.titulo })
 
                 return Response(status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -382,9 +386,9 @@ class SeguidorView(viewsets.ViewSet):
             biografia_seguido.decrementar_seguidores()
 
             seguidor.delete()
-            # notificacion = seguidor.nueva_notificacion("ha dejado de seguirte")
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            notificacion = seguidor.nueva_notificacion("ha dejado de seguirte")
+            GCMDevice.objects.filter(user=request.user).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             return Response(status=status.HTTP_200_OK)
         except Seguidor.DoesNotExist:
@@ -487,5 +491,8 @@ class HistoriaView(viewsets.ViewSet):
                 return Response(status=status.HTTP_200_OK)
             else:
               return Response(data={"message": "No tienes permisos para eliminar esta historia."} , status=status.HTTP_403_FORBIDDEN)  
-        except Comentario.DoesNotExist:
+        except Historia.DoesNotExist:
             return Response({"message": "Historia no encontrada"}, status=status.HTTP_404_NOT_FOUND)
+
+
+    
