@@ -199,7 +199,6 @@ EMAIL_HOST_USER = env("E_MAIL")
 EMAIL_HOST_PASSWORD = env("E_MAIL_PASS")
 EMAIL_USE_TLS = True
 #EMAIL_USE_SSL = False
-ADMINS=[x.split(':') for x in env.list('DJANGO_ADMINS')]
 
 # Push notifications settings. For multiple apps check https://github.com/jazzband/django-push-notifications/wiki/Multiple-Application-Support
 # We are using FCM for both iOS and Android
