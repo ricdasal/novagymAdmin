@@ -27,7 +27,7 @@ from .models import *
 APP_PERMISSIONS = {
     'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
     # 'novagym':'',
-    # 'gimnasio': {'model': 'gimnasio', 'label': ''},
+    'membresia': {'label': 'Membresia', 'app': 'membresia', 'model': 'membresia'},
     'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
     # 'contactenos':'',
     'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
@@ -49,12 +49,14 @@ def login_user(request):
                 else:
                     return redirect('novagym:principal')
             if not user.is_active:
-              messages.error(request, 'Esta cuenta ha sido desactivada.')
+                messages.error(request, 'Esta cuenta ha sido desactivada.')
             if not user.detalles.tipo == 'E':
-              messages.error(request, 'Solo admin/empleados pueden ingresar.')
+                messages.error(
+                    request, 'Solo admin/empleados pueden ingresar.')
             return redirect('seguridad:login_admin')
         else:
-            messages.error(request, 'Nombre de usuario o contraseña incorrecto.')
+            messages.error(
+                request, 'Nombre de usuario o contraseña incorrecto.')
             return redirect('seguridad:login_admin')
     else:
         if request.user and request.user.is_authenticated:
@@ -132,7 +134,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         return "{} creado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
 
     def get_title(self):
-        return "Agregar {}".format("empleado" if self.request.GET['type'] == 'E' else "cliente")
+        return "Agregar {}".format("empleado" if self.request.GET.get('type', None) == 'E' else "cliente")
 
     def get_context_data(self, **kwargs):
         context = super(CrearUsuario, self).get_context_data(**kwargs)
@@ -183,7 +185,7 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         return "{} editado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
 
     def get_title(self):
-        return "Editar {}".format("empleado" if self.request.GET['type'] == 'E' else "cliente")
+        return "Editar {}".format("empleado" if self.request.GET.get('type', None) == 'E' else "cliente")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
