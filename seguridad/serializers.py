@@ -1,20 +1,25 @@
 from django.contrib.auth.models import User
+from drf_extra_fields.fields import Base64ImageField
 from membresia.serializers import HistorialSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from drf_extra_fields.fields import Base64ImageField
 from seguridad.models import UserDetails
 
 
 class UsuarioDetallesSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='usuario.email')
+    seguidores = serializers.CharField(
+        source='usuario.biografia.seguidores', read_only=True)
+    seguidos = serializers.CharField(
+        source='usuario.biografia.seguidos', read_only=True)
     membresia = serializers.SerializerMethodField()
 
     class Meta:
         model = UserDetails
         fields = ['id', 'email', 'codigo', 'cedula', 'membresia', 'nombres', 'apellidos', 'imagen',
-                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'added_by', 'created_at', 'updated_at']
+                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'seguidores', 'seguidos', 'added_by',
+                  'created_at', 'updated_at', "created_from"]
 
     def get_membresia(self, object):
         try:

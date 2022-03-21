@@ -59,7 +59,7 @@ def guardar_notificacion(titulo, cuerpo, imagen, sender, receiver):
     return notificacion
 
 class Biografia(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="biografia")
     foto_perfil = models.ImageField(upload_to='perfil/', default='avatar.png')
     foto_portada = models.ImageField(
         upload_to='portada/', default='portada.jpg')
