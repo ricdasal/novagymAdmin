@@ -70,8 +70,9 @@ class RegistrarSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles')
         # extract imagen from data and readd to detalles_data.
-        imagen = validated_data.pop('imagen')
-        detalles_data['imagen'] = imagen
+        if "iamgen" in validated_data:
+          imagen = validated_data.pop('imagen')
+          detalles_data['imagen'] = imagen
         user = User.objects.create(
             username=validated_data['email'], email=validated_data['email'])
         user.set_password(validated_data['password'])
