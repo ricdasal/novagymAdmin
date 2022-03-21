@@ -60,11 +60,13 @@
               {% endif %}
             </p>
             {% endif %}
-            <p><b>Email:</b> {{usuario.usuario.email}}</p>
             <p><b>Fecha de registro:</b> {{usuario.created_at}}</p>
           </td>
           <td>
-            {{usuario.membresia}}
+            <p><b>Email:</b> {{usuario.usuario.email}}</p>
+            {% if usuario.membresia %}
+            <p><b>Membresía: </b>{{usuario.membresia.membresia.nombre}}</p>
+            {% endif %}
             <p><b>Telf:</b> {{usuario.telefono}}</p>
             {% if usuario.added_by %}
             <p><b>Creado por:</b> {{usuario.added_by}}</p>

@@ -1,0 +1,34 @@
+{% load static %}
+
+<div class="modal-header">
+  <h5 class="modal-title" id="membresiaTitle">Lista de usuarios - {{membresia.nombre}}</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <table class="table table-striped mb-0">
+    <tbody>
+      {% for usuario in usuarios %}
+      <tr>
+        <td>
+          {% if usuario.imagen and usuario.imagen.url %}
+          <img src="{{usuario.imagen.url}}" alt="{{usuario.nombres}}" class="table__image">
+          {% else %}
+          <img src="{% static 'images/generic_user.png' %}" alt="{{usuario.nombres}}" class="table__image">
+          {% endif %}
+        </td>
+        <td>
+          <p>{{usuario.nombres}} {{usuario.apellidos}}</p>
+          <p>CI: {{usuario.cedula}} CU: {{usuario.codigo}}</p>
+          <p><a href="{% url 'seguridad:editar' usuario.pk %}" class="btn btn-primary">Ver Perfil</a></p>
+        </td>
+      </tr>
+      {% empty %}
+      <h4>Sin usuarios</h4>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer">
+</div>

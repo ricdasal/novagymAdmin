@@ -68,7 +68,6 @@ class ListarNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Li
     model = Notificacion
     context_object_name = 'notificacion'
     template_name = "lista_notificaciones.html"
-    permission_required = 'novagym.view_empleado'
     permission_required = 'notificacion.view_notificacion'
 
     def get_context_data(self, **kwargs):
