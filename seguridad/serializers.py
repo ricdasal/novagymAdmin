@@ -3,6 +3,7 @@ from membresia.serializers import HistorialSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from drf_extra_fields.fields import Base64ImageField
 from seguridad.models import UserDetails
 
 
@@ -51,7 +52,7 @@ class RegistrarSerializer(serializers.ModelSerializer):
     email = serializers.CharField(required=True, validators=[
                                   UniqueValidator(queryset=User.objects.all())])
     password2 = serializers.CharField(write_only=True, required=True)
-    imagen = serializers.ImageField(
+    imagen = Base64ImageField(
         allow_empty_file=True, required=False, allow_null=True)
 
     class Meta:
@@ -70,9 +71,9 @@ class RegistrarSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles')
         # extract imagen from data and readd to detalles_data.
-        if "iamgen" in validated_data:
-          imagen = validated_data.pop('imagen')
-          detalles_data['imagen'] = imagen
+        if "imagen" in validated_data:
+            imagen = validated_data.pop('imagen')
+            detalles_data['imagen'] = imagen
         user = User.objects.create(
             username=validated_data['email'], email=validated_data['email'])
         user.set_password(validated_data['password'])
