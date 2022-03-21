@@ -195,7 +195,7 @@ def bloquear_publicacion(request, pk):
 
             publicacion.save()
 
-            notificacion = publicacion.notificacion_reportar_publicacion(request.user)
+            notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
             GCMDevice.objects.filter(user=publicacion.usuario).send_message(
                 notificacion.cuerpo, extra={"title": notificacion.titulo })
             

@@ -137,8 +137,12 @@ class Publicacion(models.Model):
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
 
-    def notificacion_reportar_publicacion(self, sender):
+    def notificacion_bloquear_publicacion(self, sender):
         cuerpo = f"Tu publicación ha sido bloqueda por contenido inapropiado."
+        return guardar_notificacion("Publicación Bloqueada", cuerpo, None, sender, self.usuario)
+
+    def notificacion_reportar_publicacion(self, sender):
+        cuerpo = f"Tu publicación ha sido reportada."
         return guardar_notificacion("Publicación Reportada", cuerpo, None, sender, self.usuario)
 
     @property

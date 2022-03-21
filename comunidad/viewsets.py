@@ -205,6 +205,7 @@ class ReportarPublicacionView(viewsets.ViewSet):
                 publicacion.motivo = data['motivo']
                 publicacion.visible = False
                 publicacion.save()
+                publicacion.notificacion_reportar_publicacion(request.user)
                 return Response(status=status.HTTP_200_OK)
             return Response({"message": "No puedes reportar tu propia publicación."} , status=status.HTTP_403_FORBIDDEN)
         except Publicacion.DoesNotExist:
@@ -490,21 +491,8 @@ class HistoriaView(viewsets.ViewSet):
                 return Response(status=status.HTTP_200_OK)
             else:
               return Response(data={"message": "No tienes permisos para eliminar esta historia."} , status=status.HTTP_403_FORBIDDEN)  
-        except Comentario.DoesNotExist:
+        except Historia.DoesNotExist:
             return Response({"message": "Historia no encontrada"}, status=status.HTTP_404_NOT_FOUND)
 
 
-
-class NotificacionComunidad(viewsets.ReadOnlyModelViewSet):
-    serializer_class = NotificacionSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get_queryset(self):
-        notificacionesUsuario = NotificacionUsuario.objects.filter(receiver=self.request.user)
-
-        notificaciones = []
-        for notificacion_user in notificacionesUsuario:
-            notificaciones.append(Notificacion.objects.get(id=notificacion_user.notificacion.id))
-        
-        return notificaciones
     

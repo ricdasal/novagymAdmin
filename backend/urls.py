@@ -39,4 +39,5 @@ urlpatterns = [
     path('comunidad/', include('comunidad.urls')),
     path('almacenamiento/', include('almacenamiento.urls')),
     path('calendario/', include('calendario.urls')),
+    path('promociones/', include('promociones.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
