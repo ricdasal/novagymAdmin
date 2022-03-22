@@ -43,20 +43,24 @@
             <p><b>{{membresia.nombre}}</b></p>
             <p><b>Precio:</b> ${{membresia.precio}}</p>
             <p><b>Descripción:</b> {{membresia.descripcion}}</p>
-            <p><b>Duración:</b> {{membresia.meses_duracion}}</p>
+            <p><b>Duración:</b> {{membresia.meses_duracion}} Meses</p>
           </td>
           <td>
             <p><b>Beneficios</b></p>
-            {% for beneifcio in membresia.beneficios.all %}
-            <p>{{beneifcio}}</p>
+            {% for beneficio in membresia.beneficios.all %}
+            <p>{{beneficio}}</p>
             {% endfor %}
           </td>
-          <td>
-            <a href="{% url 'membresia:editar' pk=membresia.pk %}" class="btn btn-primary">
+          <td style="width: 160px;">
+            <a href="#" data-url="{% url 'membresia:listar_usuario' pk=membresia.pk %}" 
+              data-toggle='modal' data-target="#mainModal" class="btn btn-primary use-modal btn-block" >
+              Ver usuarios <i class="fas fa-list"></i>
+            </a>
+            <a href="{% url 'membresia:editar' pk=membresia.pk %}" class="btn btn-primary btn-block">
               Editar <i class="fas fa-edit "></i>
             </a>
           </td>
-          <td>
+          <td class="text-center">
             <input type="checkbox" {%if membresia.estado%}checked{%endif%} class="use-modal" data-toggle="toggle" 
             data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
             data-target="#mainModal" data-url-activar="{%url 'membresia:activar' membresia.pk %}" 
@@ -79,7 +83,6 @@
 
 {% block specific_scripts %}
 <script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {

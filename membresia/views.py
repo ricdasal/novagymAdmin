@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
+from django.db.models import Q
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
-from rest_framework import status
+from seguridad.models import UserDetails
 from seguridad.views import UsuarioPermissionRequieredMixin
 
 from membresia.filters import MembresiaFilter
@@ -23,7 +23,7 @@ class ListarMembresia(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Filte
     model = Membresia
     context_object_name = 'usuarios'
     template_name = "lista_membresia.html"
-    permission_required = 'seguridad.view_userdetails'
+    permission_required = 'membresia.view_membresia'
     filterset_class = MembresiaFilter
 
     def get_context_data(self, **kwargs):
@@ -39,7 +39,7 @@ class CrearMembresia(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Create
     form_class = MembresiaForm
     template_name = 'crear_membresia.html'
     success_url = reverse_lazy('membresia:listar')
-    permission_required = 'seguridad.add_userdetails'
+    permission_required = 'membresia.add_membresia'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,7 +52,7 @@ class EditarMembresia(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Updat
     form_class = MembresiaForm
     template_name = 'crear_membresia.html'
     success_url = reverse_lazy('membresia:listar')
-    permission_required = 'seguridad.add_userdetails'
+    permission_required = 'membresia.add_membresia'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -61,7 +61,16 @@ class EditarMembresia(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Updat
 
 
 @login_required
-@permission_required('seguridad.delete_userdetails')
+@permission_required('membresia.view_membresia')
+def membresia_listar_usuario(request, pk):
+    membresia = Membresia.objects.get(id=pk)
+    usuarios = UserDetails.objects.filter(Q(historial_membresia__activa=True)
+                                          & Q(historial_membresia__membresia=membresia))
+    return render(request, 'lista_usuario_membresia.html', {'membresia': membresia, 'usuarios': usuarios})
+
+
+@login_required
+@permission_required('membresia.delete_membresia')
 def membresia_confirmar_eliminacion(request, pk):
     membresia = Membresia.objects.get(id=pk)
     if request.POST:
@@ -73,7 +82,7 @@ def membresia_confirmar_eliminacion(request, pk):
 
 
 @login_required
-@permission_required('seguridad.delete_userdetails')
+@permission_required('membresia.delete_membresia')
 def membresia_confirmar_activar(request, pk):
     membresia = Membresia.objects.get(id=pk)
     if request.POST:
@@ -88,7 +97,7 @@ class ListarBeneficio(LoginRequiredMixin, UsuarioPermissionRequieredMixin, ListV
     model = Beneficio
     context_object_name = 'usuarios'
     template_name = "lista_beneficio.html"
-    permission_required = 'seguridad.view_userdetails'
+    permission_required = 'membresia.view_membresia'
     filterset_class = MembresiaFilter
 
     def get_context_data(self, **kwargs):
@@ -102,7 +111,7 @@ class CrearBeneficio(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Create
     form_class = BeneficioForm
     template_name = 'crear_beneficio.html'
     success_url = reverse_lazy('membresia:listar_beneficio')
-    permission_required = 'seguridad.add_userdetails'
+    permission_required = 'membresia.add_membresia'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -116,7 +125,7 @@ class EditarBeneficio(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Updat
     form_class = BeneficioForm
     template_name = 'crear_beneficio.html'
     success_url = reverse_lazy('membresia:listar_beneficio')
-    permission_required = 'seguridad.add_userdetails'
+    permission_required = 'membresia.add_membresia'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
