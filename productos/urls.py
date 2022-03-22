@@ -12,9 +12,6 @@ urlpatterns = [
      path('descuento/create/',createDescuento,name='createDescuento'),
 
      #Producto
-     path('listarProductosNC/', ListarProductosNC.as_view(), name='listarProductosNC'),
-     path('UpdateProductoNC/<int:pk>', UpdateProductoNC.as_view(), name='UpdateProductoNC'),
-     path('CrearProductoNC/', CrearProductoNC.as_view(), name='CrearProductoNC'),
      path('deleteProducto/<int:id>', deleteProducto, name='deleteProducto'),
      path('UpdateProducto/<int:pk>', UpdateProducto.as_view(), name='UpdateProducto'),
      path('CrearProducto/', CrearProducto.as_view(), name='CrearProducto'),

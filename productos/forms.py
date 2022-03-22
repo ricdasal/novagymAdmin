@@ -3,6 +3,7 @@ from django import forms
 from .models import *
 from crispy_forms.layout import Column, Div, Field, Layout, Row
 from .widgets import DateTimePickerInput
+from crispy_forms.bootstrap import StrictButton
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
@@ -24,7 +25,7 @@ class CategoriaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ('codigo','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion')
+        fields = ('codigo','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins')
 
         valor_presentacion=forms.DecimalField(min_value=0),
         precio_referencial=forms.DecimalField(min_value=0)
@@ -53,6 +54,9 @@ class ProductoForm(forms.ModelForm):
                 Column('valor_presentacion', css_class='col-6'),
                 Column('unidad_presentacion', css_class='col-6'),
                 Column('precio_referencial', css_class='col-6'),
+            ),
+            Row(
+                Column('usaNovacoins', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
             ),
         )
@@ -60,11 +64,10 @@ class ProductoForm(forms.ModelForm):
 
 class InventarioForm(forms.ModelForm):
     class Meta:
-        fields = ('precio','stock','usaNovacoins')
+        fields = ('precio','novacoins','stock')
         model = Inventario  
 
         precio=forms.DecimalField(min_value=0)
-        usaNovacoins = forms.IntegerField(widget=forms.HiddenInput(), initial=0) 
         
 
     def __init__(self, *args, **kwargs):
@@ -74,17 +77,18 @@ class InventarioForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('precio', css_class='col-6')
+                Column('precio', css_class='col-6'),
+                Column('novacoins', css_class='col-6')
             ),
             Row(
                 Column('stock', css_class='col-6')
             )
         )
 
-class InventarioFormNC(forms.ModelForm):
+""" class InventarioFormNC(forms.ModelForm):
     class Meta:
         model = Inventario  
-        fields = ('novacoins','stock','usaNovacoins')
+        fields = ('novacoins','stock')
 
         widgets = {
             "usaNovacoins":forms.CheckboxInput(attrs={'checked':True})
@@ -99,12 +103,11 @@ class InventarioFormNC(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column('novacoins', css_class='col-6'),
-                Column('usaNovacoins', css_class='col-6 invisible')
             ),
             Row(
                 Column('stock', css_class='col-6')
             )
-        )
+        ) """
 
 class DescuentoForm(forms.ModelForm):
     class Meta:
@@ -138,10 +141,32 @@ class DescuentoForm(forms.ModelForm):
             )
         )
 
+class ProductoFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('nombre', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('categoria', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column('talla', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('usaNovacoins', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
+
 ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
-ProductoMetaNC=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=1,can_delete=False)
 DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)
 
 ProductoMetaU=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=0,can_delete=False)
-ProductoMetaNCU=forms.inlineformset_factory(Producto,Inventario,InventarioFormNC,extra=0,can_delete=False)
 DescuentoMetaU=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=0,can_delete=False)

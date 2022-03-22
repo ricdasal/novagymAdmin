@@ -14,7 +14,9 @@ class Gimnasio(models.Model):
     estado = models.BooleanField(default=True)
     ciudad = models.CharField(max_length=24)
     aforo = models.PositiveIntegerField()
-    latitud= models.DecimalField(decimal_places=5,max_digits=9)
-    longitud= models.DecimalField(decimal_places=5,max_digits=9)
+    capacidad=models.PositiveIntegerField()
+    personas= models.PositiveIntegerField(null=True, blank=True)
+    latitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
+    longitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
     def __str__(self):
         return self.nombre +"-"+self.ciudad

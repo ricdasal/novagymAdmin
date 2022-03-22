@@ -9,15 +9,17 @@ class GimnasioForm(forms.ModelForm):
         model = Gimnasio
         labels = {
             "imagen": "Imagen de referencia",
-            "estado": "Gimnasio activo"
+            "estado": "Gimnasio activo",
+            "aforo": "Aforo (%)"
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
             "horario_inicio": TimePickerInput(),
             "horario_fin": TimePickerInput(),
-            "aforo": forms.NumberInput(attrs={'min':0,'max': 100})
+            "aforo": forms.NumberInput(attrs={'min':0,'max': 100}),
+            "capacidad": forms.NumberInput(attrs={'min':0,'max': 999})
         }
-        fields = ('tipo','nombre', 'imagen','telefono','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo')
+        fields = ('tipo','nombre', 'imagen','telefono','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo','capacidad')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,8 +37,9 @@ class GimnasioForm(forms.ModelForm):
             Row(
                 Column('horario_inicio', css_class='col-6'),
                 Column('horario_fin', css_class='col-6'),
-                Column('estado', css_class='col-6'),
                 Column('aforo', css_class='col-6'),
+                Column('estado', css_class='col-6'),
+                Column('capacidad', css_class='col-6'),
                 Column('imagen', css_class='col-6')
             )
         )

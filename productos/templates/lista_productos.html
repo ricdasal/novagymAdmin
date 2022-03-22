@@ -7,25 +7,24 @@
   <div class="col">
     <h2 class="text-left">PRODUCTOS</h2>
   </div>
-  <div class="col">
-    
+
+  <div class="col-12">
+
     <a href="{% url 'productos:listarCategoria' %}" class="btn btn-primary float-right">Ver categorías <i
         class="fas fa-plus-circle"> </i></a>
-    
-    {% if nc == 1 %}
-    <a href="{% url 'productos:CrearProductoNC' %}" class="btn btn-primary float-right" style="margin-right: 2%;">Agregar producto <i
-        class="fas fa-plus-circle"> </i></a>
-        {% else %}
-        <a href="{% url 'productos:CrearProducto' %}" class="btn btn-primary float-right" style="margin-right: 2%;">Agregar producto <i
-          class="fas fa-plus-circle"> </i></a>
-    {% endif %}
+ 
+    <a href="{% url 'productos:CrearProducto' %}" class="btn btn-primary float-right" style="margin-right: 1%;">Agregar
+      producto <i class="fas fa-plus-circle"> </i></a>
+ 
 
   </div>
   <hr>
 </div>
-<div class="row mt-4">
+
+<div class="row mt-4 justify-content-center">
   <div class="col-12">
     <form method="get">
+      {% crispy filter.form %}
       {% include "export_records.html" %}
     </form>
   </div>
@@ -38,50 +37,43 @@
         <th scope="col">Acciones</th>
       </tr>
       {% if page_obj %}
-      {% for inventario in combo %}
+      {% for producto in page_obj %}
       <tr>
-        <td><img style="width: 150px; height: 150px;" src="/media/{{inventario.producto.imagen}}" alt=""></td>
+        <td><img style="width: 150px; height: 150px;" src="/media/{{producto.imagen}}" alt=""></td>
         <td>
-          <p>Código: {{ inventario.producto.codigo }}</p>
-          <p>Nombre: {{ inventario.producto.nombre }}</p>
-          <p>Descripción: {{ inventario.producto.descripcion }}</p>
-          <p>Talla: {{ inventario.producto.talla }}</p>
-          <p>Categoria: {{ inventario.producto.categoria.nombre }}</p>
+          <p>Código: {{ producto.codigo }}</p>
+          <p>Nombre: {{ producto.nombre }}</p>
+          <p>Descripción: {{ producto.descripcion }}</p>
+          <p>Talla: {{ producto.talla }}</p>
+          <p>Categoria: {{ producto.categoria.nombre }}</p>
         </td>
+        {% for inventario in producto.inventario_set.all %}
         <td>
-
-          <p>Valor presentación: ${{ inventario.producto.valor_presentacion }}</p>
-          <p>Precio referencial: ${{ inventario.producto.precio_referencial }}</p>
-          {% if inventario.usaNovacoins == 0 %}
+          <p>Valor presentación: ${{ producto.valor_presentacion }}</p>
+          <p>Precio referencial: ${{ producto.precio_referencial }}</p>
+          <p>Stock: {{inventario.stock}}</p>
+          {% if producto.usaNovacoins == 0 %}
           <p>Precio: ${{ inventario.precio }}</p>
           {% else %}
-          <p>Precio: {{ inventario.novacoins }} NC</p>
+          <p>NovaCoins: {{ inventario.novacoins }} NC</p>
           {% endif %}
-          <p>Unidad presentación: {{ inventario.producto.unidad_presentacion }}</p>
-          <p>Stock: {{ inventario.stock }}</p>
         </td>
         <td>
-          {% if inventario.usaNovacoins == 0 %}
-          <a href="{%url 'productos:UpdateProducto' inventario.id%}" class="btn btn-sm btn-primary">
+          <a href="{%url 'productos:UpdateProducto' producto.id%}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit "></i></a>
-          {% else %}
-          <a href="{%url 'productos:UpdateProductoNC' inventario.id%}" class="btn btn-sm btn-primary">
-            <i class="fas fa-edit "></i></a>
-          {% endif %}
-          
-
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-            data-url="{%url 'productos:deleteProducto' inventario.id%}" href="#">
-              <i class="fas fa-times "></i></a>
-            
+          <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+            data-url="{%url 'productos:deleteProducto' producto.id%}" href="#">
+            <i class="fas fa-times "></i></a>
         </td>
+        {% empty %}
+        {% endfor %}
       </tr>
       {% endfor %}
-        {% else %}
-        <h4>
-          No se encontraron datos.
-        </h4>
-        {% endif %}
+      {% else %}
+      <h4>
+        No se encontraron datos.
+      </h4>
+      {% endif %}
     </table>
     {% include "pagination.html" %}
   </div>
