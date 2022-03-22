@@ -1,3 +1,4 @@
+from email import message
 import json
 from django.db import DatabaseError
 from django.forms import formset_factory, inlineformset_factory
@@ -268,12 +269,6 @@ class ListarProductos(FilterView):
         context['title'] = "Productos"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
-        #inventario = Inventario.objects.all()
-        #producto = Producto.objects.all()
-        #combo= zip(inventario,producto)
-        #context['combo'] = combo
-        inventario = Inventario.objects.filter(usaNovacoins=0)
-        context['combo'] = inventario
         return context
         
     def post(self, request, *args, **kwargs):
@@ -282,7 +277,7 @@ class ListarProductos(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ListarProductosNC(FilterView):
+""" class ListarProductosNC(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Producto
@@ -295,10 +290,6 @@ class ListarProductosNC(FilterView):
         context['title'] = "Productos"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
-        #inventario = Inventario.objects.all()
-        #producto = Producto.objects.all()
-        #combo= zip(inventario,producto)
-        #context['combo'] = combo
         inventario = Inventario.objects.filter(usaNovacoins=1)
         context['combo'] = inventario
         context['nc'] = 1
@@ -308,11 +299,12 @@ class ListarProductosNC(FilterView):
         return super().get(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs) """
 
 def deleteCategoria(request,id):
     query = Categoria.objects.get(id=id)
     if request.POST:
+        query.imagen.delete()
         query.delete()
         messages.success(request, "Categoria eliminada con éxito.")
         return redirect('productos:listarCategoria')
@@ -352,6 +344,7 @@ class CrearProducto(CreateView):
         for meta in descuento_metas:
             meta.producto = self.object
             meta.save()
+        messages.success(self.request, "Producto creado con éxito!")
         return redirect(reverse("productos:listarProductos"))
     def form_invalid(self, form, product_meta_formset):
         return self.render_to_response(
@@ -393,13 +386,17 @@ class UpdateProducto(UpdateView):
         first_form = self.get_form(form_class)
         second_forms = ProductoMetaU(self.request.POST,instance=self.object)
         third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
+        print("***********")
+        print(first_form.errors)
+        print(second_forms.errors)
+        print(third_forms.errors)
         if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
-                    return self.forms_valid(first_form , second_forms,third_forms)
+            return self.forms_valid(first_form , second_forms,third_forms)
         else:
             messages.error(self.request, "Ooops! Algo salio mal...")
             return redirect(reverse("productos:listarProductos"))
 
-class CrearProductoNC(CreateView):
+""" class CrearProductoNC(CreateView):
     form_class =ProductoForm
     template_name = 'producto_nuevo.html'
     title = "CREAR PRODUCTO"
@@ -439,9 +436,9 @@ class CrearProductoNC(CreateView):
             self.get_context_data(form=form,
                                 product_meta_formset=product_meta_formset
                                 )
-        )
+        ) """
 
-class UpdateProductoNC(UpdateView):
+""" class UpdateProductoNC(UpdateView):
     template_name = "producto_nuevo.html"
     model = Producto
     form_class = ProductoForm
@@ -481,23 +478,19 @@ class UpdateProductoNC(UpdateView):
                     return self.forms_valid(first_form , second_forms,third_forms)
         else:
             messages.error(self.request, "Ooops! Algo salio mal...")
-            return redirect(reverse("productos:listarProductos"))
+            return redirect(reverse("productos:listarProductos")) """
     
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)
     inventario = Inventario.objects.get(id=id)
     descuento = ProductoDescuento.objects.get(id=id)
     if request.POST:
-        nc=inventario.usaNovacoins
         descuento.delete()
         inventario.delete()
+        producto.imagen.delete()
         producto.delete()
-        if nc==0:
-            messages.success(request, "Producto eliminado con éxito.")
-            return redirect('productos:listarProductos')
-        else:
-            messages.success(request, "Producto eliminado con éxito.")
-            return redirect('productos:listarProductosNC')
+        messages.success(request, "Producto eliminado con éxito.")
+        return redirect('productos:listarProductos')
     return render(request, "ajax/producto_confirmar_elminar.html", {"producto": producto})
 
 

@@ -88,6 +88,7 @@ class ListarSponsors(FilterView):
 def deleteSponsor(request,id):
     query = Sponsor.objects.get(id=id)
     if request.POST:
+        query.imagen.delete()
         query.delete()
         messages.success(request, "Anunciante eliminado con éxito.")
         return redirect('sponsor:listar')

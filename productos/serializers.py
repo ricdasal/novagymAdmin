@@ -30,9 +30,10 @@ class ProductoSerializer(serializers.ModelSerializer):
     valor_presentacion=serializers.DecimalField(max_digits=4, decimal_places=2)
     talla = serializers.CharField(max_length=3)
     unidad_presentacion = serializers.IntegerField()
+    usaNovacoins=serializers.BooleanField()
     class Meta:
         model = Producto
-        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id', 'valor_presentacion','talla','unidad_presentacion')
+        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins')
 
 
 

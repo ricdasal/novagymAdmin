@@ -16,11 +16,12 @@ class Categoria(models.Model):
 class Producto(models.Model):
     class Talla(models.TextChoices):
         NA = 'NA', 'No aplica'
-        EXTRA_SMALL = 'LS', 'Extra Small'
+        EXTRA_SMALL = 'XS', 'Extra Small'
         SMALL = 'S', 'Small'
         MEDIUM = 'M', 'Medium'
         LARGE = 'L', 'Large'
         EXTRA_LARE = 'XL', 'Extra Large'
+        
     id = models.AutoField(primary_key=True)
     codigo = models.CharField(max_length=255,unique=True)
     nombre = models.CharField(max_length=24,unique=True)
@@ -31,6 +32,7 @@ class Producto(models.Model):
     valor_presentacion=models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
     talla = models.CharField(max_length=3, choices=Talla.choices)
     unidad_presentacion = models.PositiveIntegerField()
+    usaNovacoins=models.BooleanField()
 
     def __str__(self):
         return self.codigo + ' - ' + self.nombre
@@ -41,7 +43,6 @@ class Inventario(models.Model):
     precio = models.DecimalField(max_digits=4, decimal_places=2,default=0)
     stock = models.PositiveIntegerField()
     novacoins=models.PositiveIntegerField(default=0)
-    usaNovacoins=models.BooleanField()
     def __str__(self):
         return self.nombre
 

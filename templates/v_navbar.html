@@ -173,54 +173,17 @@
       </div>
     </div>
 
-      <div
-      class="row  menu-container menu menu--collapsable {% if request.resolver_match.view_name == 'productos:listarProductos' or request.resolver_match.view_name == 'productos:listarProductosNC'%} menu-container--active{% endif %}"
-      data-toggle="collapse"
-      data-target="#collapsewo2"
-      aria-expanded="true"
-      aria-controls="collapsewo2"
-    >
-      <div class="col-12">
-        <div class="row">
-          <img
-            src="{% static 'images/no_image.png'%}"
-            alt="productos"
-            class="menu__image"
-          />
-          <div class="d-flex align-items-center">
-            <span class="menu__title">Productos</span>
-            <span class="px-4">
-              <i class="fas fa-angle-down"></i>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="collapsewo2" class="collapse row menu menu--collapsable">
+    <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductos' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'productos:listarProductos' %}">
-          <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductos' %}menu-container--active{% endif %}">
+          <div class="row">
             <img
               src="{% static 'images/no_image.png'%}"
-              alt="repo-ventas"
+              alt="calendario"
               class="menu__image"
             />
             <div class="d-flex align-items-center">
-              <span class="menu__title">En dólares ($)</span>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-12 ">
-        <a class="menu" href="{% url 'productos:listarProductosNC' %}">
-          <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductosNC' %}menu-container--active{% endif %}">
-            <img
-              src="{% static 'images/no_image.png'%}"
-              alt="repo-nc"
-              class="menu__image"
-            />
-            <div class="d-flex align-items-center">
-              <span class="menu__title">en NovaCoins (NC)</span>
+              <span class="menu__title">Productos</span>
             </div>
           </div>
         </a>
@@ -347,7 +310,7 @@
         </a>
       </div>
     </div>
-    <div class="row menu-container">
+    {% comment %} <div class="row menu-container">
       <div class="col-12">
         <a class="menu" href="{% url 'almacenamiento:almacenamiento_usuario' %}">
           <div class="row">
@@ -362,7 +325,7 @@
           </div>
         </a>
       </div>
-    </div>
+    </div> {% endcomment %}
 
   </div>
 </div>

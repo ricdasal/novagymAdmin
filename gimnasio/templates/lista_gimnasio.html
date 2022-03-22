@@ -48,7 +48,7 @@
           <th scope="col">Ubicación</th>
           <th scope="col">Horarios</th>
           <th scope="col">Ciudad</th>
-          <th scope="col">Aforo</th>
+          <th scope="col">Capacidad</th>
           <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
@@ -64,7 +64,11 @@
           <td>{{gimnasio.ubicacion}}</td>
           <td>{{gimnasio.horario_inicio}} - {{gimnasio.horario_fin}}</td>
           <td>{{gimnasio.ciudad}}</td>
-          <td>{{gimnasio.aforo}}%</td>
+          <td>
+            <p>Capacidad: {{gimnasio.capacidad}}</p>
+            <p>Límite: {{gimnasio.aforo}}%</p>
+            <p>Aforo: {{gimnasio.personas}}</p>
+          </td>
           <td>
             {% if gimnasio.estado == True %}
             <span class="text-success">Activo</span>

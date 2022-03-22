@@ -17,11 +17,6 @@
       </div>
     </h2>
     <hr>
-    {% if form.imagen.value %}
-    <p style="margin:1%;">Imagen</p>
-    <img src="{{form.imagen.value.url}}" alt="logo_sponsor" name="imagen" id="imagen" width="120" height="120"
-      class="mb-3 img-thumbnail">
-    {% endif %}
     <form method="POST" novalidate enctype="multipart/form-data">
       <div>
         {% csrf_token %}
