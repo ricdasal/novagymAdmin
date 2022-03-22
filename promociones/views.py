@@ -52,6 +52,7 @@ class CrearPromociones(CreateView):
 def deletePromocion(request,id):
     query = Promociones.objects.get(id=id)
     if request.POST:
+        query.imagen.delete()
         query.delete()
         messages.success(request, "Promoción eliminada con éxito.")
         return redirect('promociones:listar')

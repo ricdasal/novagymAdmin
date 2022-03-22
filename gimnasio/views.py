@@ -86,6 +86,19 @@ class CrearGimnasio(CreateView):
     template_name = 'gimnasio_nuevo.html'
     title = "CREAR SPONSOR"
     success_url = reverse_lazy('gimnasio:listar')
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        if form.is_valid():
+            valid=self.form_valid(form)
+            gymId=Gimnasio.objects.latest('id').id
+            aforo=request.POST.get('aforo')
+            capacidad=request.POST.get('capacidad')
+            calcularAforo(gymId,aforo,capacidad)
+            return valid
+        else:
+            return self.form_invalid(form)
 
 class UpdateGimnasio(UpdateView):
     form_class =GimnasioForm
@@ -94,9 +107,17 @@ class UpdateGimnasio(UpdateView):
     template_name = 'gimnasio_nuevo.html'
     success_url = reverse_lazy('gimnasio:listar')
 
+    def post(self, request, *args, **kwargs):
+        gimnasio = self.get_object().id
+        aforo=request.POST.get('aforo')
+        capacidad=request.POST.get('capacidad')
+        calcularAforo(gimnasio,aforo,capacidad)
+        return super(UpdateGimnasio, self).post(request, *args, **kwargs)
+
 def deleteGimnasio(request,id):
     query = Gimnasio.objects.get(id=id)
     if request.POST:
+        query.imagen.delete()
         query.delete()
         messages.success(request, "Gimnasio eliminado con éxito.")
         return redirect('gimnasio:listar')
@@ -118,6 +139,7 @@ def changeAforo(request):
         for gimnasio in gimnasios:
             gimnasio.aforo=aforoGlobal
             gimnasio.save()
+            calcularAforo(gimnasio.id,gimnasio.aforo,gimnasio.capacidad)
     return redirect('gimnasio:listar')
 
 def getGimnasios(request):
@@ -136,3 +158,8 @@ def getGimnasios(request):
                             "coordenadas":[float(gimnasio.latitud),float(gimnasio.longitud)]
                             }
     return HttpResponse(json.dumps(urls))
+
+def calcularAforo(id,aforo,capacidad):
+    gimnasio=Gimnasio.objects.get(id=int(id))
+    gimnasio.personas=int(capacidad)*(int(aforo)/100)
+    gimnasio.save()

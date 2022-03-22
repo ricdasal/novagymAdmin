@@ -113,6 +113,7 @@ class ShowBuzonLeidos(FilterView):
 def deleteMail(request,id):
     query = Buzon.objects.get(id=id)
     if request.POST:
+        query.imagen.delete()
         query.delete()
         messages.success(request, "Correo eliminado con éxito.")
         return redirect('contactenos:buzon')
