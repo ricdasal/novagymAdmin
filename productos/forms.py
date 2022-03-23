@@ -25,7 +25,7 @@ class CategoriaForm(forms.ModelForm):
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ('codigo','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins')
+        fields = ('codigo','nombre', 'descripcion','imagen','categoria','talla','usaNovacoins')
 
         valor_presentacion=forms.DecimalField(min_value=0),
         precio_referencial=forms.DecimalField(min_value=0)
@@ -49,11 +49,6 @@ class ProductoForm(forms.ModelForm):
                 Column('descripcion', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('talla', css_class='col-6'),
-            ),
-            Row(
-                Column('valor_presentacion', css_class='col-6'),
-                Column('unidad_presentacion', css_class='col-6'),
-                Column('precio_referencial', css_class='col-6'),
             ),
             Row(
                 Column('usaNovacoins', css_class='col-6'),
@@ -85,29 +80,6 @@ class InventarioForm(forms.ModelForm):
             )
         )
 
-""" class InventarioFormNC(forms.ModelForm):
-    class Meta:
-        model = Inventario  
-        fields = ('novacoins','stock')
-
-        widgets = {
-            "usaNovacoins":forms.CheckboxInput(attrs={'checked':True})
-        }
-        novacoins=forms.IntegerField(min_value=0)
-            
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.disable_csrf = True
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Row(
-                Column('novacoins', css_class='col-6'),
-            ),
-            Row(
-                Column('stock', css_class='col-6')
-            )
-        ) """
 
 class DescuentoForm(forms.ModelForm):
     class Meta:

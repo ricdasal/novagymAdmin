@@ -86,6 +86,12 @@ class CrearGimnasio(CreateView):
     template_name = 'gimnasio_nuevo.html'
     title = "CREAR SPONSOR"
     success_url = reverse_lazy('gimnasio:listar')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Gimnasio"
+        return context
+
     def post(self, request, *args, **kwargs):
         self.object = None
         form_class = self.get_form_class()
@@ -106,6 +112,11 @@ class UpdateGimnasio(UpdateView):
     title = "ACTUALIZAR GIMNASIO"
     template_name = 'gimnasio_nuevo.html'
     success_url = reverse_lazy('gimnasio:listar')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Editar Gimnasio"
+        return context
 
     def post(self, request, *args, **kwargs):
         gimnasio = self.get_object().id

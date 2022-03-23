@@ -189,7 +189,22 @@
         </a>
       </div>
     </div>
-
+    <div class="row menu-container {% if request.resolver_match.view_name == 'promociones:listar' %}menu-container--active{% endif %}">
+      <div class="col-12">
+        <a class="menu" href="{% url 'promociones:listar' %}">
+          <div class="row">
+            <img
+              src="{% static 'images/no_image.png'%}"
+              alt="calendario"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Promociones</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
     <div
       class="row  menu-container menu menu--collapsable"
       data-toggle="collapse"

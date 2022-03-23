@@ -26,12 +26,9 @@ class Producto(models.Model):
     codigo = models.CharField(max_length=255,unique=True)
     nombre = models.CharField(max_length=24,unique=True)
     descripcion = models.CharField(max_length=255)
-    precio_referencial = models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
     imagen=models.ImageField(upload_to="productos/", null=True, blank=True,default="images/no_image.png")
     categoria=models.ForeignKey(Categoria, on_delete=models.CASCADE)
-    valor_presentacion=models.DecimalField(max_digits=4, decimal_places=2,validators=[MinValueValidator(0)])
     talla = models.CharField(max_length=3, choices=Talla.choices)
-    unidad_presentacion = models.PositiveIntegerField()
     usaNovacoins=models.BooleanField()
 
     def __str__(self):

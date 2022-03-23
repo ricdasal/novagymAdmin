@@ -5,7 +5,7 @@ from django.urls import reverse_lazy
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from promociones.filters import PromocionesFilter
-from promociones.forms import PromocionesForm
+from promociones.forms import PromocionesCategoriasForm, PromocionesMembresiaForm
 from promociones.models import Promociones
 from django.views.generic import CreateView, UpdateView
 from django.contrib import messages
@@ -43,7 +43,14 @@ class ListarPromociones(FilterView):
         return super().get(request, *args, **kwargs)
     
 class CrearPromociones(CreateView):
-    form_class =PromocionesForm
+    form_class =PromocionesCategoriasForm
+    model=Promociones
+    template_name = 'promocion_nuevo.html'
+    title = "CREAR PROMOCION"
+    success_url = reverse_lazy('promociones:listar')
+
+class CrearPromociones(CreateView):
+    form_class =PromocionesMembresiaForm
     model=Promociones
     template_name = 'promocion_nuevo.html'
     title = "CREAR PROMOCION"
@@ -59,7 +66,7 @@ def deletePromocion(request,id):
     return render(request, "ajax/promocion_confirmar_elminar.html", {"promocion": query})
 
 class UpdatePromocion(UpdateView):
-    form_class =PromocionesForm
+    form_class =PromocionesCategoriasForm
     model=Promociones
     title = "ACTUALIZAR PROMOCIÓN"
     template_name = 'promocion_nuevo.html'
