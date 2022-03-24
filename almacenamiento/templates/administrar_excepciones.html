@@ -11,7 +11,7 @@
 </div>
 <hr>
 <div class="container">
-    {% for almacenamiento in almacenamiento_usuario %}
+    {% for almacenamiento in page_obj %}
         <div class="row border text-center">
             <div class="col-sm-2 d-flex align-items-center">
             {% if almacenamiento.usuario_info.foto_perfil %}
@@ -24,7 +24,7 @@
                 <p>Código Único: {{ almacenamiento.usuario_info.codigo }}</p>
             </div>
             <div class="col-sm-7">
-                <form id="form-{{ almacenamiento.id }}" class="mt-3" method="POST" action="{% url 'almacenamiento:configurar_usuario' almacenamiento.usuario.id %}" novalidate enctype="multipart/form-data">
+                <form id="form-{{ almacenamiento.id }}" class="mt-3" method="POST" action="{% url 'almacenamiento:modificar_almacenamiento_usuario' almacenamiento.usuario.id 'excepcion' %}" novalidate enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group row">
                         <label for="staticEmail" class="col-sm-5 col-form-label">Peso máximo de archivos: </label>
