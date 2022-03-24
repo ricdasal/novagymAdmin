@@ -1,4 +1,4 @@
-from enum import unique
+import random
 from django.db import models
 from django.core.validators import MinValueValidator
 # Create your models here.
@@ -11,7 +11,13 @@ class Categoria(models.Model):
     def __str__(self):
         return self.nombre
 
-
+def generarCodigo():
+    not_unique = True
+    while not_unique:
+        unique_code = random.randint(1000, 9999)
+        if not Producto.objects.filter(codigo=unique_code):
+            not_unique = False
+            return "PDT"+"-"+str(unique_code)
 
 class Producto(models.Model):
     class Talla(models.TextChoices):
@@ -21,14 +27,23 @@ class Producto(models.Model):
         MEDIUM = 'M', 'Medium'
         LARGE = 'L', 'Large'
         EXTRA_LARE = 'XL', 'Extra Large'
-        
+    class Presentacion(models.TextChoices):
+        NA = 'No aplica', 'No aplica'
+        Embalaje = 'Embalaje', 'Embalaje'
+        Caja = 'Caja', 'Caja'
+        Recipiente = 'Recipiente', 'Recipiente'
+        Enfundado = 'Enfundado', 'Enfundado'
+        Lata = 'Lata', 'Lata'
+        Botella = 'Botella', 'Botella'
+
     id = models.AutoField(primary_key=True)
-    codigo = models.CharField(max_length=255,unique=True)
+    codigo =  models.CharField(max_length=20,unique=True,default=generarCodigo,editable=False)
     nombre = models.CharField(max_length=24,unique=True)
     descripcion = models.CharField(max_length=255)
     imagen=models.ImageField(upload_to="productos/", null=True, blank=True,default="images/no_image.png")
     categoria=models.ForeignKey(Categoria, on_delete=models.CASCADE)
     talla = models.CharField(max_length=3, choices=Talla.choices)
+    presentacion = models.CharField(max_length=10, choices=Presentacion.choices)
     usaNovacoins=models.BooleanField()
 
     def __str__(self):
@@ -38,6 +53,7 @@ class Inventario(models.Model):
     id = models.AutoField(primary_key=True)
     producto=models.ForeignKey(Producto, on_delete=models.CASCADE)
     precio = models.DecimalField(max_digits=4, decimal_places=2,default=0)
+    precioCompra=models.DecimalField(max_digits=4, decimal_places=2,default=0)
     stock = models.PositiveIntegerField()
     novacoins=models.PositiveIntegerField(default=0)
     def __str__(self):

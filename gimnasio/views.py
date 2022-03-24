@@ -123,6 +123,7 @@ class UpdateGimnasio(UpdateView):
         aforo=request.POST.get('aforo')
         capacidad=request.POST.get('capacidad')
         calcularAforo(gimnasio,aforo,capacidad)
+        messages.success(request, "Gimnasio actualizado con éxito.")
         return super(UpdateGimnasio, self).post(request, *args, **kwargs)
 
 def deleteGimnasio(request,id):
