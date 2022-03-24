@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 from .models import *
 
 def tamanio_archivos(archivos):
@@ -36,5 +36,10 @@ def peso_archivo_permitido(user, peso_archivo):
       return False
    return True
 
+
+def validar_number(valor):
+   if Decimal(valor) < 0 or 'e' in valor or 'E' in valor:
+      raise DecimalException
+   return round(Decimal(valor) * 1000, 2)
 
    
