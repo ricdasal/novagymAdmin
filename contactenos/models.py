@@ -10,5 +10,9 @@ class Buzon(models.Model):
     fecha=models.DateTimeField(auto_now_add=True)
     imagen=models.ImageField(upload_to="mail/", null=True, blank=True)
     leido=models.BooleanField(default=False)
+
+    class Meta:
+        ordering=('-fecha',)
+
     def __str__(self):
         return self.titulo

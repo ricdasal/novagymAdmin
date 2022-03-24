@@ -98,8 +98,12 @@ class CrearSponsor(CreateView):
     form_class =SponsorForm
     model=Sponsor
     template_name = 'sponsor_nuevo.html'
-    title = "CREAR SPONSOR"
+    title = "CREAR ANUNCIANTE"
     success_url = reverse_lazy('sponsor:listar')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Anunciante"
+        return context
 
 class UpdateSponsor(UpdateView):
     form_class =SponsorForm
@@ -107,6 +111,10 @@ class UpdateSponsor(UpdateView):
     title = "ACTUALIZAR SPONSOR"
     template_name = 'sponsor_nuevo.html'
     success_url = reverse_lazy('sponsor:listar')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Editar Anunciante"
+        return context
 
 def ChangeState(request,pk):
     query = Sponsor.objects.get(id=pk)
