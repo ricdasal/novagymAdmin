@@ -123,13 +123,13 @@ input:focus {
 .btn-secondary {
   background-color: var(--btn-secondary-color) !important;
   border: 1px solid var(--btn-secondary-color) !important;
-  color: var(--black-color);
+  color: var(--white-color);
 }
 
 .btn-secondary:hover {
   background-color: var(--btn-secondary-color-hover) !important;
   border: 1px solid var(--btn-secondary-color-hover) !important;
-  color: var(--black-color);
+  color: var(--white-color);
 }
 
 .page-item.active .page-link {
@@ -221,4 +221,11 @@ input:focus {
   .main-content {
     margin-left: 400px;
   }
+}
+
+[type="submit"]:disabled {
+  background-image: url('../images/loader.gif');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }

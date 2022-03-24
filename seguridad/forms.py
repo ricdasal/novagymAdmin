@@ -21,13 +21,14 @@ class UsuarioForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].required = True
         self.fields['groups'].required = False
+        self.fields['groups'].choices = [(g.pk,g.name) for g in Group.objects.exclude(name="Todos")]
         self.fields['username'].help_text = None
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('username', css_class='col-4'),
+                Column('username', css_class='col-8'),
             ),
             Row(
                 Column('password1', css_class='col-4'),
@@ -51,6 +52,7 @@ class UsuarioEditarForm(UserChangeForm):
         self.fields['groups'].required = False
         self.fields['username'].help_text = None
         self.fields['groups'].help_text = None
+        self.fields['groups'].choices = [(g.pk,g.name) for g in Group.objects.exclude(name="Todos")]
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
