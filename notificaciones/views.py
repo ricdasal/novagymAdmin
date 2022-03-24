@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView
 from novagym.utils import calculate_pages_to_render
-from push_notifications.models import APNSDevice, GCMDevice
+from push_notifications.models import GCMDevice
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -68,7 +68,6 @@ class ListarNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Li
     model = Notificacion
     context_object_name = 'notificacion'
     template_name = "lista_notificaciones.html"
-    permission_required = 'novagym.view_empleado'
     permission_required = 'notificacion.view_notificacion'
 
     def get_context_data(self, **kwargs):
@@ -77,6 +76,9 @@ class ListarNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Li
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
+
+    def get_queryset(self):
+        return self.model.objects.filter(tipo=Notificacion.Tipo.Admin)
 
 
 class CrearNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateView):
@@ -92,9 +94,9 @@ class CrearNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Cre
         context['title'] = self.title
         return context
 
-    def post(self, request, *args, **kwargs):
-        messages.success(request, "Notificación creada con éxito.")
-        return super().post(request, *args, **kwargs)
+    def form_valid(self, form):
+        messages.success(self.request, "Notificación creada con éxito.")
+        return super().form_valid(form)
 
 
 class UpdateNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateView):
@@ -110,9 +112,9 @@ class UpdateNotificacion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Up
         context['title'] = self.title
         return context
 
-    def post(self, request, *args, **kwargs):
-        messages.success(request, "Notificación editada con éxito.")
-        return super().post(request, *args, **kwargs)
+    def form_valid(self, form):
+        messages.success(self.request, "Notificación editada con éxito.")
+        return super().form_valid(form)
 
 
 def deleteNotificacion(request, id):
@@ -141,20 +143,23 @@ def changeState(request, pk):
     return render(request, "ajax/notificacion_confirmar_activar.html", {"notificacion": notificacion})
 
 
-#TODO: Enviar por batches, no uno por uno
+# Ref: https://github.com/jazzband/django-push-notifications#sending-messages-in-bulk
 def enviarNotificacionGlobal(request, id_notificacion):
     notificacion = Notificacion.objects.get(id=id_notificacion)
-    dispositivos = GCMDevice.objects.all()
-    for dispositivo in dispositivos:
-        dispositivo.send_message(notificacion.cuerpo, extra={
-                                 "title": notificacion.titulo, "image": notificacion.imagen})
+    imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+    GCMDevice.objects.all().send_message(notificacion.cuerpo, extra={
+        "title": notificacion.titulo, "image": imagen})
+    report = NotificacionUsuario(notificacion=notificacion,
+                                 sender=request.user, grupo_usuarios=Group.objects.get(name='Todos'))
+    report.save()
     messages.success(request, "Notificación enviada a todos los usuarios.")
     return redirect('notificaciones:listar')
 
 
 def enviarNotificacionIndividual(request, id_notificacion, usuario):
     notificacion = Notificacion.objects.get(id=id_notificacion)
-    dispositivos = GCMDevice.objects.filter(user=usuario).send_message(
-        notificacion.cuerpo, extra={"title": notificacion.titulo, "image": notificacion.imagen})
+    imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+    GCMDevice.objects.filter(user=usuario).send_message(
+        notificacion.cuerpo, extra={"title": notificacion.titulo, "image": imagen})
     messages.success(request, "Notificación enviada al usuario "+usuario+".")
     return redirect('notificaciones:listar')

@@ -7,6 +7,9 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from django.conf import settings
 from django.core.files.base import File
+
+from push_notifications.models import GCMDevice
+
 from almacenamiento.models import AlmacenamientoUsuario
 
 from novagym.utils import calculate_pages_to_render
@@ -191,6 +194,11 @@ def bloquear_publicacion(request, pk):
                 archivo.aumentar_almacenamiento(publicacion.usuario)
 
             publicacion.save()
+
+            notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
+            GCMDevice.objects.filter(user=publicacion.usuario).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
+            
             messages.success(request, 'Operacion realizada con exito.')
         except Publicacion.DoesNotExist:
             messages.error(request, "No se ha encontrado la publicación.")
