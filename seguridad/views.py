@@ -26,12 +26,12 @@ from .models import *
 
 APP_PERMISSIONS = {
     'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
-    # 'novagym':'',
     'membresia': {'label': 'Membresia', 'app': 'membresia', 'model': 'membresia'},
-    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
-    # 'contactenos':'',
-    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
     'notificaciones': {'label': 'Notificaciones', 'app': 'notificaciones', 'model': 'notificacion'},
+    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
+    'comunidad': {'label': 'Comunidad', 'app': 'comunidad', 'model': 'biografia'},
+    'almacenamiento': {'label': 'Almacenamiento', 'app': 'almacenamiento', 'model': 'almacenamientousuario'},
 }  # TODO: agregar apps:model
 
 
@@ -230,6 +230,20 @@ def usuario_confirmar_eliminacion(request, pk):
         return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
 
+@login_required
+@permission_required('seguridad.delete_userdetails')
+def usuario_confirmar_eliminacion_perma(request, pk):
+    detalles = UserDetails.objects.get(id=pk)
+    if request.POST:
+        success_url = reverse_lazy('seguridad:listar', kwargs={
+                                   'type': request.POST['type']})
+        usuario = detalles.usuario
+        usuario.delete()
+        messages.error(request, "Usuario eliminado")
+        return redirect(success_url)
+    return render(request, "ajax/usuario_confirmar_elminar_perma.html", {"usuario": detalles})
+
+
 
 @login_required
 @permission_required('seguridad.delete_userdetails')
@@ -282,12 +296,11 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
     def post(self, request, *args, **kwargs):
         self.object = None
         rol_form = self.form_class(request.POST)
-        apps = request.POST.getlist('apps', None)
         apps_permissions = request.POST.getlist('apps_permissions', None)
         next_page = request.POST.get('next', None)
 
         list_permissions = []
-        if rol_form.is_valid() and apps and apps_permissions:
+        if rol_form.is_valid() and apps_permissions:
             rol = rol_form.save(commit=False)
             for permission in apps_permissions:
                 app, action_model = permission.split('.')  # get the app

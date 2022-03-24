@@ -79,4 +79,7 @@ class NotificacionForm(forms.ModelForm):
             cleaned_data["fecha_inicio"] = None
             cleaned_data["fecha_fin"] = None
             cleaned_data["hora"] = None
+        elif cleaned_data["fecha_inicio"] > cleaned_data["fecha_fin"]:
+          self.add_error('fecha_inicio', forms.ValidationError(
+                'Fecha de inicio no puede ser mayor a la fecha de fin'))
         return cleaned_data

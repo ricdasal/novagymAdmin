@@ -16,11 +16,11 @@
   --primary-color-light: #ffd91a;
   --primary-color-lighter: #ffdd33;
 
-  --secondary-color: #d0ff00;
-  --secondary-color-dark: #d0ff00;
-  --secondary-color-darker: #d0ff00;
-  --secondary-color-light: #d0ff00;
-  --secondary-color-lighter: #d0ff00;
+  --secondary-color: #424242;
+  --secondary-color-dark: #292929;
+  --secondary-color-darker: #000;
+  --secondary-color-light: #5a5a5a;
+  --secondary-color-lighter: #aaa;
 
   --navbar-color: var(--white-color);
   
