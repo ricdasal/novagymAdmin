@@ -1,3 +1,4 @@
+from cProfile import label
 import datetime
 from crispy_forms.helper import FormHelper
 from django import forms
@@ -35,6 +36,7 @@ class ProductoForm(forms.ModelForm):
         valor_presentacion = forms.DecimalField(min_value=0),
         precio_referencial = forms.DecimalField(min_value=0)
         labels = {
+            "usaNovacoins": "Este producto se adquiere con Novacoins",
             "imagen": "Imagen del producto",
             "presentacion": "Presentación del producto"
         }
@@ -50,16 +52,17 @@ class ProductoForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('presentacion', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
+                Column('presentacion', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('talla', css_class='col-6'),
             ),
             Row(
-                Column('usaNovacoins', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
             ),
+            Row(
+                Column('usaNovacoins', css_class='col-6'),            ),
         )
 
 
@@ -67,7 +70,9 @@ class InventarioForm(forms.ModelForm):
     class Meta:
         fields = ('precio', 'precioCompra', 'novacoins', 'stock')
         model = Inventario
-
+        labels={
+            "precioCompra": "Precio de compra"
+        }
         precio = forms.DecimalField(min_value=0)
 
     def __init__(self, *args, **kwargs):
@@ -77,9 +82,9 @@ class InventarioForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('precioCompra', css_class='col-6'),
                 Column('precio', css_class='col-6'),
-                Column('novacoins', css_class='col-6')
+                Column('novacoins', css_class='col-6'),
+                Column('precioCompra', css_class='col-6'),
             ),
             Row(
                 Column('stock', css_class='col-6')
