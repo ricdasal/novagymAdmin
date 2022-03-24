@@ -237,6 +237,10 @@ class crearCategoria(CreateView):
     template_name = 'categoria_nueva.html'
     title = "CREAR CATEGORIA"
     success_url = reverse_lazy('productos:listarCategoria')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Categoría"
+        return context
 
 class ListarCategoria(FilterView):
     paginate_by = 20
@@ -277,30 +281,6 @@ class ListarProductos(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-""" class ListarProductosNC(FilterView):
-    paginate_by = 20
-    max_pages_render = 10
-    model = Producto
-    context_object_name = 'producto'
-    template_name = "lista_productos.html"
-    permission_required = 'novagym.view_empleado'
-    filterset_class=ProductoFilter
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "Productos"
-        page_obj = context["page_obj"]
-        context['num_pages'] = calculate_pages_to_render(self, page_obj)
-        inventario = Inventario.objects.filter(usaNovacoins=1)
-        context['combo'] = inventario
-        context['nc'] = 1
-        return context
-        
-    def post(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs) """
-
 def deleteCategoria(request,id):
     query = Categoria.objects.get(id=id)
     if request.POST:
@@ -317,6 +297,7 @@ class CrearProducto(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(CrearProducto, self).get_context_data(**kwargs)
+        context['title'] = "Agregar Producto"
         context['product_meta_formset'] = ProductoMeta()
         context['descuento_meta_formset'] = DescuentoMeta()
         return context
@@ -360,6 +341,7 @@ class UpdateProducto(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title'] = "Editar Producto"
         if self.request.method == 'POST':
             context['product_meta_formset'] = ProductoMetaU(self.request.POST,instance=self.object)
             context['descuento_meta_formset'] = DescuentoMetaU(self.request.POST,instance=self.object)
@@ -386,99 +368,14 @@ class UpdateProducto(UpdateView):
         first_form = self.get_form(form_class)
         second_forms = ProductoMetaU(self.request.POST,instance=self.object)
         third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
-        print("***********")
-        print(first_form.errors)
-        print(second_forms.errors)
-        print(third_forms.errors)
+
         if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
             return self.forms_valid(first_form , second_forms,third_forms)
         else:
             messages.error(self.request, "Ooops! Algo salio mal...")
             return redirect(reverse("productos:listarProductos"))
 
-""" class CrearProductoNC(CreateView):
-    form_class =ProductoForm
-    template_name = 'producto_nuevo.html'
-    title = "CREAR PRODUCTO"
 
-    def get_context_data(self, **kwargs):
-        context = super(CrearProductoNC, self).get_context_data(**kwargs)
-        context['product_meta_formset'] = ProductoMetaNC()
-        context['descuento_meta_formset'] = DescuentoMeta()
-        return context
-    
-    def post(self, request, *args, **kwargs):
-        self.object = None
-        form_class = self.get_form_class()
-        form = self.get_form(form_class)
-        product_meta_formset = ProductoMetaNC(self.request.POST)
-        descuento_meta_formset = DescuentoMeta(self.request.POST)
-        if form.is_valid() and product_meta_formset.is_valid() and descuento_meta_formset.is_valid():
-            return self.form_valid(form, product_meta_formset,descuento_meta_formset)
-        else:
-            return self.form_invalid(form, product_meta_formset)
-        
-    def form_valid(self, form, product_meta_formset,descuento_meta_formset):
-        self.object = form.save(commit=False)
-        self.object.save()
-        # saving ProductMeta Instances
-        product_metas = product_meta_formset.save(commit=False)
-        for meta in product_metas:
-            meta.producto = self.object
-            meta.save()
-        descuento_metas = descuento_meta_formset.save(commit=False)
-        for meta in descuento_metas:
-            meta.producto = self.object
-            meta.save()
-        return redirect(reverse("productos:listarProductosNC"))
-    def form_invalid(self, form, product_meta_formset):
-        return self.render_to_response(
-            self.get_context_data(form=form,
-                                product_meta_formset=product_meta_formset
-                                )
-        ) """
-
-""" class UpdateProductoNC(UpdateView):
-    template_name = "producto_nuevo.html"
-    model = Producto
-    form_class = ProductoForm
-    context_object_name = "first_obj"
-    def get_success_url(self):
-        return redirect(reverse("productos:listarProductosNC"))
-        
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.method == 'POST':
-            context['product_meta_formset'] = ProductoMetaNCU(self.request.POST,instance=self.object)
-            context['descuento_meta_formset'] = DescuentoMetaU(self.request.POST,instance=self.object)
-        else:
-            context['product_meta_formset'] = ProductoMetaNCU(instance=self.object)
-            context['descuento_meta_formset'] = DescuentoMetaU(instance=self.object)
-        return context
-
-    def forms_valid(self, first, seconds,third):
-        try:      
-            seconds.save()
-            third.save()
-            first.save()
-            messages.success(self.request, "Actualización exitosa!")
-
-        except DatabaseError as err:
-            print(err)
-            messages.error(self.request, "Ooops!  Algo salio mal...")
-        return redirect(reverse("productos:listarProductosNC"))
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form_class = self.get_form_class()
-        first_form = self.get_form(form_class)
-        second_forms = ProductoMetaNCU(self.request.POST,instance=self.object)
-        third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
-        if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
-                    return self.forms_valid(first_form , second_forms,third_forms)
-        else:
-            messages.error(self.request, "Ooops! Algo salio mal...")
-            return redirect(reverse("productos:listarProductos")) """
     
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)

@@ -12,6 +12,6 @@ class Promociones(models.Model):
     imagen = models.ImageField(upload_to="promociones/", null=True, blank=True,default="images/no_image.png")
     categoria=models.ForeignKey(Categoria,on_delete=models.CASCADE,blank=True,null=True)
     membresia=models.ForeignKey(Membresia,on_delete=models.CASCADE,blank=True,null=True)
-    descuento_categoria=models.PositiveIntegerField(blank=True,null=True)
-    descuento_membresia=models.PositiveIntegerField(blank=True,null=True)
+    descuento_categoria=models.PositiveIntegerField(default=0)
+    descuento_membresia=models.PositiveIntegerField(default=0)
     activo=models.BooleanField(default=True)

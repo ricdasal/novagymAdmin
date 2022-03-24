@@ -45,18 +45,19 @@
           <p>Nombre: {{ producto.nombre }}</p>
           <p>Descripción: {{ producto.descripcion }}</p>
           <p>Talla: {{ producto.talla }}</p>
-          <p>Categoria: {{ producto.categoria.nombre }}</p>
         </td>
         {% for inventario in producto.inventario_set.all %}
         <td>
-          <p>Valor presentación: ${{ producto.valor_presentacion }}</p>
-          <p>Precio referencial: ${{ producto.precio_referencial }}</p>
+          <p>Categoria: {{ producto.categoria.nombre }}</p>
           <p>Stock: {{inventario.stock}}</p>
           {% if producto.usaNovacoins == 0 %}
           <p>Precio: ${{ inventario.precio }}</p>
           {% else %}
           <p>NovaCoins: {{ inventario.novacoins }} NC</p>
           {% endif %}
+          {% for descuento in producto.productodescuento_set.all %}
+            <p>Descuento: {{ descuento.porcentaje_descuento }}%</p>
+          {% endfor %}
         </td>
         <td>
           <a href="{%url 'productos:UpdateProducto' producto.id%}" class="btn btn-sm btn-primary">
