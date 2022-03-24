@@ -33,10 +33,12 @@
           {% endif %}
         </td>
         <td>
-          <p><b>Frecuencia</b></p>
-          <p>{{ notificacion.get_frecuencia_display }}</p>
-          <p><b>Fecha de creación</b></p>
-          <p>{{notificacion.created_at}}</p>
+          <p><b>{{notificacion.nombre}}</b></p>
+          <p><b>Frecuencia:</b> {{ notificacion.get_frecuencia_display }}</p>
+          {% if notificacion.fecha_inicio %}
+          Desde {{notificacion.fecha_inicio}} hasta {{notificacion.fecha_fin}} a las {{notificacion.hora}}</p>
+          {% endif %}
+          <p><b>Fecha de creación:</b> {{notificacion.created_at}}</p>
         </td>
         <td>
           <p><b>Título:</b></p>
