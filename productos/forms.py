@@ -1,20 +1,24 @@
+from cProfile import label
+import datetime
 from crispy_forms.helper import FormHelper
 from django import forms
 from .models import *
 from crispy_forms.layout import Column, Div, Field, Layout, Row
 from .widgets import DateTimePickerInput
 from crispy_forms.bootstrap import StrictButton
+
+
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
-        
+
         labels = {
             "imagen": "Imagen de referencia"
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
         }
-        fields = ('nombre','imagen')
+        fields = ('nombre', 'imagen')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,19 +26,23 @@ class CategoriaForm(forms.ModelForm):
         self.helper.disable_csrf = True
         self.helper.form_tag = False
 
+
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
-        fields = ('codigo','nombre', 'descripcion','precio_referencial','imagen','categoria', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins')
+        fields = ('presentacion', 'nombre', 'descripcion',
+                  'imagen', 'categoria', 'talla', 'usaNovacoins')
 
-        valor_presentacion=forms.DecimalField(min_value=0),
-        precio_referencial=forms.DecimalField(min_value=0)
+        valor_presentacion = forms.DecimalField(min_value=0),
+        precio_referencial = forms.DecimalField(min_value=0)
         labels = {
-            "imagen": "Imagen del producto"
+            "usaNovacoins": "Este producto se adquiere con Novacoins",
+            "imagen": "Imagen del producto",
+            "presentacion": "Presentación del producto"
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
-            "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
+            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -44,31 +52,28 @@ class ProductoForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('codigo', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
+                Column('presentacion', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('talla', css_class='col-6'),
             ),
             Row(
-                Column('valor_presentacion', css_class='col-6'),
-                Column('unidad_presentacion', css_class='col-6'),
-                Column('precio_referencial', css_class='col-6'),
-            ),
-            Row(
-                Column('usaNovacoins', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
             ),
+            Row(
+                Column('usaNovacoins', css_class='col-6'),            ),
         )
 
 
 class InventarioForm(forms.ModelForm):
     class Meta:
-        fields = ('precio','novacoins','stock')
-        model = Inventario  
-
-        precio=forms.DecimalField(min_value=0)
-        
+        fields = ('precio', 'precioCompra', 'novacoins', 'stock')
+        model = Inventario
+        labels={
+            "precioCompra": "Precio de compra"
+        }
+        precio = forms.DecimalField(min_value=0)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -78,53 +83,49 @@ class InventarioForm(forms.ModelForm):
         self.helper.layout = Layout(
             Row(
                 Column('precio', css_class='col-6'),
-                Column('novacoins', css_class='col-6')
+                Column('novacoins', css_class='col-6'),
+                Column('precioCompra', css_class='col-6'),
             ),
             Row(
                 Column('stock', css_class='col-6')
             )
         )
 
-""" class InventarioFormNC(forms.ModelForm):
-    class Meta:
-        model = Inventario  
-        fields = ('novacoins','stock')
+    def clean(self):
+        cleaned_data = super(InventarioForm, self).clean()
+        precio = cleaned_data.get("precio")
+        precioCompra = cleaned_data.get("precioCompra")
+        if precio and precioCompra:
+            if precio < precioCompra:
+                raise forms.ValidationError(
+                    "El precio de venta no puede ser menor al de compra")
+        return cleaned_data
 
-        widgets = {
-            "usaNovacoins":forms.CheckboxInput(attrs={'checked':True})
-        }
-        novacoins=forms.IntegerField(min_value=0)
-            
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.helper = FormHelper()
-        self.helper.disable_csrf = True
-        self.helper.form_tag = False
-        self.helper.layout = Layout(
-            Row(
-                Column('novacoins', css_class='col-6'),
-            ),
-            Row(
-                Column('stock', css_class='col-6')
-            )
-        ) """
 
 class DescuentoForm(forms.ModelForm):
     class Meta:
         model = ProductoDescuento
-        
-        fields = ('porcentaje_descuento', 'fecha_hora_desde','fecha_hora_hasta','estado')
+
+        fields = ('porcentaje_descuento', 'fecha_hora_desde',
+                  'fecha_hora_hasta', 'estado')
         labels = {
             "estado": "Descuento activo",
-            'porcentaje_descuento':"Valor de descuento (Sin descuento: 0)"
+            'porcentaje_descuento': "Valor de descuento (Sin descuento: 0)"
         }
-        
-        widgets={
-            "porcentaje_descuento":forms.NumberInput(attrs={'min':0,'max': 100}),
-            "fecha_hora_hasta": DateTimePickerInput(),
-            "fecha_hora_desde": DateTimePickerInput(),
+
+        widgets = {
+            "porcentaje_descuento": forms.NumberInput(attrs={'min': 0, 'max': 100}),
+
+            "fecha_hora_desde": forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+                'value':"{{form.fecha_hora_desde.value | fecha_hora_desde:'c'}}"
+            }, format='%Y-%m-%d %H:%M:%S'),
+
+            "fecha_hora_hasta": forms.DateTimeInput(attrs={
+                'type': 'datetime-local',
+            }, format='%Y/%m/%dT%H:%M:%S'),
         }
-        
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
@@ -141,6 +142,20 @@ class DescuentoForm(forms.ModelForm):
             )
         )
 
+    def clean(self):
+        cleaned_data = super(DescuentoForm, self).clean()
+        fecha_hora_desde = cleaned_data.get("fecha_hora_desde")
+        fecha_hora_hasta = cleaned_data.get("fecha_hora_hasta")
+        if fecha_hora_desde and fecha_hora_hasta:
+            if fecha_hora_hasta < fecha_hora_desde:
+                raise forms.ValidationError(
+                    "La fecha de fin no puede ser anterior a la fecha de inicio.")
+            elif fecha_hora_desde.replace(tzinfo=None) < datetime.datetime.today():
+                raise forms.ValidationError(
+                    "La fecha de inicio no puede ser anterior a la fecha actual.")
+        return cleaned_data
+
+
 class ProductoFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -154,7 +169,8 @@ class ProductoFilterForm(forms.Form):
             ),
             Row(
                 Column('talla', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
-                Column('usaNovacoins', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('usaNovacoins',
+                       css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
             ),
             Row(
                 Column(
@@ -165,8 +181,13 @@ class ProductoFilterForm(forms.Form):
             ),
         )
 
-ProductoMeta=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=1,can_delete=False)
-DescuentoMeta=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=1,can_delete=False)
 
-ProductoMetaU=forms.inlineformset_factory(Producto,Inventario,InventarioForm,extra=0,can_delete=False)
-DescuentoMetaU=forms.inlineformset_factory(Producto,ProductoDescuento,DescuentoForm,extra=0,can_delete=False)
+ProductoMeta = forms.inlineformset_factory(
+    Producto, Inventario, InventarioForm, extra=1, can_delete=False)
+DescuentoMeta = forms.inlineformset_factory(
+    Producto, ProductoDescuento, DescuentoForm, extra=1, can_delete=False)
+
+ProductoMetaU = forms.inlineformset_factory(
+    Producto, Inventario, InventarioForm, extra=0, can_delete=False)
+DescuentoMetaU = forms.inlineformset_factory(
+    Producto, ProductoDescuento, DescuentoForm, extra=0, can_delete=False)

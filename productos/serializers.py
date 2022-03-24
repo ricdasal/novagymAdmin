@@ -24,12 +24,9 @@ class ProductoSerializer(serializers.ModelSerializer):
     codigo = serializers.CharField(max_length=255)
     nombre = serializers.CharField(max_length=24)
     descripcion = serializers.CharField(max_length=255)
-    precio_referencial = serializers.DecimalField(max_digits=4, decimal_places=2)
     imagen = serializers.FileField(required=False)
     categoria_id=serializers.IntegerField()
-    valor_presentacion=serializers.DecimalField(max_digits=4, decimal_places=2)
     talla = serializers.CharField(max_length=3)
-    unidad_presentacion = serializers.IntegerField()
     usaNovacoins=serializers.BooleanField()
     class Meta:
         model = Producto

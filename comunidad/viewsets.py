@@ -241,8 +241,8 @@ class ComentarioView(viewsets.ViewSet):
         if serializer.is_valid():
             comentario = serializer.save()
             notificacion = comentario.nueva_notificacion()
-            GCMDevice.objects.filter(user=request.user).send_message(
-                notificacion.cuerpo, extra={"title": notificacion.titulo })
+            # GCMDevice.objects.filter(user=request.user).send_message(
+            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             publicacion = Publicacion.objects.get(id=data['publicacion'])
             comentarios = publicacion.comentario.filter(comentario_padre=None).all()
@@ -326,8 +326,8 @@ class LikeView(viewsets.ViewSet):
             like = Like.objects.create(publicacion=publicacion, usuario=usuario)
             like.incrementar_publicacion_likes()
             notificacion = like.nueva_notificacion()
-            GCMDevice.objects.filter(user=request.user).send_message(
-                notificacion.cuerpo, extra={"title": notificacion.titulo })
+            # GCMDevice.objects.filter(user=request.user).send_message(
+            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             return Response(status=status.HTTP_201_CREATED)
     
@@ -373,8 +373,8 @@ class SeguidorView(viewsets.ViewSet):
 
                 seguidor = serializer.save()
                 notificacion = seguidor.nueva_notificacion("empezó a seguirte")
-                GCMDevice.objects.filter(user=request.user).send_message(
-                    notificacion.cuerpo, extra={"title": notificacion.titulo })
+                # GCMDevice.objects.filter(user=request.user).send_message(
+                #     notificacion.cuerpo, extra={"title": notificacion.titulo })
 
                 return Response(status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -391,8 +391,8 @@ class SeguidorView(viewsets.ViewSet):
 
             seguidor.delete()
             notificacion = seguidor.nueva_notificacion("ha dejado de seguirte")
-            GCMDevice.objects.filter(user=request.user).send_message(
-                notificacion.cuerpo, extra={"title": notificacion.titulo })
+            # GCMDevice.objects.filter(user=request.user).send_message(
+            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
 
             return Response(status=status.HTTP_200_OK)
         except Seguidor.DoesNotExist:
