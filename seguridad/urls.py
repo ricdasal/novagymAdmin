@@ -14,7 +14,7 @@ urlpatterns = [
     path('usuarios/editar/<int:pk>/', EditarUsuario.as_view(), name='editar'),
     path('usuarios/eliminar/<int:pk>/', usuario_confirmar_eliminacion,
          name='eliminar'),
-    path('usuarios/eliminar_perma/<int:pk>/', usuario_confirmar_eliminacion_perma,
+    path('usuarios/eliminar-perma/<int:pk>/', usuario_confirmar_eliminacion_perma,
          name='eliminar_perma'),
     path('usuarios/activar/<int:pk>/', usuario_confirmar_activar,
          name='activar'),

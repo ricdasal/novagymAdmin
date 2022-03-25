@@ -185,6 +185,7 @@ input:focus {
   width: 75px;
   height: 75px;
   margin-left: 25px;
+  padding: 12px;
 }
 
 .menu__title {
