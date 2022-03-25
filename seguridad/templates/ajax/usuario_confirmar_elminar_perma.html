@@ -8,7 +8,7 @@
   {% csrf_token %}
   <input type="hidden" name="type" value="{{request.GET.type}}" />
   <div class="modal-body">
-    ¿Está seguro que desea eliminar el siguiente usuario? 
+    ¿Está segura/o que desea eliminar el siguiente usuario?
     <h5>**Esta acción no puede revertirse</h5>
     <div class="row">
       <div class="col-3">Cédula</div>
@@ -29,6 +29,6 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    <button id="anular" class="btn btn-danger mr-3 btn-submit" type="submit">Eliminar</button>
+    <button class="btn btn-danger mr-3" type="submit">Eliminar</button>
   </div>
 </form>
