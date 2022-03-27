@@ -1,8 +1,9 @@
 from django.urls import path
 from knox import views as knox_views
-from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet, HistorialMemebresiaViewset,
-                                MembresiaViewSet)
+from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet,
+                                HistorialMemebresiaViewset, MembresiaViewSet)
 from notificaciones.viewsets import NotificacionUsuarioViewSet
+from novagym.viewsets import ProgresoImcViewSet
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 from rest_framework import routers
 from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
@@ -13,12 +14,15 @@ from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
 """
 novagym = routers.DefaultRouter()
 novagym.register('usuarios', DetallesViewSet, 'usuario')
-novagym.register('notificacion-usuario', NotificacionUsuarioViewSet, 'notificacion-usuario')
+novagym.register('imc', ProgresoImcViewSet, 'imc')
 novagym.register('membresias', MembresiaViewSet, 'membresia')
-novagym.register('membresias-usuario', HistorialMemebresiaViewset, 'membresias-usuario')
+novagym.register('membresias-usuario',
+                 HistorialMemebresiaViewset, 'membresias-usuario')
 novagym.register('descuentos', DescuentoViewSet, 'descuento')
 novagym.register('beneficios', BeneficioViewSet, 'beneficio')
 novagym.register(r'registrar/gcm', GCMDeviceAuthorizedViewSet)
+novagym.register('notificacion-usuario',
+                 NotificacionUsuarioViewSet, 'notificacion-usuario')
 novagym_api = novagym.urls
 
 """

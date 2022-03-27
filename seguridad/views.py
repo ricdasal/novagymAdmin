@@ -151,6 +151,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         usuario_detalles_form = self.form_class(request.POST)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
             user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
             user.email = user.username
             user.save()
             detalles = usuario_detalles_form.save(commit=False)
@@ -205,7 +206,9 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         usuario_form = self.user_form_class(
             request.POST, instance=self.object.usuario)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save()
+            user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
+            user.save()
             detalles = usuario_detalles_form.save(commit=False)
             detalles.usuario = user
             detalles.save()
