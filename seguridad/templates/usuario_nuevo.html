@@ -27,7 +27,7 @@
       {% if request.GET.type == 'E'%}
       <div class="form-row">
         <div class="col-8 col-lg-4">
-          <label for="">{{user_form.groups.label}}</label>
+          <label for="id_groups">{{user_form.groups.label}}</label>
           <div>
             <select name="groups" class="select custom-select" id="id_groups" data-url="{% url 'seguridad:ver_rol' %}">
               {% for value, label in user_form.groups.field.choices %}
