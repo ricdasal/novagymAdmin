@@ -99,7 +99,7 @@ class SucursalForm(forms.ModelForm):
             'telefono':"Teléfono fijo"
         }
         fields = ('nombre', 'telefono', 'imagen',
-                  'horario_apertura', 'horario_cierre', 'sponsor','correo','celular')
+                  'horario_apertura', 'horario_cierre', 'sponsor','correo','celular','direccion')
 
         widgets = {
             "imagen": forms.ClearableFileInput(),
@@ -121,6 +121,8 @@ class SucursalForm(forms.ModelForm):
                 Column('sponsor', css_class='col-6'),
                 Column('telefono', css_class='col-6'),
                 Column('celular', css_class='col-6'),
+                Column('direccion', css_class='col-6'),
+                Column('correo', css_class='col-6'),
             ),
             Row(
                 Column('correo', css_class='col-6'),
