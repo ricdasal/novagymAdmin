@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 
 from almacenamiento.models import AlmacenamientoGlobal, AlmacenamientoUsuario
+from notificaciones.models import Notificacion, NotificacionUsuario
 from seguridad.models import UserDetails
 
 
@@ -41,9 +42,24 @@ def reducir_almacenamiento_global(almacenamiento_utilizado):
         almacenamiento.total_usado = 0
     almacenamiento.save()
 
+def guardar_notificacion(titulo, cuerpo, imagen, sender, receiver):
+    notificacion = Notificacion()
+    notificacion.nombre = "Comunidad"
+    notificacion.titulo = titulo
+    notificacion.cuerpo = cuerpo
+    notificacion.imagen = imagen
+    notificacion.frecuencia = "NA"
+    notificacion.save()
+
+    notificacionUsuario = NotificacionUsuario()
+    notificacionUsuario.notificacion = notificacion
+    notificacionUsuario.sender = sender
+    notificacionUsuario.receiver = receiver
+    notificacionUsuario.save()
+    return notificacion
 
 class Biografia(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="biografia")
     foto_perfil = models.ImageField(upload_to='perfil/', default='avatar.png')
     foto_portada = models.ImageField(
         upload_to='portada/', default='portada.jpg')
@@ -86,6 +102,11 @@ class Seguidor(models.Model):
     def __str__(self):
         return f'{str(self.usuario)} - {str(self.seguidor)}'
 
+    def nueva_notificacion(self, msg):
+        user = usuario_detalle(self.seguidor)
+        cuerpo = f"{user['nombre']} {user['apellido']} {msg}."
+        return guardar_notificacion("Seguidor", cuerpo, None, self.seguidor, self.usuario)
+
     @property
     def seguidos_info(self):
         return usuario_detalle(self.usuario)
@@ -115,6 +136,14 @@ class Publicacion(models.Model):
 
     def __str__(self):
         return f'{str(self.usuario)}: {self.pk}'
+
+    def notificacion_bloquear_publicacion(self, sender):
+        cuerpo = f"Tu publicación ha sido bloqueda por contenido inapropiado."
+        return guardar_notificacion("Publicación Bloqueada", cuerpo, None, sender, self.usuario)
+
+    def notificacion_reportar_publicacion(self, sender):
+        cuerpo = f"Tu publicación ha sido reportada."
+        return guardar_notificacion("Publicación Reportada", cuerpo, None, sender, self.usuario)
 
     @property
     def usuario_info(self):
@@ -178,6 +207,18 @@ class Like(models.Model):
         if publicacion.num_likes > 0:
             publicacion.num_likes -= 1
         publicacion.save()
+    
+    def nueva_notificacion(self):
+        archivos = ArchivoPublicacion.objects.filter(publicacion=self.publicacion)
+        archivo = None
+        for a in archivos:
+            if a.tipo == "IMG":
+                archivo = a
+                break
+        imagen = archivo.archivo if archivo and archivo.tipo == "IMG" else None
+        user = usuario_detalle(self.usuario)
+        cuerpo = f"A {user['nombre']} {user['apellido']} le gusta tu publicación."
+        return guardar_notificacion("Me Gusta", cuerpo, imagen, self.usuario, self.publicacion.usuario)
 
 class Comentario(models.Model):
 
@@ -213,6 +254,11 @@ class Comentario(models.Model):
 
     def count_comentarios_hijos(self):
         return Comentario.objects.filter(comentario_padre=self).all().count()
+
+    def nueva_notificacion(self):
+        user = usuario_detalle(self.usuario)
+        cuerpo = f"{user['nombre']} {user['apellido']} comentó tu publicación."
+        return guardar_notificacion("Comentario", cuerpo, self.imagen, self.usuario, self.publicacion.usuario)
    
     @property
     def usuario_info(self):

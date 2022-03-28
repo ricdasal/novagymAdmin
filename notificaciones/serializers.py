@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
-from .models import *
 from rest_framework import serializers
 
+from .models import *
 
 
 class NotificacionSerializer(serializers.ModelSerializer):
@@ -9,13 +9,15 @@ class NotificacionSerializer(serializers.ModelSerializer):
     cuerpo = serializers.CharField(max_length=255)
     imagen = serializers.FileField(required=False)
     created_at = serializers.DateTimeField()
+
     class Meta:
         model = Notificacion
         fields = ('id', 'titulo', 'cuerpo', 'imagen', 'created_at')
 
+
 class NotificacionUsuarioSerializer(serializers.ModelSerializer):
-    sender_id = serializers.IntegerField()
-    receiver_id = serializers.IntegerField()
+    notificacion = NotificacionSerializer()
+
     class Meta:
         model = NotificacionUsuario
-        fields = ('id','sender_id', 'receiver_id')
+        fields = ('id', 'notificacion')

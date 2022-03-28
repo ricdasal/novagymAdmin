@@ -26,12 +26,12 @@ from .models import *
 
 APP_PERMISSIONS = {
     'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
-    # 'novagym':'',
-    # 'gimnasio': {'model': 'gimnasio', 'label': ''},
-    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
-    # 'contactenos':'',
-    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    'membresia': {'label': 'Membresia', 'app': 'membresia', 'model': 'membresia'},
     'notificaciones': {'label': 'Notificaciones', 'app': 'notificaciones', 'model': 'notificacion'},
+    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
+    'comunidad': {'label': 'Comunidad', 'app': 'comunidad', 'model': 'biografia'},
+    'almacenamiento': {'label': 'Almacenamiento', 'app': 'almacenamiento', 'model': 'almacenamientousuario'},
 }  # TODO: agregar apps:model
 
 
@@ -49,12 +49,14 @@ def login_user(request):
                 else:
                     return redirect('novagym:principal')
             if not user.is_active:
-              messages.error(request, 'Esta cuenta ha sido desactivada.')
+                messages.error(request, 'Esta cuenta ha sido desactivada.')
             if not user.detalles.tipo == 'E':
-              messages.error(request, 'Solo admin/empleados pueden ingresar.')
+                messages.error(
+                    request, 'Solo admin/empleados pueden ingresar.')
             return redirect('seguridad:login_admin')
         else:
-            messages.error(request, 'Nombre de usuario o contraseña incorrecto.')
+            messages.error(
+                request, 'Nombre de usuario o contraseña incorrecto.')
             return redirect('seguridad:login_admin')
     else:
         if request.user and request.user.is_authenticated:
@@ -132,7 +134,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         return "{} creado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
 
     def get_title(self):
-        return "Agregar {}".format("empleado" if self.request.GET['type'] == 'E' else "cliente")
+        return "Agregar {}".format("empleado" if self.request.GET.get('type', None) == 'E' else "cliente")
 
     def get_context_data(self, **kwargs):
         context = super(CrearUsuario, self).get_context_data(**kwargs)
@@ -149,6 +151,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         usuario_detalles_form = self.form_class(request.POST)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
             user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
             user.email = user.username
             user.save()
             detalles = usuario_detalles_form.save(commit=False)
@@ -159,6 +162,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
                 sec = '0001'
             detalles.codigo = sec
             detalles.usuario = user
+            detalles.added_by = request.user
             detalles.save()
             messages.success(request, self.get_success_message())
             return HttpResponseRedirect(self.get_success_url())
@@ -182,7 +186,7 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         return "{} editado con éxito.".format("Empleado" if self.request.GET['type'] == 'E' else "Cliente")
 
     def get_title(self):
-        return "Editar {}".format("empleado" if self.request.GET['type'] == 'E' else "cliente")
+        return "Editar {}".format("empleado" if self.request.GET.get('type', None) == 'E' else "cliente")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -202,7 +206,9 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         usuario_form = self.user_form_class(
             request.POST, instance=self.object.usuario)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save()
+            user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
+            user.save()
             detalles = usuario_detalles_form.save(commit=False)
             detalles.usuario = user
             detalles.save()
@@ -226,6 +232,20 @@ def usuario_confirmar_eliminacion(request, pk):
         messages.info(request, "Usuario deshabilitado con éxito.")
         return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
+
+@login_required
+@permission_required('seguridad.delete_userdetails')
+def usuario_confirmar_eliminacion_perma(request, pk):
+    detalles = UserDetails.objects.get(id=pk)
+    if request.POST:
+        success_url = reverse_lazy('seguridad:listar', kwargs={
+                                   'type': request.POST['type']})
+        usuario = detalles.usuario
+        usuario.delete()
+        messages.error(request, "Usuario eliminado")
+        return redirect(success_url)
+    return render(request, "ajax/usuario_confirmar_elminar_perma.html", {"usuario": detalles})
+
 
 
 @login_required
@@ -279,12 +299,11 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
     def post(self, request, *args, **kwargs):
         self.object = None
         rol_form = self.form_class(request.POST)
-        apps = request.POST.getlist('apps', None)
         apps_permissions = request.POST.getlist('apps_permissions', None)
         next_page = request.POST.get('next', None)
 
         list_permissions = []
-        if rol_form.is_valid() and apps and apps_permissions:
+        if rol_form.is_valid() and apps_permissions:
             rol = rol_form.save(commit=False)
             for permission in apps_permissions:
                 app, action_model = permission.split('.')  # get the app

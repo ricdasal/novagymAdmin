@@ -6,7 +6,7 @@
         <a class="menu" href="{% url 'novagym:principal' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/dashboard_icon.png'%}"
               alt="dashboard"
               class="menu__image"
             />
@@ -27,7 +27,7 @@
       <div class="col-12">
         <div class="row">
           <img
-            src="{% static 'images/no_image.png'%}"
+            src="{% static 'images/admin-icons/usuarios_icon.png'%}"
             alt="usuarios"
             class="menu__image"
           />
@@ -45,7 +45,7 @@
         <a class="menu" href="{% url 'seguridad:listar' type='E'%}">
           <div class="row menu-container {% if view.kwargs.type == 'E' %}menu-container--active{% endif %}">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/usuarios_icon.png'%}"
               alt="empleados"
               class="menu__image"
             />
@@ -59,7 +59,7 @@
         <a class="menu" href="{% url 'seguridad:listar' type='C' %}">
           <div class="row menu-container {% if view.kwargs.type == 'C' %}menu-container--active{% endif %}">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/usuarios_icon.png'%}"
               alt="clientes"
               class="menu__image"
             />
@@ -76,7 +76,7 @@
         <a class="menu" href="{% url 'membresia:listar' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/membresias_icon.png'%}"
               alt="notificaciones"
               class="menu__image"
             />
@@ -88,12 +88,12 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'notificaciones:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'notificaciones' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'notificaciones:listar' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/notificaciones_icon.png'%}"
               alt="notificaciones"
               class="menu__image"
             />
@@ -105,12 +105,12 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'contactenos:buzon' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'contactenos' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'contactenos:buzon' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/sugerencias_icon.png'%}"
               alt="sugerencias"
               class="menu__image"
             />
@@ -122,12 +122,12 @@
       </div>
     </div>
 
-    <div class="row menu-container  {% if request.resolver_match.view_name == 'sponsor:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container  {% if request.resolver_match.namespace == 'sponsor' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'sponsor:listar' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/anunciantes_icon.png'%}"
               alt="anunciantes"
               class="menu__image"
             />
@@ -139,12 +139,12 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'calendario:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'calendario' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'calendario:listar' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/calendario_icon.png'%}"
               alt="calendario"
               class="menu__image"
             />
@@ -161,7 +161,7 @@
         <a class="menu" href="">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/reservaciones_icon.png'%}"
               alt="reservaciones"
               class="menu__image"
             />
@@ -173,12 +173,12 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'productos:listarProductos' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'productos' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'productos:listarProductos' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/productos_icon.png'%}"
               alt="calendario"
               class="menu__image"
             />
@@ -189,7 +189,7 @@
         </a>
       </div>
     </div>
-    <div class="row menu-container {% if request.resolver_match.view_name == 'promociones:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'promociones' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'promociones:listar' %}">
           <div class="row">
@@ -215,7 +215,7 @@
       <div class="col-12">
         <div class="row">
           <img
-            src="{% static 'images/no_image.png'%}"
+            src="{% static 'images/admin-icons/reporteria_icon.png'%}"
             alt="reporteria"
             class="menu__image"
           />
@@ -233,7 +233,7 @@
         <a class="menu" href="">
           <div class="row menu-container">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/ventas_icon.png'%}"
               alt="repo-ventas"
               class="menu__image"
             />
@@ -247,7 +247,7 @@
         <a class="menu" href="">
           <div class="row menu-container">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/novacoins_icon.png'%}"
               alt="repo-nc"
               class="menu__image"
             />
@@ -264,7 +264,7 @@
         <a class="menu" href="">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/admin_nc_icon.png'%}"
               alt="administrar-nc"
               class="menu__image"
             />
@@ -276,12 +276,12 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.view_name == 'gimnasio:listar' %}menu-container--active{% endif %}">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'gimnasio' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'gimnasio:listar' %}">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/horarios_icon.png'%}"
               alt="horarios"
               class="menu__image"
             />
@@ -297,7 +297,7 @@
         <a class="menu" href="">
           <div class="row">
             <img
-              src="{% static 'images/no_image.png'%}"
+              src="{% static 'images/admin-icons/afiliados_icon.png'%}"
               alt="afiliados"
               class="menu__image"
             />
@@ -309,7 +309,7 @@
       </div>
     </div>
 
-    <div class="row menu-container">
+    <div class="row menu-container {% if request.resolver_match.namespace == 'comunidad' %}menu-container--active{% endif %}">
       <div class="col-12">
         <a class="menu" href="{% url 'comunidad:publicacion_novagym' %}">
           <div class="row">
@@ -325,7 +325,7 @@
         </a>
       </div>
     </div>
-    <div class="row menu-container">
+    {% comment %} <div class="row menu-container">
       <div class="col-12">
         <a class="menu" href="{% url 'almacenamiento:almacenamiento_usuario' %}">
           <div class="row">
@@ -340,7 +340,7 @@
           </div>
         </a>
       </div>
-    </div>
+    </div> {% endcomment %}
 
   </div>
 </div>
