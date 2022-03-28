@@ -96,7 +96,8 @@ class SucursalForm(forms.ModelForm):
             'horario_apertura': "Horario de apertura de la sucursal",
             'correo':"Correo electrónico",
             'celular': "Teléfono móvil",
-            'telefono':"Teléfono fijo"
+            'telefono':"Teléfono fijo",
+            'direccion':"Dirección de la sucursal"
         }
         fields = ('nombre', 'telefono', 'imagen',
                   'horario_apertura', 'horario_cierre', 'sponsor','correo','celular','direccion')
