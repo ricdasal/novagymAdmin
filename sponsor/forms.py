@@ -126,7 +126,6 @@ class SucursalForm(forms.ModelForm):
                 Column('correo', css_class='col-6'),
             ),
             Row(
-                Column('correo', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
                 Column('horario_apertura', css_class='col-6'),
                 Column('horario_cierre', css_class='col-6 '),

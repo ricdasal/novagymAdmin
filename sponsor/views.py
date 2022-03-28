@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -11,24 +10,24 @@ from .serializers import *
 from novagym.utils import calculate_pages_to_render
 from .models import *
 from django.contrib import messages
-import json
+from rest_framework.views import APIView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 from .filters import SponsorFilter, SucursalFilter
 # Create your views here.
 #SPONSOR
 
-@api_view(["GET"])
-def sponsorList(request):
-    sponsors= Sponsor.objects.all()
-    serializer=SponsorSerializer(sponsors,many=True)
-    return Response(serializer.data)
+class sponsorList(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Sponsor.objects.all()
+        serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-@api_view(["GET"])
-def sponsorDetail(request,id):
-    sponsors= Sponsor.objects.get(id=id)
-    serializer=SponsorSerializer(sponsors,many=False)
-    return Response(serializer.data)
+class sponsorDetail(APIView):
+    def get(self, request,id, *args, **kwargs):
+        queryset = Sponsor.objects.get(id=id)
+        serializer = SponsorSerializer(queryset, many=False, context={"request":request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 def sponsorCreate(request):
@@ -177,13 +176,16 @@ def deleteSucursal(request,id):
 
 def ChangeState(request,pk):
     query = Sponsor.objects.get(id=pk)
-    print(query.activo)
-    if query.activo==0:
-        query.activo=1
-        messages.success(request, "Anunciante "+query.nombre +" habilitado.")
-    elif query.activo==1:
-        query.activo=0
-        messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
-    query.save()
-    return redirect('sponsor:listar')
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Anunciante "+query.nombre +" habilitado.")
+            query.save()
+            return redirect('sponsor:listar')
+        elif query.activo==1:
+            query.activo=0
+            messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
+            query.save()
+            return redirect('sponsor:listar')
+    return render(request, "ajax/sponsor_confirmar_change.html", {"sponsor": query})
 

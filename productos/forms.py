@@ -116,14 +116,17 @@ class DescuentoForm(forms.ModelForm):
         widgets = {
             "porcentaje_descuento": forms.NumberInput(attrs={'min': 0, 'max': 100}),
 
-            "fecha_hora_desde": forms.DateTimeInput(attrs={
-                'type': 'datetime-local',
-                'value':"{{form.fecha_hora_desde.value | fecha_hora_desde:'c'}}"
-            }, format='%Y-%m-%d %H:%M:%S'),
+            "fecha_hora_desde": forms.DateTimeInput(
+                format=('%Y-%m-%dT%H:%M'),
+                attrs={'class': 'form-control',
+                       'type': 'datetime-local'
+                       }),
 
-            "fecha_hora_hasta": forms.DateTimeInput(attrs={
-                'type': 'datetime-local',
-            }, format='%Y/%m/%dT%H:%M:%S'),
+            "fecha_hora_hasta": forms.DateTimeInput(
+                format=('%Y-%m-%dT%H:%M'),
+                attrs={'class': 'form-control',
+                       'type': 'datetime-local'
+                       }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -150,7 +153,7 @@ class DescuentoForm(forms.ModelForm):
             if fecha_hora_hasta < fecha_hora_desde:
                 raise forms.ValidationError(
                     "La fecha de fin no puede ser anterior a la fecha de inicio.")
-            elif fecha_hora_desde.replace(tzinfo=None) < datetime.datetime.today():
+            elif fecha_hora_desde.replace(tzinfo=None) < (datetime.datetime.today() - datetime.timedelta(days=1)):
                 raise forms.ValidationError(
                     "La fecha de inicio no puede ser anterior a la fecha actual.")
         return cleaned_data
