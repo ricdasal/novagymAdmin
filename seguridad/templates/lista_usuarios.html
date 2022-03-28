@@ -46,13 +46,13 @@
           <td>
             <p>{{usuario.nombres}} {{usuario.apellidos}}</p>
             <p>
-              <span class="mr-3">CI: {{usuario.cedula}}</span>
+              <span class="mr-3"><b>CI:</b> {{usuario.cedula}}</span>
               {% if view.kwargs.type == 'C'%}
-              <span>CU: {{usuario.codigo}}</span>
+              <span><b>CU:</b> {{usuario.codigo}}</span>
               {% endif %}
             </p>
             {% if view.kwargs.type == 'E'%}
-            <p>Rol:             
+            <p><b>Rol:</b>
               {% if usuario.usuario.groups.all %}
                 {% for grupo in usuario.usuario.groups.all %}
                   <span>{{grupo}} </span>
@@ -60,23 +60,39 @@
               {% endif %}
             </p>
             {% endif %}
-            <p>Fecha de registro: {{usuario.created_at}}</p>
+            <p><b>Fecha de registro:</b> {{usuario.created_at}}</p>
           </td>
           <td>
-            <p>Telf: {{usuario.telefono}}</p>
-            <p>Email: {{usuario.usuario.email}}</p>
+            <p><b>Email:</b> {{usuario.usuario.email}}</p>
+            {% if usuario.membresia %}
+            <p><b>Membresía: </b>{{usuario.membresia.membresia.nombre}}</p>
+            {% endif %}
+            <p><b>Telf:</b> {{usuario.telefono}}</p>
+            {% if usuario.added_by %}
+            <p><b>Creado por:</b> {{usuario.added_by}}</p>
+            {% endif %}
+            {% if usuario.created_from %}
+            <p><b>Creado desde:</b> {{usuario.get_created_from_display}}</p>
+            {% endif %}
           </td>
-          <td>
-            <a href="{% url 'seguridad:editar' pk=usuario.pk %}?type={{usuario.tipo}}" class="btn btn-primary">
+          <td style="width: 160px;">
+            <a href="{% url 'seguridad:editar' pk=usuario.pk %}?type={{usuario.tipo}}" class="btn btn-primary btn-block">
               Ver perfil <i class="fas fa-edit "></i>
             </a>
+            <a href="#" class="btn btn-danger btn-block use-modal" data-toggle='modal' data-target="#mainModal"
+              data-url="{%url 'seguridad:eliminar_perma' pk=usuario.pk%}?type={{usuario.tipo}}">
+              Eliminar <i class="fas fa-skull-crossbones"></i>
+            </a>
           </td>
-          <td>
+          <td class="text-center">
             <input type="checkbox" {%if usuario.usuario.is_active%}checked{%endif%} class="use-modal" data-toggle="toggle" 
               data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
               data-target="#mainModal" data-url-activar="{%url 'seguridad:activar' usuario.pk%}?type={{usuario.tipo}}" 
               data-url-eliminar="{%url 'seguridad:eliminar' usuario.pk%}?type={{usuario.tipo}}"
             >
+          </td>
+          <td>
+
           </td>
         </tr>
         {% endfor %}

@@ -11,7 +11,7 @@
     </div>
     <hr>
     <div class="mt-5">
-        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:configurar_usuario' almacenamiento_usuario.usuario.id %}" novalidate enctype="multipart/form-data">
+        <form id="form-publicacion" method="POST" action="{% url 'almacenamiento:modificar_almacenamiento_usuario' almacenamiento_usuario.usuario.id 'configurar' %}" novalidate enctype="multipart/form-data">
             {% csrf_token %}
             <div class="mb-3" style="width: 35%;">
                 <label for="servidor" class="form-label">Almacenamiento Usado</label>

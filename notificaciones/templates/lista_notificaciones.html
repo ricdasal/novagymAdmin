@@ -33,10 +33,12 @@
           {% endif %}
         </td>
         <td>
-          <p><b>Frecuencia</b></p>
-          <p>{{ notificacion.get_frecuencia_display }}</p>
-          <p><b>Fecha de creación</b></p>
-          <p>{{notificacion.created_at}}</p>
+          <p><b>{{notificacion.nombre}}</b></p>
+          <p><b>Frecuencia:</b> {{ notificacion.get_frecuencia_display }}</p>
+          {% if notificacion.fecha_inicio %}
+          Desde {{notificacion.fecha_inicio}} hasta {{notificacion.fecha_fin}} a las {{notificacion.hora}}</p>
+          {% endif %}
+          <p><b>Fecha de creación:</b> {{notificacion.created_at}}</p>
         </td>
         <td>
           <p><b>Título:</b></p>
@@ -44,14 +46,19 @@
           <p><b>Descripción:</b></p>
           <p>{{ notificacion.cuerpo|truncatechars:50}}</p>
         </td>
-        <td>
-          <a class="btn btn-primary" href="{%url 'notificaciones:notificacionGlobal' notificacion.id%}">
+        <td style="width: 160px;">
+          <a class="btn btn-primary btn-block btn-sm" href="{%url 'notificaciones:notificacionGlobal' notificacion.id%}">
             Enviar ahora <i class="fas fa-bullhorn "></i>
           </a>
-          <a href="{%url 'notificaciones:update' notificacion.id%}" class="btn btn-primary">
-            Editar <i class="fas fa-edit "></i></a>
+          <a href="{%url 'notificaciones:update' notificacion.id%}" class="btn btn-primary btn-block btn-sm">
+            Editar <i class="fas fa-edit "></i>
+          </a>
+          <a href="#" class="btn btn-danger btn-block use-modal btn-sm" data-toggle='modal' data-target="#mainModal"
+            data-url="{%url 'notificaciones:eliminar_perma' pk=notificacion.pk%}">
+            Eliminar <i class="fas fa-skull-crossbones"></i>
+          </a>
         </td>
-        <td>
+        <td class="text-center">
           <input type="checkbox" {%if notificacion.activo%}checked{%endif%} class="use-modal" data-toggle="toggle"
             data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success"
             data-offstyle="danger" data-target="#mainModal"

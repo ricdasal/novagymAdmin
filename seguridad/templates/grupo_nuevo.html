@@ -17,8 +17,8 @@
       <input type="submit" class="btn btn-primary" value="Guardar">
       {% if rol %}
       <a class="btn btn-danger use-modal float-right" data-toggle='modal' data-target="#mainModal"
-        data-url="{%url 'seguridad:eliminar_rol' rol.pk%}" href="#">Eliminar 
-        <i class="fas fa-times"></i>
+        data-url="{%url 'seguridad:eliminar_rol' rol.pk%}?next={{request.GET.next}}" href="#">Eliminar 
+        <i class="fas fa-skull-crossbones"></i>
       </a>
       {% endif %}
       {% if request.GET.next %}
