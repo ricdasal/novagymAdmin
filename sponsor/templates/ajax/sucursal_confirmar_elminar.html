@@ -1,0 +1,51 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Eliminar sponsor</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+<form method="POST" action="{% url 'sponsor:eliminarSucursal' sucursal.id %}">
+  {% csrf_token %}
+
+  <div class="modal-body">
+    ¿Desea eliminar la siguiente sucursal?
+    <div class="row">
+      <div class="col-3">
+        Código
+      </div>
+      <div class="col">
+        {{sucursal.codigo}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Nombre
+      </div>
+      <div class="col">
+        {{sucursal.nombre}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Dirección
+      </div>
+      <div class="col">
+        {{sucursal.direccion}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Imagen
+      </div>
+      <div class="col">
+        <img src="/media/{{sucursal.imagen}}" style="width: 100px;height: 100px;" alt="">
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    <button id="anular" class="btn btn-danger mr-3" type="submit"> Eliminar </button>
+  </div>
+</form>
