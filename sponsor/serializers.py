@@ -1,18 +1,21 @@
+from importlib.metadata import requires
+from unittest.util import _MAX_LENGTH
 from django.contrib.auth.models import User
+
+from backend.settings import BASE_DIR
 from .models import *
-from rest_framework import serializers
+from rest_framework.serializers import Serializer, ModelSerializer
+from rest_framework.serializers import Serializer, TimeField,FileField, CharField,URLField, PrimaryKeyRelatedField, DateField, BooleanField, EmailField
 
-
-class SponsorSerializer(serializers.ModelSerializer):
-    nombre=serializers.CharField(max_length=24)
-    descripcion = serializers.CharField(max_length=255)
-    telefono = serializers.CharField(max_length=12)
-    nombre_contacto = serializers.CharField(max_length=24)
-    url = serializers.CharField(max_length=255)
-    imagen = serializers.FileField(required=False)
-    fecha_inicio=serializers.DateField()
-    fecha_fin=serializers.DateField()
-    activo=serializers.BooleanField()
+class SucursalSerializer(ModelSerializer):
+    imagen= FileField(required=False)
     class Meta:
         model = Sponsor
-        fields = ('id', 'nombre', 'descripcion', 'telefono', 'nombre_contacto', 'url','imagen','fecha_inicio','fecha_fin',"activo")
+        fields = ('id','codigo', 'direccion', 'nombre', 'telefono','celular','imagen','horario_apertura','horario_cierre','correo')
+
+class SponsorSerializer(ModelSerializer):
+    sucursal_set = SucursalSerializer(read_only=True, many=True)
+    imagen=FileField(required=False)
+    class Meta:
+        model = Sponsor
+        fields = ('id', 'nombre','direccion','correo','es_matriz', 'descripcion', 'telefono','celular', 'nombre_contacto', 'url','red_social','imagen','fecha_inicio','fecha_fin',"activo",'horario_apertura','horario_cierre','sucursal_set')

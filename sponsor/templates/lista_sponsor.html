@@ -16,6 +16,8 @@
   <div class="col">
     <a href="{% url 'sponsor:crear' %}" class="btn btn-primary float-right">Agregar sponsor <i
         class="fas fa-plus-circle"> </i></a>
+        <a style="margin-right: 1%;" href="{% url 'sponsor:listarSucursal' %}" class="btn btn-primary float-right">Ver sucursales <i
+          class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
 </div>
@@ -34,9 +36,9 @@
           <th scope="col">Nombre</th>
           <th scope="col">Descripción</th>
           <th scope="col">Contacto</th>
-          <th scope="col">URL</th>
-          <th scope="col">Fecha inicio</th>
-          <th scope="col">Fecha fin</th>
+          <th scope="col">Links</th>
+          <th scope="col">Plazo</th>
+          <th scope="col">Horarios</th>
           <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
@@ -49,10 +51,16 @@
           <td>{{sponsor.codigo}}</td>
           <td>{{sponsor.nombre}}</td>
           <td><div class="detailPanel">{{sponsor.descripcion}} </div></td>
-          <td>{{sponsor.nombre_contacto}}: {{sponsor.telefono}}</td>
-          <td>{{sponsor.url}}</td>
-          <td>{{sponsor.fecha_inicio}}</td>
-          <td>{{sponsor.fecha_fin}}</td>
+          <td>
+            {{sponsor.nombre_contacto}} <br>
+            Telf: {{sponsor.telefono}} <br>
+            Cel: {{sponsor.celular}} <br>
+            Email: {{sponsor.correo}}
+          </td>
+          <td>{{sponsor.url}}<br><br>{{sponsor.red_social}}
+          </td>
+          <td>{{sponsor.fecha_inicio}} - {{sponsor.fecha_fin}}</td>
+          <td>{{sponsor.horario_apertura}} - {{sponsor.horario_cierre}}</td>
           <td>
             {%if sponsor.activo == 0 and sponsor.compararFechas %}
             <span class="text-warning">Inactivo</span>
