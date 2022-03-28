@@ -1,13 +1,15 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django_filters.views import FilterView
 from django.views.generic import UpdateView
 from django.contrib import messages
 
-from decimal import Decimal
+from decimal import Decimal, DecimalException
 
 from novagym.utils import calculate_pages_to_render
 
 from .models import AlmacenamientoGlobal, AlmacenamientoUsuario
+from .utils import validar_number
 
 class AlmacenamientoUsuarioView(FilterView):
     paginate_by = 20
@@ -19,7 +21,27 @@ class AlmacenamientoUsuarioView(FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        almacenamiento_global, created = AlmacenamientoGlobal.objects.get_or_create(id=1, peso_archivo_max=5000.00)
+        almacenamiento_global, created = AlmacenamientoGlobal.objects.get_or_create(id=1)
+        context['almacenamiento_global'] = almacenamiento_global
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+
+class AdministrarExcepcionesView(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = AlmacenamientoUsuario
+    queryset = AlmacenamientoUsuario.objects.filter(es_excepcion=True).order_by('usuario')
+    context_object_name = 'administrar_excepciones'
+    template_name = "administrar_excepciones.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
         context['almacenamiento_global'] = almacenamiento_global
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
@@ -41,10 +63,10 @@ def configurar_almacenamiento(request):
             almacenamiento_global.sin_limite = True
         else:
             try:
-                servidor = round(Decimal(request.POST.get('servidor')) * 1000, 2)
-                nueva_capacidad_max = round(Decimal(request.POST.get('capacidad_max')) * 1000, 2)
-                nuevo_peso_archivo_max = round(Decimal(request.POST.get('peso_archivo_max')) * 1000, 2)
-            except:
+                servidor = validar_number(request.POST.get('servidor'))
+                nueva_capacidad_max = validar_number(request.POST.get('capacidad_max'))
+                nuevo_peso_archivo_max = validar_number(request.POST.get('peso_archivo_max'))
+            except DecimalException:
                 messages.error(request, 'Error al guardar los valores.')
                 return render(request, 'configurar_almacenamiento.html', context)
 
@@ -72,10 +94,25 @@ def configurar_almacenamiento(request):
 
 def configurar_usuario(request, user):
     almacenamiento_usuario = AlmacenamientoUsuario.objects.get(usuario=user)
+    context = {
+        'almacenamiento_usuario': almacenamiento_usuario
+    }
+    return render(request, 'configurar_almacenamiento_usuario.html', context)
 
+
+def modificar_almacenamiento_usuario(request, user, page):
+    almacenamiento_usuario = AlmacenamientoUsuario.objects.get(usuario=user)
     if request.POST:
-        nuevo_asignado = round(Decimal(request.POST.get('asignado')) * 1000, 2)
-        nuevo_peso_archivo_asignado = round(Decimal(request.POST.get('peso_archivo_asignado')) * 1000, 2)
+        try:
+            nuevo_asignado = validar_number(request.POST.get('asignado'))
+            nuevo_peso_archivo_asignado = validar_number(request.POST.get('peso_archivo_asignado'))
+        except DecimalException:
+            messages.error(request, 'Error al guardar los valores.')
+            if page == 'excepcion':
+                return redirect('almacenamiento:administrar_excepciones')
+            else:
+                return redirect('almacenamiento:configurar_usuario', user=almacenamiento_usuario.usuario.id)
+
 
         if nuevo_asignado != almacenamiento_usuario.asignado or nuevo_peso_archivo_asignado != almacenamiento_usuario.peso_archivo_asignado:
             almacenamiento_usuario.es_excepcion = True
@@ -91,18 +128,6 @@ def configurar_usuario(request, user):
         messages.success(request, 'Operacion realizada con exito.')
         return redirect('almacenamiento:almacenamiento_usuario')
 
-    context = {
-        'almacenamiento_usuario': almacenamiento_usuario
-    }
-    return render(request, 'configurar_almacenamiento_usuario.html', context)
 
 
-def administrar_excepciones(request):
-    almacenamiento_usuario = AlmacenamientoUsuario.objects.filter(es_excepcion=True).all()
-    almacenamiento_global = AlmacenamientoGlobal.objects.get(id=1)
 
-    context = {
-        'almacenamiento_usuario': almacenamiento_usuario,
-        'almacenamiento_sin_limite': almacenamiento_global.sin_limite,
-    }
-    return render(request, 'administrar_excepciones.html', context)

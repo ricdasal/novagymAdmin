@@ -3,8 +3,9 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Column, Div, Field, Layout, Row
 from django import forms
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
-from seguridad.models import *
 from django.contrib.auth.models import Group
+
+from seguridad.models import *
 
 
 class UsuarioForm(UserCreationForm):
@@ -20,13 +21,15 @@ class UsuarioForm(UserCreationForm):
         super().__init__(*args, **kwargs)
         self.fields['username'].required = True
         self.fields['groups'].required = False
+        self.fields['groups'].choices = [
+            (g.pk, g.name) for g in Group.objects.exclude(name="Todos")]
         self.fields['username'].help_text = None
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('username', css_class='col-4'),
+                Column('username', css_class='col-8'),
             ),
             Row(
                 Column('password1', css_class='col-4'),
@@ -50,6 +53,8 @@ class UsuarioEditarForm(UserChangeForm):
         self.fields['groups'].required = False
         self.fields['username'].help_text = None
         self.fields['groups'].help_text = None
+        self.fields['groups'].choices = [
+            (g.pk, g.name) for g in Group.objects.exclude(name="Todos")]
         self.helper = FormHelper()
         self.helper.disable_csrf = True
         self.helper.form_tag = False
@@ -89,6 +94,7 @@ class UsuarioDetallesForm(forms.ModelForm):
         self.helper.layout = Layout(
             'codigo',
             Row(
+                Column('created_from', css_class='d-none'),
                 Column('imagen', css_class='col-6'),
             ),
             Row(
@@ -140,6 +146,7 @@ class UsuarioFilterForm(forms.Form):
             ),
         )
 
+
 class ClienteFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -175,6 +182,7 @@ class ClienteFilterForm(forms.Form):
                 )
             ),
         )
+
 
 class RolUsuarioForm(forms.ModelForm):
     class Meta:

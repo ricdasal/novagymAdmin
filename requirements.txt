@@ -17,6 +17,7 @@ django-filter==21.1
 django-push-notifications==3.0.0
 django-rest-knox==4.2.0
 djangorestframework==3.13.1
+drf-extra-fields==3.4.0
 fcm-django==1.0.8
 firebase-admin==5.2.0
 future==0.18.2

@@ -7,6 +7,9 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from django.conf import settings
 from django.core.files.base import File
+
+from push_notifications.models import GCMDevice
+
 from almacenamiento.models import AlmacenamientoUsuario
 
 from novagym.utils import calculate_pages_to_render
@@ -50,24 +53,33 @@ class CrearPublicacion(CreateView):
             data['archivos'] = ArchivoFormSet()
             data['peso_archivo_asignado'] = AlmacenamientoUsuario.objects.get(usuario=self.request.user).peso_archivo_asignado
         return data
+
+    def valid_files(self,files):
+        for file in files:
+            tipo = file.content_type.split("/")
+            if tipo[0] not in enum_media:
+                messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
+                return False
+        return True
     
     def form_valid(self, form):
-        context = self.get_context_data()
         archivos = self.request.FILES.getlist('archivos-0-archivo')
-        formset = context['archivos']
-        if form.is_valid() and formset.is_valid():
+        if form.is_valid() and self.valid_files(archivos):
             form.instance.usuario = self.request.user
             self.object = form.save()
             for file in archivos:
                 tamanio = round(file.size/1000, 2)
                 tipo = file.content_type.split("/")
-                if tipo[0] not in enum_media:
-                    messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
-                    return redirect('comunidad:publicacion_novagym')
                 archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
                     tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
                 archivo.aumentar_almacenamiento(self.request.user)
-        return super().form_valid(form)
+            return super().form_valid(form)
+        return redirect('comunidad:crear-publicacion')
+    
+    def form_invalid(self, form):
+        return self.render_to_response(
+            self.get_context_data(form=form)
+        )
     
     def get_success_url(self):
         return reverse("comunidad:publicacion_novagym")
@@ -88,29 +100,34 @@ class EditarPublicacion(UpdateView):
             data['archivos'] = ArchivoFormSet()
             data['peso_archivo_asignado'] = AlmacenamientoUsuario.objects.get(usuario=self.request.user).peso_archivo_asignado
         return data
+    
+    def valid_files(self,files):
+        for file in files:
+            tipo = file.content_type.split("/")
+            if tipo[0] not in enum_media:
+                messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
+                return False
+        return True
 
     def form_valid(self, form):
         context = self.get_context_data()
-        
-        archivos = ArchivoPublicacion.objects.filter(publicacion=context['publicacion'])
-        for archivo in archivos:
-            archivo.reducir_almacenamiento(self.request.user)
-            archivo.delete()
 
         nuevos_archivos = self.request.FILES.getlist('archivos-0-archivo')
-        if form.is_valid():
+        if form.is_valid() and self.valid_files(nuevos_archivos):
+            archivos = ArchivoPublicacion.objects.filter(publicacion=context['publicacion'])
+            for archivo in archivos:
+                archivo.reducir_almacenamiento(self.request.user)
+                archivo.delete()
             form.instance.usuario = self.request.user
             self.object = form.save()
             for file in nuevos_archivos:
                 tamanio = round(file.size/1000, 2)
                 tipo = file.content_type.split("/")
-                if tipo[0] not in enum_media:
-                    messages.error(self.request, "Error al subir los archivos. Solo se puede subir imagenes, videos o audios.")
-                    return redirect('comunidad:publicacion_novagym')
                 archivo = ArchivoPublicacion.objects.create(publicacion=self.object, archivo=file,
                     tipo=enum_media[tipo[0]], almacenamiento_utilizado=Decimal(str(tamanio))) 
                 archivo.aumentar_almacenamiento(self.request.user)
-        return super().form_valid(form)
+            return super().form_valid(form)
+        return redirect('comunidad:crear-publicacion')
     
     def get_success_url(self):
         return reverse("comunidad:publicacion_novagym")
@@ -191,6 +208,11 @@ def bloquear_publicacion(request, pk):
                 archivo.aumentar_almacenamiento(publicacion.usuario)
 
             publicacion.save()
+
+            notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
+            # GCMDevice.objects.filter(user=publicacion.usuario).send_message(
+            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            
             messages.success(request, 'Operacion realizada con exito.')
         except Publicacion.DoesNotExist:
             messages.error(request, "No se ha encontrado la publicación.")

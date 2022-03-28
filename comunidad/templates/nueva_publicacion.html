@@ -34,8 +34,6 @@
     fileSelector.addEventListener('change', (event) => {
         const fileList = event.target.files;
         for(var file of fileList){
-            console.log(file.size/1000)
-            console.log(peso_maximo < (file.size/1000))
             if((file.size / 1000) > peso_maximo){
                 msg.style.display = "block"
                 submit.disabled = true
