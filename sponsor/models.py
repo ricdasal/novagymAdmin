@@ -68,7 +68,7 @@ class Sucursal(models.Model):
     horario_apertura=models.TimeField()
     horario_cierre=models.TimeField()
     sponsor=models.ForeignKey(Sponsor,on_delete=models.CASCADE)
-    correo=models.EmailField(max_length=20,blank=True,null=True)
+    correo=models.EmailField(max_length=40,blank=True,null=True)
 
     def __str__(self):
         return str(self.nombre)

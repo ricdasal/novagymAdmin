@@ -131,7 +131,7 @@ class SucursalForm(forms.ModelForm):
         )
 
     def clean(self):
-        cleaned_data = super(SponsorForm, self).clean()
+        cleaned_data = super(SucursalForm, self).clean()
         hora_inicio = cleaned_data.get("horario_apertura")
         hora_fin = cleaned_data.get("horario_cierre")
         if hora_inicio and hora_fin:
