@@ -6,7 +6,7 @@
 {% csrf_token %}
 <form method="POST" action="{% url 'contactenos:leer' mail.id %}">
   {% csrf_token %}
-
+  <div class="modal-dialog mw-100" style="min-width: 80%;">
   <div class="modal-body">
     <div class="row">
       <div class="col-12">
@@ -37,4 +37,5 @@
       </div>
     </div>
   </div>
+</div>
 </form>

@@ -11,11 +11,13 @@ class Gimnasio(models.Model):
         Cuenca = 'Cuenca', 'Cuenca'
         Manta = 'Manta', 'Manta'
 
-    phone_regex = RegexValidator(regex=r'^(09)[0-9]{8}', message="Ingrese el número en el formato correcto: 091234567")
+    phone_regex = RegexValidator(regex=r'^(0)[1-9]{1}(\s){1}[0-9]{7}', message="Ingrese el número en el formato correcto: 04 1234567")
+    mobile_regex = RegexValidator(regex=r'^(09)[0-9]{8}', message="Ingrese el número en el formato correcto: 091234567")
     id = models.AutoField(primary_key=True,unique=True)
     nombre = models.CharField(max_length=24,unique=True)
     imagen = models.ImageField(upload_to="gimnasios/", null=True, blank=True,default="images/no_image.png")
-    telefono = models.CharField(validators=[phone_regex], max_length=10, blank=True)
+    telefono = models.CharField(validators=[phone_regex], max_length=10, blank=True,null=True)
+    celular = models.CharField(validators=[mobile_regex], max_length=10, blank=True,null=True)
     ubicacion = models.CharField(max_length=40)
     horario_inicio = models.TimeField(blank=False,null=False)
     horario_fin = models.TimeField(blank=False,null=False)
