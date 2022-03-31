@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'notificaciones',
     'push_notifications',
     'membresia',
+    'novacoin',
     'calendario',
     'almacenamiento',
     'promociones'
