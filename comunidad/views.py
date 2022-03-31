@@ -14,6 +14,7 @@ from almacenamiento.models import AlmacenamientoUsuario
 
 from novagym.utils import calculate_pages_to_render
 from comunidad.utils import enum_media
+from seguridad.models import UserDetails
 
 from .models import ArchivoPublicacion, Publicacion
 from .forms import PublicacionForm, ArchivoFormSet
@@ -25,7 +26,7 @@ class ListaPublicacionNovagym(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Publicacion
-    queryset = Publicacion.objects.filter(usuario__is_superuser=1).order_by('-fecha_creacion')
+    queryset = Publicacion.objects.filter(usuario__tipo='E').order_by('-fecha_creacion')
     context_object_name = 'publicacion_novagym'
     template_name = "lista_publicacion.html"
 
@@ -65,7 +66,7 @@ class CrearPublicacion(CreateView):
     def form_valid(self, form):
         archivos = self.request.FILES.getlist('archivos-0-archivo')
         if form.is_valid() and self.valid_files(archivos):
-            form.instance.usuario = self.request.user
+            form.instance.usuario = self.request.user.detalles
             self.object = form.save()
             for file in archivos:
                 tamanio = round(file.size/1000, 2)
@@ -118,7 +119,7 @@ class EditarPublicacion(UpdateView):
             for archivo in archivos:
                 archivo.reducir_almacenamiento(self.request.user)
                 archivo.delete()
-            form.instance.usuario = self.request.user
+            form.instance.usuario = self.request.user.detalles
             self.object = form.save()
             for file in nuevos_archivos:
                 tamanio = round(file.size/1000, 2)
@@ -139,7 +140,7 @@ def eliminar_publicacion(request, pk):
             publicacion = Publicacion.objects.get(pk=pk)
             archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
             for archivo in archivos:
-                archivo.reducir_almacenamiento(publicacion.usuario)
+                archivo.reducir_almacenamiento(publicacion.usuario.usuario)
                 archivo.delete()
             publicacion.delete()
             messages.success(request, "La publicación ha sido eliminada.")
@@ -154,7 +155,7 @@ class ListaPublicacionReportada(FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Publicacion
-    queryset = Publicacion.objects.filter(visible=False).all()
+    queryset = Publicacion.objects.filter(visible=False).all().order_by('-fecha_creacion')
     context_object_name = 'publicacion_reportada'
     template_name = "lista_publicacion.html"
 
@@ -193,7 +194,7 @@ def bloquear_publicacion(request, pk):
 
             archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
             for archivo in archivos:
-                archivo.reducir_almacenamiento(publicacion.usuario)
+                archivo.reducir_almacenamiento(publicacion.usuario.usuario)
                 archivo.delete()
 
             archivo = ArchivoPublicacion()
@@ -205,13 +206,13 @@ def bloquear_publicacion(request, pk):
                 archivo.almacenamiento_utilizado = Decimal(str(round(os.path.getsize(ruta) * 0.001, 2)))
                 archivo.archivo.save(f'reportado_{publicacion.id}_{publicacion.usuario.id}.jpg', file)
                 archivo.save()
-                archivo.aumentar_almacenamiento(publicacion.usuario)
+                archivo.aumentar_almacenamiento(publicacion.usuario.usuario)
 
             publicacion.save()
 
             notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
-            # GCMDevice.objects.filter(user=publicacion.usuario).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
             
             messages.success(request, 'Operacion realizada con exito.')
         except Publicacion.DoesNotExist:
