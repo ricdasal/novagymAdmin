@@ -13,11 +13,26 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
+
+  <form action="{% url 'sponsor:listarSucursal' %}" method="get">
+    <select class="form-control" name="sucursales" id="sucursales">
+      <option value="inicial" selected disabled>Seleccione una sucursal</option>
+      {% if sponsors %}
+      {% for sponsor in sponsors %}
+      <option value="{{ sponsor.id }}">{{ sponsor.nombre }}</option>
+      {% endfor %}
+      {% else %}
+      <option value="Sin datos" selected disabled>Sin datos</option>
+      {% endif %}
+    </select>
+    <div class="d-flex justify-content-end">
+    <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
+    </div>
+    </form>
+
   <div class="col">
-    <a href="{% url 'sponsor:crear' %}" class="btn btn-primary float-right">Agregar sponsor <i
+    <a href="{% url 'sponsor:crearSucursal' %}" class="btn btn-primary float-right">Agregar sucursal <i
         class="fas fa-plus-circle"> </i></a>
-        <a style="margin-right: 1%;" href="{% url 'sponsor:listarSucursal' %}" class="btn btn-primary float-right">Ver sucursales <i
-          class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
 </div>
@@ -34,48 +49,35 @@
           <th scope="col">Imágen</th>
           <th scope="col">Código</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Descripción</th>
+          <th scope="col">Dirección</th>
           <th scope="col">Contacto</th>
-          <th scope="col">Links</th>
-          <th scope="col">Plazo</th>
           <th scope="col">Horarios</th>
-          <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
+
         {% if page_obj %}
-        {% for sponsor in page_obj %}
+        {% for sucursal in page_obj %}
         <tr class="text-center">
-          <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{sponsor.imagen}}" alt=""></td>
-          <td>{{sponsor.codigo}}</td>
-          <td>{{sponsor.nombre}}</td>
-          <td><div class="detailPanel">{{sponsor.descripcion}} </div></td>
+          <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{sucursal.imagen}}" alt=""></td>
+          <td>{{sucursal.codigo}}</td>
+          <td>{{sucursal.nombre}}</td>
+          <td>{{sucursal.direccion}}</td>
+          <td>Telf: {{sucursal.telefono}} <br> 
+              Cel: {{sucursal.celular}} <br>
+              Email: {{sucursal.correo}}
+          </td>
+          </td>
+          <td>{{sucursal.horario_apertura}} - {{sucursal.horario_cierre}}</td>
           <td>
-            {{sponsor.nombre_contacto}} <br>
-            Telf: {{sponsor.telefono}} <br>
-            Cel: {{sponsor.celular}} <br>
-            Email: {{sponsor.correo}}
-          </td>
-          <td>{{sponsor.url}}<br><br>{{sponsor.red_social}}
-          </td>
-          <td>{{sponsor.fecha_inicio}} - {{sponsor.fecha_fin}}</td>
-          <td>{{sponsor.horario_apertura}} - {{sponsor.horario_cierre}}</td>
-          <td class="text-center">
-            <input type="checkbox" {%if sponsor.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
-            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
-            data-target="#mainModal" data-url-activar="{%url 'sponsor:change' sponsor.pk %}"
-            data-url-eliminar="{%url 'sponsor:change' sponsor.pk %}"
-            >
-          </td>
-          <td>
-            <a href="{% url 'sponsor:update' sponsor.pk %}" class="btn btn-sm btn-primary">
+            
+            <a href="{% url 'sponsor:editarSucursal' sucursal.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
-            <a class="btn btn-sm btn-warning use-modal" data-toggle='modal' data-target="#mainModal"
-            data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
-              <i class="fas fa-trash "></i></a>
-            
+              <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+              data-url="{% url 'sponsor:eliminarSucursal' sucursal.id %}" href="#">
+                <i class="fas fa-times "></i></a>
           </td>
           
         </tr>
@@ -98,7 +100,6 @@
 <script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));
