@@ -1,3 +1,4 @@
+from gc import get_objects
 from django.contrib.auth import login
 from django.contrib.auth.models import Group
 from knox.models import AuthToken
@@ -54,16 +55,46 @@ class LoginAPI(KnoxLoginView):
 
 
 class DetallesViewSet(viewsets.ModelViewSet):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
     serializer_class = UsuarioDetallesSerializer
-    queryset = UserDetails.objects.all()
-    http_method_names = ['get', 'put', 'patch', 'head']
+
+    def get_object(self):
+        obj = generics.get_object_or_404(
+            self.get_queryset(), usuario=self.request.user)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def get_queryset(self):
+        queryset = UserDetails.objects.filter(
+            usuario=self.request.user)
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+        request.data['usuario'] = request.user.detalles.pk
+        return super().update(request, *args, **kwargs)
 
 
-class TokenValidatorAPI(APIView):
-    permission_classes = (permissions.AllowAny,)
+class ChangePasswordView(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = ChangePasswordSerializer
+    queryset = User.objects.all()
 
-    def get(self, request, format=None):
+    def get_object(self):
+        obj = generics.get_object_or_404(
+            self.queryset, username=self.request.user)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response({
-            "detail": request.user.is_authenticated
+            "detail": "Su contraseña se ha actualizado exitosamente"
         })
