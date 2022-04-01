@@ -1,0 +1,53 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock specific_head %}
+
+{% block main %}
+
+<div class="row mt-4">
+  <div class="col">
+    <h2 class="text-left">{{title|upper}}</h2>
+  </div>
+  <div class="col">
+    <a href="{% url 'novacoin:agregar' %}" class="btn btn-primary float-right">Agregar Recompensa <i
+      class="fas fa-plus-circle"> </i>
+    </a>
+    <a href="{% url 'novacoin:tasa' %}" class="btn btn-primary float-right mr-2">Tasa de Cambio
+      <i class="fas fa-arrow-down-arrow-up"></i>
+    </a>
+  </div>
+  <hr>
+</div>
+
+<div class="row mt-4 justify-content-center">
+  <div class="col-12 col-lg-9">
+    <form method="get">
+      {% crispy filter.form %}
+    </form>
+  </div>
+  <div class="col-12 table-container">
+    <table class="table table-responsive-lg table-hover" id="tabla-recompensa-nc">
+      <tbody>
+        {% if page_obj %}
+        {% for recompensa in page_obj %}
+        {% endfor %}
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock main %}
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+{% endblock %}

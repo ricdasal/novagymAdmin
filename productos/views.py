@@ -242,6 +242,17 @@ class crearCategoria(CreateView):
         context['title'] = "Agregar Categoría"
         return context
 
+class editarCategoria(UpdateView):
+    form_class =CategoriaForm
+    model=Categoria
+    template_name = 'categoria_nueva.html'
+    title = "EDITAR CATEGORIA"
+    success_url = reverse_lazy('productos:listarCategoria')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Editar Categoría"
+        return context
+
 class ListarCategoria(FilterView):
     paginate_by = 20
     max_pages_render = 10
@@ -284,8 +295,11 @@ class ListarProductos(FilterView):
 def deleteCategoria(request,id):
     query = Categoria.objects.get(id=id)
     if request.POST:
-        query.imagen.delete()
-        query.delete()
+        try:
+            query.delete()
+        except:
+            messages.error(request, "Imposible eliminar. Existen productos pertenecientes a la categoría")
+            return redirect('productos:listarCategoria')
         messages.success(request, "Categoria eliminada con éxito.")
         return redirect('productos:listarCategoria')
     return render(request, "ajax/categoria_confirmar_elminar.html", {"categoria": query})
