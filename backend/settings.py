@@ -65,7 +65,8 @@ INSTALLED_APPS = [
     'membresia',
     'calendario',
     'almacenamiento',
-    'promociones'
+    'promociones',
+    'charts'
 ]
 
 MIDDLEWARE = [
