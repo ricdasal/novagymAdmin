@@ -19,7 +19,7 @@ class Calendario(models.Model):
     descripcion = models.CharField(max_length=255)
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)
-    gimnasio=models.ForeignKey(Gimnasio, on_delete=models.CASCADE)
+    gimnasio=models.ForeignKey(Gimnasio, on_delete=models.PROTECT)
     class Meta:
         ordering=('horario_inicio',)
     def __str__(self):

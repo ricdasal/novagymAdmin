@@ -35,3 +35,11 @@ class CalendarioForm(forms.ModelForm):
                 Column('horario_fin', css_class='col-6 '),
             ),
         )
+    def clean(self):
+        cleaned_data = super(CalendarioForm, self).clean()
+        horario_inicio = cleaned_data.get("horario_inicio")
+        horario_fin = cleaned_data.get("horario_fin")
+        if horario_inicio and horario_fin:
+            if horario_fin < horario_inicio:
+                raise forms.ValidationError("La hora de inicio no puede ser anterior a la hora de fin.")
+        return cleaned_data

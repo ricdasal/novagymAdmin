@@ -48,9 +48,8 @@ class Producto(models.Model):
         max_length=20, unique=True, default=generarCodigo, editable=False)
     nombre = models.CharField(max_length=24, unique=True)
     descripcion = models.CharField(max_length=255)
-    imagen = models.ImageField(
-        upload_to="productos/", null=True, blank=True, default="images/no_image.png")
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    imagen=models.ImageField(upload_to="productos/", null=False, blank=False,default="images/no_image.png")
+    categoria=models.ForeignKey(Categoria, on_delete=models.PROTECT)
     talla = models.CharField(max_length=3, choices=Talla.choices)
     presentacion = models.CharField(
         max_length=10, choices=Presentacion.choices)

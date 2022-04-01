@@ -27,6 +27,7 @@ urlpatterns = [
      path('deleteCategoria/<int:id>', deleteCategoria, name='deleteCategoria'),
      path('listarCategoria/', ListarCategoria.as_view(), name='listarCategoria'),
      path('crearCategoria/', crearCategoria.as_view(), name='crearCategoria'),
+     path('editarCategoria/<str:pk>', editarCategoria.as_view(), name='editarCategoria'),
      path('categoria-list/', categoriaList, name='categoria-overview'),
      path('categoria-detail/<str:id>', categoriaDetail, name='categoria-detail'),
      path('categoria-create/', categoriaCreate, name='categoria-create'),

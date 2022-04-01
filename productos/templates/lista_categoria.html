@@ -38,7 +38,7 @@
           <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{categoria.imagen}}" alt=""></td>
           <td>{{categoria.nombre}}</td>
           <td>
-            <a href="" class="btn btn-sm btn-primary">
+            <a href="{%url 'productos:editarCategoria' categoria.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
               data-url="{%url 'productos:deleteCategoria' categoria.id %}" href="#"><i class="fas fa-times"></i></a>
