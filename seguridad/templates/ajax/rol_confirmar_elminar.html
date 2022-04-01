@@ -6,6 +6,9 @@
 </div>
 <form method="POST" action="{% url 'seguridad:eliminar_rol' rol.pk %}">
   {% csrf_token %}
+  {% if request.GET.next %}
+  <input type="hidden" name="next" value="{{ request.GET.next }}" />
+  {% endif %}
   <div class="modal-body">
     ¿Desea eliminar el siguiente rol?
     <div class="row">

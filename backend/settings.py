@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'notificaciones',
     'push_notifications',
     'membresia',
+    'novacoin',
     'calendario',
     'almacenamiento',
     'promociones'
@@ -203,7 +204,17 @@ EMAIL_USE_TLS = True
 # Push notifications settings. For multiple apps check https://github.com/jazzband/django-push-notifications/wiki/Multiple-Application-Support
 # We are using FCM for both iOS and Android
 PUSH_NOTIFICATIONS_SETTINGS = {
-    "FCM_API_KEY": env('FCM_API_KEY'),
+    "CONFIG": "push_notifications.conf.AppConfig",
+    "APPLICATIONS": {
+        "1:130827247065:android:b32ca5bc87773ab5f4cdc8": {
+            "PLATFORM": "FCM",
+            "API_KEY": env('FCM_API_KEY'),
+        },
+        "1:130827247065:ios:24223982c8899550f4cdc8": {
+            "PLATFORM": "FCM",
+            "API_KEY": env('FCM_API_KEY'),
+        }
+    },
     "FCM_MAX_RECIPIENTS": 500,
     "UPDATE_ON_DUPLICATE_REG_ID": True
 }

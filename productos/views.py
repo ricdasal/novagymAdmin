@@ -368,7 +368,7 @@ class UpdateProducto(UpdateView):
         first_form = self.get_form(form_class)
         second_forms = ProductoMetaU(self.request.POST,instance=self.object)
         third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
-
+        print(first_form.errors,second_forms.errors,third_forms.errors)
         if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
             return self.forms_valid(first_form , second_forms,third_forms)
         else:
@@ -406,7 +406,7 @@ def getAllProducts(request):
                             "precio":float(producto.precio),
                             "stock":producto.stock,
                             "novacoins":producto.novacoins,
-                            "usaNovacoins":producto.usaNovacoins,
+                            "usaNovacoins":producto.producto.usaNovacoins,
                             "porcentajeDescuento":str(descuento.porcentaje_descuento)+"%",
                             "fechaHoraDesde":str(descuento.fecha_hora_desde),
                             "fechaHoraHasta":str(descuento.fecha_hora_hasta),

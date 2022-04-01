@@ -1,5 +1,7 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from seguridad.models import UserDetails
+from seguridad.validators import validate_decimal_positive
 
 # Create your models here.
 
@@ -15,14 +17,23 @@ class Beneficio(models.Model):
 class Membresia(models.Model):
     nombre = models.CharField(max_length=50)
     descripcion = models.TextField(blank=True)
-    precio = models.DecimalField(max_digits=12, decimal_places=2)
-    meses_duracion = models.IntegerField()
+    precio = models.DecimalField(max_digits=12, decimal_places=2, validators=[
+                                 validate_decimal_positive])
+    meses_duracion = models.PositiveIntegerField(
+        validators=[validate_decimal_positive])
     beneficios = models.ManyToManyField(Beneficio, related_name='membresia')
     estado = models.BooleanField(default=True)
     imagen = models.ImageField(upload_to='membresia/', null=True, blank=True)
 
     class Meta:
-        ordering = ['-estado']
+        ordering = ['-pk']
+
+    @property
+    def descuento_activo(self):
+        try:
+          return self.descuentos.get(activo=True).porcentaje_descuento
+        except:
+          return 0
 
     def __str__(self):
         return self.nombre
@@ -31,7 +42,9 @@ class Membresia(models.Model):
 class Descuento(models.Model):
     membresia = models.ForeignKey(
         Membresia, related_name='descuentos', on_delete=models.SET_NULL, null=True)
-    porcentaje_descuento = models.PositiveIntegerField()
+    porcentaje_descuento = models.PositiveIntegerField(
+        validators=[MaxValueValidator(100), MinValueValidator(1)]
+    )
     fecha_hora_desde = models.DateTimeField()
     fecha_hora_hasta = models.DateTimeField()
     activo = models.BooleanField(default=False)

@@ -16,6 +16,8 @@
   <div class="col">
     <a href="{% url 'sponsor:crear' %}" class="btn btn-primary float-right">Agregar sponsor <i
         class="fas fa-plus-circle"> </i></a>
+        <a style="margin-right: 1%;" href="{% url 'sponsor:listarSucursal' %}" class="btn btn-primary float-right">Ver sucursales <i
+          class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
 </div>
@@ -34,9 +36,9 @@
           <th scope="col">Nombre</th>
           <th scope="col">Descripción</th>
           <th scope="col">Contacto</th>
-          <th scope="col">URL</th>
-          <th scope="col">Fecha inicio</th>
-          <th scope="col">Fecha fin</th>
+          <th scope="col">Links</th>
+          <th scope="col">Plazo</th>
+          <th scope="col">Horarios</th>
           <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
@@ -49,40 +51,30 @@
           <td>{{sponsor.codigo}}</td>
           <td>{{sponsor.nombre}}</td>
           <td><div class="detailPanel">{{sponsor.descripcion}} </div></td>
-          <td>{{sponsor.nombre_contacto}}: {{sponsor.telefono}}</td>
-          <td>{{sponsor.url}}</td>
-          <td>{{sponsor.fecha_inicio}}</td>
-          <td>{{sponsor.fecha_fin}}</td>
           <td>
-            {%if sponsor.activo == 0 and sponsor.compararFechas %}
-            <span class="text-warning">Inactivo</span>
-            {%elif sponsor.compararFechas %}
-            <span class="text-success">Activo</span>
-            {%else%}
-            <span class="text-danger">Caducado</span>
-            {%endif%}
+            {{sponsor.nombre_contacto}} <br>
+            Telf: {{sponsor.telefono}} <br>
+            Cel: {{sponsor.celular}} <br>
+            Email: {{sponsor.correo}}
+          </td>
+          <td>{{sponsor.url}}<br><br>{{sponsor.red_social}}
+          </td>
+          <td>{{sponsor.fecha_inicio}} - {{sponsor.fecha_fin}}</td>
+          <td>{{sponsor.horario_apertura}} - {{sponsor.horario_cierre}}</td>
+          <td class="text-center">
+            <input type="checkbox" {%if sponsor.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{%url 'sponsor:change' sponsor.pk %}"
+            data-url-eliminar="{%url 'sponsor:change' sponsor.pk %}"
+            >
           </td>
           <td>
-            {% if sponsor.compararFechas %}
             <a href="{% url 'sponsor:update' sponsor.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
-              {% if sponsor.activo %}
-            <a class="btn btn-sm btn-success" 
-               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
-              {% else %}
-            <a class="btn btn-sm btn-warning" 
-               href="{%url 'sponsor:change' sponsor.pk%}"><i class="fas fa-power-off "></i></a>
-
-               {%endif%}
-               <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-               data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
-                 <i class="fas fa-times "></i></a>
-            {% else %}
             <a class="btn btn-sm btn-warning use-modal" data-toggle='modal' data-target="#mainModal"
             data-url="{%url 'sponsor:eliminar' sponsor.id%}" href="#">
-              <i class="fas fa-check "></i></a>
-            {% endif %}
+              <i class="fas fa-trash "></i></a>
             
           </td>
           
@@ -106,6 +98,7 @@
 <script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

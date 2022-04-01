@@ -143,6 +143,17 @@ def changeState(request, pk):
     return render(request, "ajax/notificacion_confirmar_activar.html", {"notificacion": notificacion})
 
 
+@login_required
+@permission_required('notificacion.delete_notificacion')
+def notificacion_confirmar_eliminar(request, pk):
+    notificacion = Notificacion.objects.get(id=pk)
+    if request.POST:
+        messages.info(request, "Notificación eliminada.")
+        notificacion.delete()
+        return redirect('notificaciones:listar')
+    return render(request, "ajax/notificacion_confirmar_elminar_perma.html", {"notificacion": notificacion})
+
+
 # Ref: https://github.com/jazzband/django-push-notifications#sending-messages-in-bulk
 def enviarNotificacionGlobal(request, id_notificacion):
     notificacion = Notificacion.objects.get(id=id_notificacion)

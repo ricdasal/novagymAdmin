@@ -26,12 +26,12 @@ from .models import *
 
 APP_PERMISSIONS = {
     'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
-    # 'novagym':'',
     'membresia': {'label': 'Membresia', 'app': 'membresia', 'model': 'membresia'},
-    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
-    # 'contactenos':'',
-    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
     'notificaciones': {'label': 'Notificaciones', 'app': 'notificaciones', 'model': 'notificacion'},
+    'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
+    'comunidad': {'label': 'Comunidad', 'app': 'comunidad', 'model': 'biografia'},
+    'almacenamiento': {'label': 'Almacenamiento', 'app': 'almacenamiento', 'model': 'almacenamientousuario'},
 }  # TODO: agregar apps:model
 
 
@@ -151,6 +151,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         usuario_detalles_form = self.form_class(request.POST)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
             user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
             user.email = user.username
             user.save()
             detalles = usuario_detalles_form.save(commit=False)
@@ -205,7 +206,9 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         usuario_form = self.user_form_class(
             request.POST, instance=self.object.usuario)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save()
+            user = usuario_form.save(commit=False)
+            user.groups.add(Group.objects.get(name='Todos'))
+            user.save()
             detalles = usuario_detalles_form.save(commit=False)
             detalles.usuario = user
             detalles.save()
@@ -229,6 +232,20 @@ def usuario_confirmar_eliminacion(request, pk):
         messages.info(request, "Usuario deshabilitado con éxito.")
         return redirect(success_url)
     return render(request, "ajax/usuario_confirmar_elminar.html", {"usuario": detalles})
+
+@login_required
+@permission_required('seguridad.delete_userdetails')
+def usuario_confirmar_eliminacion_perma(request, pk):
+    detalles = UserDetails.objects.get(id=pk)
+    if request.POST:
+        success_url = reverse_lazy('seguridad:listar', kwargs={
+                                   'type': request.POST['type']})
+        usuario = detalles.usuario
+        usuario.delete()
+        messages.error(request, "Usuario eliminado")
+        return redirect(success_url)
+    return render(request, "ajax/usuario_confirmar_elminar_perma.html", {"usuario": detalles})
+
 
 
 @login_required
@@ -282,12 +299,11 @@ class CrearRolUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Creat
     def post(self, request, *args, **kwargs):
         self.object = None
         rol_form = self.form_class(request.POST)
-        apps = request.POST.getlist('apps', None)
         apps_permissions = request.POST.getlist('apps_permissions', None)
         next_page = request.POST.get('next', None)
 
         list_permissions = []
-        if rol_form.is_valid() and apps and apps_permissions:
+        if rol_form.is_valid() and apps_permissions:
             rol = rol_form.save(commit=False)
             for permission in apps_permissions:
                 app, action_model = permission.split('.')  # get the app
