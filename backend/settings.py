@@ -66,7 +66,8 @@ INSTALLED_APPS = [
     'novacoin',
     'calendario',
     'almacenamiento',
-    'promociones'
+    'promociones',
+    'charts'
 ]
 
 MIDDLEWARE = [

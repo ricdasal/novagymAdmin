@@ -24,7 +24,7 @@ class ProductoSerializer(serializers.ModelSerializer):
     codigo = serializers.CharField(max_length=255)
     nombre = serializers.CharField(max_length=24)
     descripcion = serializers.CharField(max_length=255)
-    imagen = serializers.FileField(required=False)
+    imagen = serializers.FileField(required=True)
     categoria_id=serializers.IntegerField()
     talla = serializers.CharField(max_length=3)
     usaNovacoins=serializers.BooleanField()
