@@ -129,8 +129,11 @@ class UpdateGimnasio(UpdateView):
 def deleteGimnasio(request,id):
     query = Gimnasio.objects.get(id=id)
     if request.POST:
-        query.imagen.delete()
-        query.delete()
+        try:
+            query.delete()
+        except:
+            messages.error(request, "Imposible eliminar. Existen horarios pertenecientes al gimnasio")
+            return redirect('gimnasio:listar')
         messages.success(request, "Gimnasio eliminado con éxito.")
         return redirect('gimnasio:listar')
     return render(request, "ajax/gimnasio_confirmar_elminar.html", {"gimnasio": query})

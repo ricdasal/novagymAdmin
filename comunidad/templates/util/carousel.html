@@ -13,7 +13,7 @@
     <ul data-slides>
         {% for archivo in archivos %}
             {% if archivo.tipo == 'IMG' %}
-                <li class="slide" data-active>
+                <li class="slide d-flex" data-active>
                     <img src="{{ archivo.archivo.url }}" alt="">
                 </li>
             {% elif archivo.tipo == 'AUD' %}
@@ -25,8 +25,8 @@
                     </audio>
                 </li>
             {% else %}
-                <li class="slide" data-active>
-                    <video width="320" height="240" controls>
+                <li class="slide d-flex" data-active>
+                    <video class="w-100 h-auto" style="max-height: 500px; background: black;" controls>
                         <source src="{{ archivo.archivo.url }}" type="video/{{ archivo.archivo.url|mime_type }}"> 
                         Your browser does not support the video tag.
                     </video>

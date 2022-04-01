@@ -10,8 +10,7 @@ class BiografiaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Biografia
-        fields = ['id', 'usuario', 'foto_perfil', 'foto_portada',
-                 'descripcion', 'seguidores', 'usuario_info']
+        fields = ['id', 'usuario','descripcion', 'seguidores', 'usuario_info']
 
 
 class ArchivoPublicacionSerializer(serializers.ModelSerializer):
@@ -36,7 +35,7 @@ class PublicacionSerializer(serializers.ModelSerializer):
         publicacion = Publicacion.objects.create(**validated_data)
         for archivo in archivos:
             archivo_publicacion = ArchivoPublicacion.objects.create(publicacion=publicacion, **archivo)
-            archivo_publicacion.aumentar_almacenamiento(publicacion.usuario)
+            archivo_publicacion.aumentar_almacenamiento(publicacion.usuario.usuario)
 
         return publicacion
     
@@ -47,7 +46,7 @@ class PublicacionSerializer(serializers.ModelSerializer):
         instance.save()
         for archivo in archivos:
             archivo_publicacion = ArchivoPublicacion.objects.create(publicacion=instance, **archivo)
-            archivo_publicacion.aumentar_almacenamiento(instance.usuario)
+            archivo_publicacion.aumentar_almacenamiento(instance.usuario.usuario)
         return instance
 
 

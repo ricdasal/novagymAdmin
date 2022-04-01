@@ -33,23 +33,6 @@ class BiografiaView(viewsets.ViewSet):
         data = request.data
         biografia = self.get_object(request.user)
 
-        if data['foto_perfil'] != None:
-            resultado = fileb64decode(data['foto_perfil'], request.user.id)
-            if "message" in resultado:
-                return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-            data['foto_perfil'] = resultado[1]
-            eliminar_archivo(biografia.foto_perfil)
-        else:
-            data.pop('foto_perfil')
-        if data['foto_portada'] != None:
-            resultado = fileb64decode(data['foto_portada'], request.user.id)
-            if "message" in resultado:
-                return Response(resultado, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-            data['foto_portada'] = resultado[1]
-            eliminar_archivo(biografia.foto_portada)
-        else:
-            data.pop('foto_portada')
-
         serializer = BiografiaSerializer(biografia, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -71,17 +54,17 @@ class PublicacionView(viewsets.ViewSet):
     def list(self, request):
         start = timezone.now().replace(hour=0, minute=0, second=0)
         end = timezone.now().replace(hour=23, minute=59, second=59)
-        publicaciones_admin = Publicacion.objects.filter(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
-        publicaciones = Publicacion.objects.filter(visible=True).order_by('-fecha_creacion')
-        data = []
-        if len(publicaciones_admin) > 0:
-            data = list(publicaciones_admin) + list(publicaciones.exclude(usuario__is_superuser=1, fecha_creacion__gte=start, fecha_creacion__lte=end))
-        else:
-            data = publicaciones
+
+        publicaciones_admin = Publicacion.objects.filter(usuario__tipo='E', fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
+        publicaciones_user = Publicacion.objects.filter(visible=True).order_by('-fecha_creacion')
+        
+        if len(publicaciones_admin) != 0:
+            publicaciones_user = Publicacion.objects.exclude(usuario__tipo='E', fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
+        publicaciones = list(publicaciones_admin) + list(publicaciones_user)
 
         paginator = PageNumberPagination()
         paginator.page_size = 10
-        result = paginator.paginate_queryset(data, request)
+        result = paginator.paginate_queryset(publicaciones, request)
 
         serializer = PublicacionSerializer(result, many=True)
         data = serializer.data
@@ -109,7 +92,7 @@ class PublicacionView(viewsets.ViewSet):
                 return Response({"message": "El archivo supera el limite de peso establecido."}, status=status.HTTP_400_BAD_REQUEST)
 
         data['archivos'] = archivos
-        data['usuario'] = request.user.id
+        data['usuario'] = request.user.detalles.id
 
         if not almacenamiento_disponible_user(request.user, data['archivos']):
             return Response({"message": "Publicación supera la capacidad maxima de almacenamiento."}, status=status.HTTP_400_BAD_REQUEST)
@@ -126,14 +109,14 @@ class PublicacionView(viewsets.ViewSet):
         data = request.data
         try:
             publicacion = Publicacion.objects.get(pk=pk)
-            if publicacion.usuario == request.user:
+            if publicacion.usuario.usuario == request.user:
                 archivos = data['archivos'] if 'archivos' in data else []
                 nuevos_archivos = []
                 for i, archivo in enumerate(archivos):
                     if 'id' in archivo:
                         archivo_db = ArchivoPublicacion.objects.get(id=archivo['id'])
                         if archivo['archivo'] == None:
-                            archivo_db.reducir_almacenamiento(publicacion.usuario)
+                            archivo_db.reducir_almacenamiento(publicacion.usuario.usuario)
                             archivo_db.delete()
                     else:
                         resultado = fileb64decode(archivo['archivo'], request.user.id)
@@ -167,10 +150,10 @@ class PublicacionView(viewsets.ViewSet):
     def destroy(self, request, pk):
         try:
             publicacion = Publicacion.objects.get(pk=pk)
-            if publicacion.usuario == request.user:
+            if publicacion.usuario.usuario == request.user:
                 archivos = ArchivoPublicacion.objects.filter(publicacion=publicacion)
                 for archivo in archivos:
-                    archivo.reducir_almacenamiento(publicacion.usuario)
+                    archivo.reducir_almacenamiento(publicacion.usuario.usuario)
                     archivo.delete()
                 publicacion.delete()
                 return Response(status=status.HTTP_200_OK)
@@ -183,7 +166,7 @@ class PublicacionUsuarioView(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
     def list(self, request):
-        publicaciones = Publicacion.objects.filter(usuario=request.user.id)
+        publicaciones = Publicacion.objects.filter(usuario=request.user.detalles)
         
         paginator = PageNumberPagination()
         paginator.page_size = 10
@@ -202,9 +185,11 @@ class ReportarPublicacionView(viewsets.ViewSet):
         data = request.data
         try:
             publicacion = Publicacion.objects.get(pk=pk)
-            if publicacion.usuario != request.user:
+            if publicacion.usuario.usuario != request.user:
                 if 'motivo' not in data:
                     return Response(status=status.HTTP_400_BAD_REQUEST) 
+                elif data['motivo'] == '':
+                    return Response({"message": "Debe ingresar un motivo para reportar la publicación."}, status=status.HTTP_400_BAD_REQUEST) 
                 data['visible'] = False
                 publicacion.motivo = data['motivo']
                 publicacion.visible = False
@@ -241,12 +226,12 @@ class ComentarioView(viewsets.ViewSet):
         if serializer.is_valid():
             comentario = serializer.save()
             notificacion = comentario.nueva_notificacion()
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+            GCMDevice.objects.filter(user=comentario.publicacion.usuario.usuario).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo, "image": imagen })
 
             publicacion = Publicacion.objects.get(id=data['publicacion'])
             comentarios = publicacion.comentario.filter(comentario_padre=None).all()
-
             return Response(ComentarioSerializer(comentarios, many=True).data ,status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -321,13 +306,14 @@ class LikeView(viewsets.ViewSet):
             return Response({"message": "Ya se ha dado like a esa publicación."}, status=status.HTTP_400_BAD_REQUEST)
         except Like.DoesNotExist:
             publicacion = Publicacion.objects.get(id=publicacion_id)
-            if publicacion.usuario == usuario:
+            if publicacion.usuario.usuario == usuario:
                 return Response({"message": "No puede dar like a su publicación."}, status=status.HTTP_400_BAD_REQUEST)
             like = Like.objects.create(publicacion=publicacion, usuario=usuario)
             like.incrementar_publicacion_likes()
             notificacion = like.nueva_notificacion()
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
+            imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+            GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo, "image": imagen })
 
             return Response(status=status.HTTP_201_CREATED)
     
@@ -359,6 +345,10 @@ class SeguidorView(viewsets.ViewSet):
     def create(self, request):
         data = request.data
         data['seguidor'] = request.user.id
+
+        if request.user.id == data['usuario']:
+            return Response({"message": "No puedes seguirte a ti mismo."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             Seguidor.objects.get(seguidor=request.user.id, usuario=data['usuario'])
             return Response({"message": "Ya sigues a este usuario"}, status=status.HTTP_400_BAD_REQUEST)
@@ -373,9 +363,8 @@ class SeguidorView(viewsets.ViewSet):
 
                 seguidor = serializer.save()
                 notificacion = seguidor.nueva_notificacion("empezó a seguirte")
-                # GCMDevice.objects.filter(user=request.user).send_message(
-                #     notificacion.cuerpo, extra={"title": notificacion.titulo })
-
+                GCMDevice.objects.filter(user=biografia_seguido.usuario).send_message(
+                    notificacion.cuerpo, extra={"title": notificacion.titulo })
                 return Response(status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -391,9 +380,8 @@ class SeguidorView(viewsets.ViewSet):
 
             seguidor.delete()
             notificacion = seguidor.nueva_notificacion("ha dejado de seguirte")
-            # GCMDevice.objects.filter(user=request.user).send_message(
-            #     notificacion.cuerpo, extra={"title": notificacion.titulo })
-
+            GCMDevice.objects.filter(user=biografia_seguido.usuario).send_message(
+                notificacion.cuerpo, extra={"title": notificacion.titulo })
             return Response(status=status.HTTP_200_OK)
         except Seguidor.DoesNotExist:
             return Response({"message": "Parece que ya no sigues a este usuario"}, status=status.HTTP_404_NOT_FOUND)
@@ -404,7 +392,7 @@ class RecomendacionAmigoView(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         q = self.request.GET.get('amigo')
-        biografias = Biografia.objects.all().exclude(usuario=self.request.user.id)
+        biografias = Biografia.objects.all().exclude(usuario=self.request.user.id).exclude(usuario__is_superuser=1)
         seguidos = Seguidor.objects.filter(seguidor=self.request.user.id)
 
         biografia_seguidos = []
@@ -417,8 +405,7 @@ class RecomendacionAmigoView(viewsets.ReadOnlyModelViewSet):
                 disponibles.append(b)
 
         if q:
-            user_details = UserDetails.objects.filter(nombres__icontains=q).exclude(usuario=self.request.user.id)
-            disponibles.clear()
+            user_details = UserDetails.objects.filter(nombres__icontains=q).exclude(usuario=self.request.user.id).exclude(usuario__is_superuser=1)
             for detalle in user_details:
                 disponibles.append(Biografia.objects.get(usuario=detalle.usuario))
         else:

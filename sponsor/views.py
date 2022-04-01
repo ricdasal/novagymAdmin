@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -11,24 +10,24 @@ from .serializers import *
 from novagym.utils import calculate_pages_to_render
 from .models import *
 from django.contrib import messages
-import json
+from rest_framework.views import APIView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
-from .filters import SponsorFilter
+from .filters import SponsorFilter, SucursalFilter
 # Create your views here.
 #SPONSOR
 
-@api_view(["GET"])
-def sponsorList(request):
-    sponsors= Sponsor.objects.all()
-    serializer=SponsorSerializer(sponsors,many=True)
-    return Response(serializer.data)
+class sponsorList(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset = Sponsor.objects.all()
+        serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-@api_view(["GET"])
-def sponsorDetail(request,id):
-    sponsors= Sponsor.objects.get(id=id)
-    serializer=SponsorSerializer(sponsors,many=False)
-    return Response(serializer.data)
+class sponsorDetail(APIView):
+    def get(self, request,id, *args, **kwargs):
+        queryset = Sponsor.objects.get(id=id)
+        serializer = SponsorSerializer(queryset, many=False, context={"request":request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 def sponsorCreate(request):
@@ -116,29 +115,77 @@ class UpdateSponsor(UpdateView):
         context['title'] = "Editar Anunciante"
         return context
 
+class ListarSucursales(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Sucursal
+    context_object_name = 'sucursal'
+    template_name = "lista_sucursal.html"
+    permission_required = 'novagym.view_empleado'
+    filterset_class=SucursalFilter
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "SUCURSALES"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        context['sponsors'] = Sponsor.objects.all()
+        return context
+
+    def filtering(self, request, *args, **kwargs):
+        if request.GET.get('sucursales'):
+            data=request.GET.get('sucursales')
+            return data
+
+    def get_queryset(self):
+        return self.model.objects.filter(sponsor=self.filtering(self.request))
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
+
+class UpdateSucursal(UpdateView):
+    form_class =SucursalForm
+    model=Sucursal
+    title = "ACTUALIZAR SUCURSAL"
+    template_name = 'sponsor_nuevo.html'
+    success_url = reverse_lazy('sponsor:listarSucursal')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Editar Sucursal"
+        return context
+
+
+class CrearSucursal(CreateView):
+    form_class =SucursalForm
+    model=Sucursal
+    template_name = 'sponsor_nuevo.html'
+    title = "CREAR SUCURSAL"
+    success_url = reverse_lazy('sponsor:listarSucursal')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Sucursal"
+        return context
+
+def deleteSucursal(request,id):
+    query = Sucursal.objects.get(id=id)
+    if request.POST:
+        query.imagen.delete()
+        query.delete()
+        messages.success(request, "Sucursal eliminada con éxito.")
+        return redirect('sponsor:listarSucursal')
+    return render(request, "ajax/sucursal_confirmar_elminar.html", {"sucursal": query})
+
 def ChangeState(request,pk):
     query = Sponsor.objects.get(id=pk)
-    print(query.activo)
-    if query.activo==0:
-        query.activo=1
-        messages.success(request, "Anunciante "+query.nombre +" habilitado.")
-    elif query.activo==1:
-        query.activo=0
-        messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
-    query.save()
-    return redirect('sponsor:listar')
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Anunciante "+query.nombre +" habilitado.")
+            query.save()
+            return redirect('sponsor:listar')
+        elif query.activo==1:
+            query.activo=0
+            messages.success(request, "Anunciante "+query.nombre +" deshabilitado.")
+            query.save()
+            return redirect('sponsor:listar')
+    return render(request, "ajax/sponsor_confirmar_change.html", {"sponsor": query})
 
-def getAllSponsors(request):
-    urls={}
-    sponsors=Sponsor.objects.all()
-    for sponsor in sponsors:
-        urls[sponsor.nombre]={
-                            "codigo":sponsor.codigo,
-                            "descripcion":sponsor.descripcion,
-                            "imagen":request.build_absolute_uri('/media/')+str(sponsor.imagen),
-                            "fechaInicio":str(sponsor.fecha_inicio),
-                            "fechaFin":str(sponsor.fecha_fin),
-                            "url":sponsor.url,
-                            "activo":sponsor.activo
-                            }
-    return HttpResponse(json.dumps(urls))

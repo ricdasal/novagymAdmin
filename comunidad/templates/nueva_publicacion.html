@@ -17,9 +17,11 @@
         {% crispy form %}
         <hr>
         {{ archivos|crispy }}
+        {% if peso_archivo_asignado %}
         <p id="peso_maximo" data-peso-maximo="{{ peso_archivo_asignado }}" style="display: none; color: red;">
             **Archivo supera el limite permitido de {{ peso_archivo_asignado|conversion }}
         </p>
+        {% endif %}
         <hr>
         <input type="submit" class="btn btn-primary" value="Guardar">
     </form>
