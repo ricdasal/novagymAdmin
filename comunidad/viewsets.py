@@ -56,7 +56,10 @@ class PublicacionView(viewsets.ViewSet):
         end = timezone.now().replace(hour=23, minute=59, second=59)
 
         publicaciones_admin = Publicacion.objects.filter(usuario__tipo='E', fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
-        publicaciones_user = Publicacion.objects.filter(usuario__tipo='C', visible=True).order_by('-fecha_creacion')
+        publicaciones_user = Publicacion.objects.filter(visible=True).order_by('-fecha_creacion')
+        
+        if len(publicaciones_admin) != 0:
+            publicaciones_user = Publicacion.objects.exclude(usuario__tipo='E', fecha_creacion__gte=start, fecha_creacion__lte=end).order_by('-fecha_creacion')
         publicaciones = list(publicaciones_admin) + list(publicaciones_user)
 
         paginator = PageNumberPagination()
@@ -185,6 +188,8 @@ class ReportarPublicacionView(viewsets.ViewSet):
             if publicacion.usuario.usuario != request.user:
                 if 'motivo' not in data:
                     return Response(status=status.HTTP_400_BAD_REQUEST) 
+                elif data['motivo'] == '':
+                    return Response({"message": "Debe ingresar un motivo para reportar la publicación."}, status=status.HTTP_400_BAD_REQUEST) 
                 data['visible'] = False
                 publicacion.motivo = data['motivo']
                 publicacion.visible = False
