@@ -6,8 +6,8 @@ from notificaciones.viewsets import NotificacionUsuarioViewSet
 from novagym.viewsets import ProgresoImcViewSet
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 from rest_framework import routers
-from seguridad.viewsets import (DetallesViewSet, LoginAPI, RegistrarAPI,
-                                TokenValidatorAPI)
+from seguridad.viewsets import (ChangePasswordView, DetallesViewSet, LoginAPI,
+                                RegistrarAPI)
 
 """
  APIS Gym
@@ -34,6 +34,5 @@ seguridad_api = [
     path('logout/', knox_views.LogoutView.as_view(), name='logout'),
     path('logoutall/', knox_views.LogoutAllView.as_view(),
          name='logoutall'),
-    path("validate/", TokenValidatorAPI.as_view(),
-         name="validate_token")
+    path('cambiar-password/', ChangePasswordView.as_view(), name='cambiar-password'),
 ]
