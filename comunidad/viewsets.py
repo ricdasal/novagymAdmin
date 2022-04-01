@@ -226,9 +226,11 @@ class ComentarioView(viewsets.ViewSet):
         if serializer.is_valid():
             comentario = serializer.save()
             notificacion = comentario.nueva_notificacion()
-            imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+            extra = {"title": notificacion.titulo }
+            if notificacion.imagen:
+                extra['image'] = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
             GCMDevice.objects.filter(user=comentario.publicacion.usuario.usuario).send_message(
-                notificacion.cuerpo, extra={"title": notificacion.titulo, "image": imagen })
+                notificacion.cuerpo, extra=extra)
 
             publicacion = Publicacion.objects.get(id=data['publicacion'])
             comentarios = publicacion.comentario.filter(comentario_padre=None).all()
@@ -311,9 +313,11 @@ class LikeView(viewsets.ViewSet):
             like = Like.objects.create(publicacion=publicacion, usuario=usuario)
             like.incrementar_publicacion_likes()
             notificacion = like.nueva_notificacion()
-            imagen = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
+            extra = {"title": notificacion.titulo }
+            if notificacion.imagen:
+                extra['image'] = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
             GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
-                notificacion.cuerpo, extra={"title": notificacion.titulo, "image": imagen })
+                notificacion.cuerpo, extra=extra)
 
             return Response(status=status.HTTP_201_CREATED)
     
