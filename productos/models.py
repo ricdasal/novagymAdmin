@@ -19,10 +19,10 @@ class Categoria(models.Model):
 def generarCodigo():
     not_unique = True
     while not_unique:
-        unique_code = random.randint(1000, 9999)
+        unique_code = "PDT-"+str(random.randint(1000, 9999))
         if not Producto.objects.filter(codigo=unique_code):
             not_unique = False
-            return "PDT"+"-"+str(unique_code)
+            return "PDT-"+str(unique_code)
 
 
 class Producto(models.Model):

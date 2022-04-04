@@ -8,18 +8,18 @@ from django.core.validators import RegexValidator
 def generarCodigo():
     not_unique = True
     while not_unique:
-        unique_code = random.randint(1000, 9999)
+        unique_code = "SPR-"+str(random.randint(1000, 9999))
         if not Sponsor.objects.filter(codigo=unique_code):
             not_unique = False
-            return "SPR"+"-"+str(unique_code)
+            return "SPR-"+str(unique_code)
 
 def generarCodigoS():
     not_unique = True
     while not_unique:
-        unique_code = random.randint(1000, 9999)
+        unique_code = "SUC-"+str(random.randint(1000, 9999))
         if not Sucursal.objects.filter(codigo=unique_code):
             not_unique = False
-            return "SUC"+"-"+str(unique_code)
+            return "SUC-"+str(unique_code)
 
 class Sponsor(models.Model):
     phone_regex = RegexValidator(regex=r'^(0)[1-9]{1}(\s){1}[0-9]{7}', message="Ingrese el número en el formato correcto: 04 1234567")

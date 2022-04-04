@@ -1,22 +1,23 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from .models import Calendario
+from .models import Horario
 from crispy_forms.layout import Column, Div, Field, Layout, Row
 from .widgets import TimePickerInput
 
-class CalendarioForm(forms.ModelForm):
+class HorarioForm(forms.ModelForm):
     class Meta:
-        model= Calendario
+        model= Horario
         labels = {
             "imagen": "Logo del sponsor",
             "descripcion": "Descripción de la actividad"
         }
-        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio')
+        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidad')
 
         widgets = {
             "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
             "horario_inicio": TimePickerInput(),
             "horario_fin": TimePickerInput(),
+            "capacidad":forms.NumberInput(attrs={'min':1})
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -28,6 +29,7 @@ class CalendarioForm(forms.ModelForm):
                 Column('dia', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
+                Column('capacidad', css_class='col-6'),
             ),
             Row(
                 Column('gimnasio', css_class='col-6'),
@@ -36,7 +38,7 @@ class CalendarioForm(forms.ModelForm):
             ),
         )
     def clean(self):
-        cleaned_data = super(CalendarioForm, self).clean()
+        cleaned_data = super(HorarioForm, self).clean()
         horario_inicio = cleaned_data.get("horario_inicio")
         horario_fin = cleaned_data.get("horario_fin")
         if horario_inicio and horario_fin:

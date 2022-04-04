@@ -1,3 +1,4 @@
+from django.db import DataError
 from django.shortcuts import render
 from django.forms import BooleanField
 from django.http import HttpResponse
@@ -8,7 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
-
+from rest_framework.views import APIView
 from calendario.filters import CalendarioFilter
 from .forms import *
 from .serializers import *
@@ -20,24 +21,45 @@ from django.contrib import messages
 import json
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
+from rest_framework.parsers import MultiPartParser, FormParser
 # Create your views here.
 
 @api_view(["GET"])
 def calendarioList(request):
-    calendario= Calendario.objects.all()
-    serializer=CalendarioSerializer(calendario,many=True)
+    calendario= Horario.objects.all()
+    serializer=HorarioSerializer(calendario,many=True)
     return Response(serializer.data)
 
 @api_view(["GET"])
 def calendarioDetail(request,id):
-    calendario= Calendario.objects.get(id=id)
-    serializer=CalendarioSerializer(calendario,many=False)
+    calendario= Horario.objects.get(id=id)
+    serializer=HorarioSerializer(calendario,many=False)
     return Response(serializer.data)
+
+
+class Reservar(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
+        idHorario=request.data["horario"]
+        idUsuario=request.data["usuario"]
+        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario)
+        horario=Horario.objects.get(id=idHorario)
+        if reserva.is_valid():
+            if reservado:
+                return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
+            if horario.asistentes < horario.capacidad:
+                horario.asistentes+=1
+                horario.save()
+                reserva.save()
+            else:
+                return Response(data="Horario lleno", status=status.HTTP_200_OK)
+        return Response(reserva.data, status=status.HTTP_200_OK)
 
 class ShowCalendario(FilterView):
     paginate_by = 20
     max_pages_render = 10
-    model = Calendario
+    model = Horario
     context_object_name = 'calendario'
     template_name = "templates/lista_calendario.html"
     permission_required = 'novagym.view_empleado'
@@ -69,21 +91,21 @@ class ShowCalendario(FilterView):
         return super().get(request, *args, **kwargs)
 
 class CrearCalendario(CreateView):
-    form_class =CalendarioForm
-    model=Calendario
+    form_class =HorarioForm
+    model=Horario
     template_name = 'templates/calendario_nuevo.html'
     title = "AGREGAR ACTIVIDAD"
     success_url = reverse_lazy('calendario:listar')
 
 class UpdateCalendario(UpdateView):
-    form_class =CalendarioForm
-    model=Calendario
+    form_class =HorarioForm
+    model=Horario
     title = "ACTUALIZAR ACTIVIDAD"
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listar')
 
 def deleteCalendario(request,id):
-    query = Calendario.objects.get(id=id)
+    query = Horario.objects.get(id=id)
     if request.POST:
         query.delete()
         messages.success(request, "Actividad eliminada con éxito.")
@@ -92,7 +114,7 @@ def deleteCalendario(request,id):
 
 def getHorarios(request):
     urls={}
-    horarios=Calendario.objects.all()
+    horarios=Horario.objects.all()
     for horario in horarios:
         if horario.gimnasio.nombre not in urls.keys():
             urls[horario.gimnasio.nombre]={
