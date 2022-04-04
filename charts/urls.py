@@ -9,4 +9,5 @@ urlpatterns = [
     path("listar/",listar,name="reportes"),
     path('productos/', productos_chart, name='productos'),
     path('stockChart/<int:id>', grafico_categorias, name='stockChart'),
+    path('dateChart/<fechaI>&<fechaF>', grafico_fechas, name='dateChart'),
 ]

@@ -1,14 +1,10 @@
 import sys
-
-from productos.filters import ProductoFilter
 sys.path.append("..")
 from django.shortcuts import render
 from productos.models import Categoria, Producto
+from sponsor.models import Sponsor
 from django.http import JsonResponse
-from django.core import serializers
-from django_filters.views import FilterView
-from django.views.decorators.http import require_http_methods
-
+import random as rd
 
 def listar(request):
     categorias=Categoria.objects.all()
@@ -39,6 +35,27 @@ def grafico_categorias(request, id):
         },
     })
 
+def grafico_fechas(request, fechaI,fechaF):
+    sponsors=Sponsor.objects.filter(fecha_inicio__range=[fechaI, fechaF])
+    labels=[]
+    data=[]
+    for sponsor in sponsors:
+        labels.append(sponsor.nombre)
+        data.append(rd.randint(5,20))
+    return JsonResponse({
+        'title': f'Productos vendidos por los sponsors durante {fechaI} - {fechaF}',
+        'data': {
+            'labels': labels,
+            
+            'datasets': [{
+                'label': 'Unidades',
+                'backgroundColor': "blue",
+                'borderColor': "black",
+                'data': data,
+            }]
+        },
+        })
+
 def productos_chart(request):
     labels = []
     data = []
@@ -54,21 +71,3 @@ def productos_chart(request):
         'data': data,
     })
 
-""" def postFriend(request):
-    # request should be ajax and method should be POST.
-    if request.is_ajax and request.method == "POST":
-        # get the form data
-        form = FriendForm(request.POST)
-        # save the data and after fetch the object in instance
-        if form.is_valid():
-            instance = form.save()
-            # serialize in new friend object in json
-            ser_instance = serializers.serialize('json', [ instance, ])
-            # send to client side.
-            return JsonResponse({"instance": ser_instance}, status=200)
-        else:
-            # some form errors occured.
-            return JsonResponse({"error": form.errors}, status=400)
-
-    # some error occured
-    return JsonResponse({"error": ""}, status=400) """
