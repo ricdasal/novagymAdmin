@@ -14,20 +14,79 @@ from rest_framework.views import APIView
 from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 from .filters import SponsorFilter, SucursalFilter
+import datetime
 # Create your views here.
 #SPONSOR
 
 class sponsorList(APIView):
-    def get(self, request, *args, **kwargs):
-        queryset = Sponsor.objects.all()
-        serializer = SponsorSerializer(queryset, many=True, context={"request":request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get(self, request,activo, *args, **kwargs):
+        if activo=="activo":
+            queryset = Sponsor.objects.all().filter(activo=1)
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="inactivo":
+            queryset = Sponsor.objects.all().filter(activo=0)
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="todos":
+            queryset = Sponsor.objects.all()
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="vigentes":
+            today=datetime.datetime.now().strftime("%Y-%m-%d")
+            queryset=Sponsor.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today)
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
 
+class sucursalList(APIView):
+    def get(self, request,activo, *args, **kwargs):
+        if activo=="activo":
+            queryset = Sucursal.objects.all().filter(activo=1)
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="inactivo":
+            queryset = Sucursal.objects.all().filter(activo=0)
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="todos":
+            queryset = Sucursal.objects.all()
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="vigentes":
+            today=datetime.datetime.now().strftime("%Y-%m-%d")
+            queryset=Sucursal.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today)
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
+
+class sucursalDetail(APIView):
+    def get(self, request,id, *args, **kwargs):
+        if id:
+            queryset = Sucursal.objects.all().filter(sponsor=id)
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
+
+""" class sponsorFecha(APIView):
+    def get(self, request, *args, **kwargs):
+        today=datetime.datetime.now().strftime("%Y-%m-%d")
+        if fechaI<= today <=fechaF:
+            queryset=Sponsor.objects.filter(fecha_inicio__level__lte=today).filter(fecha_fin__level__gte=today)
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(data="F",status=status.HTTP_404_NOT_FOUND) """
+            
 class sponsorDetail(APIView):
     def get(self, request,id, *args, **kwargs):
         queryset = Sponsor.objects.get(id=id)
         serializer = SponsorSerializer(queryset, many=False, context={"request":request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(["POST"])
 def sponsorCreate(request):
@@ -189,3 +248,17 @@ def ChangeState(request,pk):
             return redirect('sponsor:listar')
     return render(request, "ajax/sponsor_confirmar_change.html", {"sponsor": query})
 
+def ChangeStateSucursal(request,pk):
+    query = Sucursal.objects.get(id=pk)
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Sucursal "+query.nombre +" habilitado.")
+            query.save()
+            return redirect('sponsor:listarSucursal')
+        elif query.activo==1:
+            query.activo=0
+            messages.success(request, "Sucursal "+query.nombre +" deshabilitado.")
+            query.save()
+            return redirect('sponsor:listarSucursal')
+    return render(request, "ajax/sucursal_confirmar_change.html", {"sucursal": query})

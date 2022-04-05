@@ -11,7 +11,7 @@ def generarCodigo():
         unique_code = "SPR-"+str(random.randint(1000, 9999))
         if not Sponsor.objects.filter(codigo=unique_code):
             not_unique = False
-            return "SPR-"+str(unique_code)
+            return str(unique_code)
 
 def generarCodigoS():
     not_unique = True
@@ -19,7 +19,7 @@ def generarCodigoS():
         unique_code = "SUC-"+str(random.randint(1000, 9999))
         if not Sucursal.objects.filter(codigo=unique_code):
             not_unique = False
-            return "SUC-"+str(unique_code)
+            return str(unique_code)
 
 class Sponsor(models.Model):
     phone_regex = RegexValidator(regex=r'^(0)[1-9]{1}(\s){1}[0-9]{7}', message="Ingrese el número en el formato correcto: 04 1234567")
@@ -42,8 +42,9 @@ class Sponsor(models.Model):
     horario_apertura=models.TimeField()
     horario_cierre=models.TimeField()
     es_matriz=models.BooleanField(default=True)
-    correo=models.EmailField(max_length=20,blank=False,null=False)
-
+    correo=models.EmailField(max_length=50,blank=False,null=False)
+    class Meta:
+        ordering=('-id',)
     def __str__(self):
         return str(self.nombre)
 
@@ -68,7 +69,11 @@ class Sucursal(models.Model):
     horario_apertura=models.TimeField()
     horario_cierre=models.TimeField()
     sponsor=models.ForeignKey(Sponsor,on_delete=models.CASCADE)
-    correo=models.EmailField(max_length=40,blank=True,null=True)
-
+    correo=models.EmailField(max_length=50,blank=True,null=True)
+    activo=models.BooleanField(default=True)
+    fecha_inicio=models.DateField()
+    fecha_fin=models.DateField()
+    class Meta:
+        ordering=('-id',)
     def __str__(self):
         return str(self.nombre)

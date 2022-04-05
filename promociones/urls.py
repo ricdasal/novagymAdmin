@@ -10,5 +10,5 @@ urlpatterns = [
      path('editar/<int:pk>/', UpdatePromocion.as_view(), name='editar'),
      path('eliminar/<int:id>/', deletePromocion, name='eliminar'),
      path('changeState/<int:pk>/', ChangeState, name='changeState'),
-     path('getPromociones/', getPromociones, name='getPromociones'),
+     path('getPromociones/', getPromociones.as_view(), name='getPromociones'),
 ]

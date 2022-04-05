@@ -1,28 +1,24 @@
-import json
-from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django_filters.views import FilterView
+from httplib2 import Response
 from novagym.utils import calculate_pages_to_render
 from promociones.filters import PromocionesFilter
-from promociones.forms import PromocionesCategoriasForm, PromocionesMembresiaForm
+from promociones.forms import PromocionesForm
 from promociones.models import Promociones
 from django.views.generic import CreateView, UpdateView
+from rest_framework.views import APIView
 from django.contrib import messages
+from promociones.serializers import PublicidadSerializer
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
-def getPromociones(request):
-    promociones=Promociones.objects.all()
-    urls={}
-    for promocion in promociones:
-        urls[promocion.titulo]={
-                    "imagen":request.build_absolute_uri('/media/')+str(promocion.imagen),
-                    "fecha_hora_inicio":str(promocion.fecha_hora_inicio),
-                    "fecha_hora_fin":str(promocion.fecha_hora_fin),
-                    "categoria":str(promocion.categoria),
-                    "membresia":str(promocion.membresia),
-                    }
-    return HttpResponse(json.dumps(urls))
+class getPromociones(APIView):
+    def get(self, request, *args, **kwargs):
+        queryset=Promociones.objects.all()
+        serializer=PublicidadSerializer(queryset,many=True, context={"request":request})
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 class ListarPromociones(FilterView):
     paginate_by = 20
@@ -43,17 +39,10 @@ class ListarPromociones(FilterView):
         return super().get(request, *args, **kwargs)
     
 class CrearPromociones(CreateView):
-    form_class =PromocionesCategoriasForm
+    form_class =PromocionesForm
     model=Promociones
     template_name = 'promocion_nuevo.html'
-    title = "CREAR PROMOCION"
-    success_url = reverse_lazy('promociones:listar')
-
-class CrearPromociones(CreateView):
-    form_class =PromocionesMembresiaForm
-    model=Promociones
-    template_name = 'promocion_nuevo.html'
-    title = "CREAR PROMOCION"
+    title = "AGREGAR PUBLICIDAD"
     success_url = reverse_lazy('promociones:listar')
 
 def deletePromocion(request,id):
@@ -66,19 +55,23 @@ def deletePromocion(request,id):
     return render(request, "ajax/promocion_confirmar_elminar.html", {"promocion": query})
 
 class UpdatePromocion(UpdateView):
-    form_class =PromocionesCategoriasForm
+    form_class =PromocionesForm
     model=Promociones
-    title = "ACTUALIZAR PROMOCIÓN"
+    title = "ACTUALIZAR PUBLICIDAD"
     template_name = 'promocion_nuevo.html'
     success_url = reverse_lazy('promociones:listar')
 
 def ChangeState(request,pk):
     query = Promociones.objects.get(id=pk)
-    if query.activo==0:
-        query.activo=1
-        messages.success(request, "Promocion "+query.titulo +" habilitada.")
-    elif query.activo==1:
-        query.activo=0
-        messages.error(request, "Promocion "+query.titulo +" deshabilitada.")
-    query.save()
-    return redirect('promociones:listar')
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Publicidad habilitada.")
+            query.save()
+            return redirect('promociones:listar')
+        elif query.activo==1:
+            query.activo=0
+            messages.success(request, "Publicidad deshabilitada.")
+            query.save()
+            return redirect('promociones:listar')
+    return render(request, "ajax/promocion_confirmar_change.html", {"promocion": query})
