@@ -1,18 +1,18 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Estado del sponsor</h5>
+  <h5 class="modal-title" id="ordenTitle">Estado de la sucursal</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% csrf_token %}
-<form method="POST" action="{% url 'sponsor:change' sponsor.pk %}">
+<form method="POST" action="{% url 'sponsor:changeSucursal' sucursal.pk %}">
   {% csrf_token %}
 
   <div class="modal-body">
-    {% if sponsor.activo %}
-    ¿Desea desactivar el siguiente sponsor?
+    {% if sucursal.activo %}
+    ¿Desea desactivar la siguiente sucursal?
     {% else %}
-    ¿Desea activar el siguiente sponsor?
+    ¿Desea activar la siguiente sucursal?
     {% endif %}
    
     <div class="row">
@@ -20,7 +20,7 @@
         Código
       </div>
       <div class="col">
-        {{sponsor.codigo}}
+        {{sucursal.codigo}}
       </div>
     </div>
     <div class="row">
@@ -28,7 +28,7 @@
         Nombre
       </div>
       <div class="col">
-        {{sponsor.nombre}}
+        {{sucursal.nombre}}
       </div>
     </div>
     <div class="row">
@@ -36,7 +36,7 @@
         Descripción
       </div>
       <div class="col">
-        {{sponsor.descripcion}}
+        {{sucursal.descripcion}}
       </div>
     </div>
     <div class="row">
@@ -44,14 +44,14 @@
         Imagen
       </div>
       <div class="col">
-        <img src="/media/{{sponsor.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="/media/{{sucursal.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    {% if sponsor.activo %}
+    {% if sucursal.activo %}
     <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
     {% else %}
     <button id="anular" class="btn btn-success mr-3" type="submit">Activar</button>

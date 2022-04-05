@@ -11,7 +11,9 @@ class Categoria(models.Model):
     nombre = models.CharField(max_length=24)
     imagen = models.ImageField(upload_to="categoriasProductos/",
                                null=True, blank=True, default="images/no_image.png")
-
+                               
+    class Meta:
+        ordering=('-id',)
     def __str__(self):
         return self.nombre
 
@@ -19,10 +21,10 @@ class Categoria(models.Model):
 def generarCodigo():
     not_unique = True
     while not_unique:
-        unique_code = random.randint(1000, 9999)
+        unique_code = "PDT-"+str(random.randint(1000, 9999))
         if not Producto.objects.filter(codigo=unique_code):
             not_unique = False
-            return "PDT"+"-"+str(unique_code)
+            return str(unique_code)
 
 
 class Producto(models.Model):
@@ -47,14 +49,15 @@ class Producto(models.Model):
     codigo = models.CharField(
         max_length=20, unique=True, default=generarCodigo, editable=False)
     nombre = models.CharField(max_length=24, unique=True)
-    descripcion = models.CharField(max_length=255)
+    descripcion = models.CharField(max_length=130)
     imagen=models.ImageField(upload_to="productos/", null=False, blank=False,default="images/no_image.png")
     categoria=models.ForeignKey(Categoria, on_delete=models.PROTECT)
     talla = models.CharField(max_length=3, choices=Talla.choices)
     presentacion = models.CharField(
         max_length=10, choices=Presentacion.choices)
     usaNovacoins = models.BooleanField()
-
+    class Meta:
+        ordering=('-id',)
     @property
     def descuento_activo(self):
         try:

@@ -372,7 +372,6 @@ class UpdateProducto(UpdateView):
             messages.success(self.request, "Actualización exitosa!")
 
         except DatabaseError as err:
-            print(err)
             messages.error(self.request, "Ooops!  Algo salio mal...")
         return redirect(reverse("productos:listarProductos"))
 

@@ -48,6 +48,39 @@
       </div>
     </div>
   </div>
+
+
+  <div class="card">
+    <div class="card-header" id="heading2">
+      <h5 class="mb-0">
+        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse2"
+          aria-expanded="true" aria-controls="collapse2">
+          Stock de productos
+        </button>
+      </h5>
+    </div>
+
+    <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent="#accordion">
+      <div class="card-body">
+        <form action="">
+            <p>Seleccione un rango de fechas</p>
+            <input type="date" id="fechaI" required>
+            <input type="date" id="fechaF" required>
+            <a id="botonFecha" class="btn btn-primary">Buscar</a>
+        </form>
+        <div id="container" style="width: 75%;">
+
+          <canvas id="chartCanvas2" data-url="{% url 'charts:productos' %}">
+
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
 </div>
 {% endblock main %}
 
@@ -59,21 +92,43 @@
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script>
 
+  $("#botonFecha").click(function () {
+    try {
+      dateChart.destroy();
+    } catch { }
+    var ctx2 = document.getElementById("chartCanvas2").getContext("2d");
+    dateChart = new Chart(ctx2, {
+      type: 'bar',
+      options: {
+        responsive: true,
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+      }
+    });
+    crearChart("/reportes/dateChart/"+$("#fechaI").val()+"&"+$("#fechaF").val(), dateChart);
+  });
   $("#categorias").change(function () {
-    try{
-      chart.destroy(); 
-    }catch{}
+    try {
+      categoriaChart.destroy();
+    } catch { }
+    var ctx = document.getElementById("chartCanvas").getContext("2d");
+    categoriaChart = new Chart(ctx, {
+      type: 'bar',
+      options: {
+        responsive: true,
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
+      }
+    });
+
+    crearChart("/reportes/stockChart/" + $("#categorias option:selected").val(), categoriaChart);
+  });
+
+  function crearChart(link, chart) {
     $.ajax({
-      url: "/reportes/stockChart/" + $("#categorias option:selected").val(),
+      url: link,
       type: "GET",
       dataType: "json",
       success: (jsonResponse) => {
-        var ctx = document.getElementById("chartCanvas").getContext("2d");
-        chart = new Chart(ctx, { type: 'bar',
-          options: {
-            responsive: true,
-            scales:{yAxes:[{ticks:{beginAtZero: true}}]}
-          }});
+
         const title = jsonResponse.title;
         const labels = jsonResponse.data.labels;
         const datasets = jsonResponse.data.datasets;
@@ -89,7 +144,7 @@
       },
       error: () => console.log("Failed to fetch chart data from " + endpoint + "!")
     });
-  });
+  };
 </script>
 
 <script>
