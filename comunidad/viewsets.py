@@ -63,7 +63,9 @@ class PublicacionView(viewsets.ViewSet):
         publicaciones = list(publicaciones_admin) + list(publicaciones_user)
 
         paginator = PageNumberPagination()
-        paginator.page_size = 10
+        q_perPage = request.GET.get('perPage')
+        perPage = q_perPage if request.GET.get('perPage') and int(q_perPage) > 0 else 10
+        paginator.page_size = perPage
         result = paginator.paginate_queryset(publicaciones, request)
 
         serializer = PublicacionSerializer(result, many=True)
@@ -429,6 +431,15 @@ class HistoriaView(viewsets.ViewSet):
             "apellidos": detalle.apellidos,
             "foto_perfil": detalle.imagen.url if detalle.imagen else None,
         }
+
+    def retrieve(self, request, pk):
+        try:
+            historias = Historia.objects.filter(usuario=request.user)
+            data = usuario_detalle(request.user.id)
+            data.update({"historias": HistoriaSerializer(historias, many=True).data})
+            return Response(data, status=status.HTTP_200_OK)
+        except Historia.DoesNotExist:
+            return Response({"message": "Historias no encontradas"}, status=status.HTTP_404_NOT_FOUND)
 
     def list(self, request):
         historias = []
