@@ -5,7 +5,7 @@ class PromocionesFilter(django_filters.FilterSet):
         model = Promociones
         fields = ['id',
                   'titulo',
-                  'categoria',
-                  'membresia',
+                    'fecha_hora_inicio',
+                    'fecha_hora_fin',
                   'activo'
                   ]

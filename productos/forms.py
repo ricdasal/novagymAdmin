@@ -42,7 +42,7 @@ class ProductoForm(forms.ModelForm):
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
-            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15,'maxlength': '130'}),
         }
 
     def __init__(self, *args, **kwargs):

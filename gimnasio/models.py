@@ -28,5 +28,7 @@ class Gimnasio(models.Model):
     personas= models.PositiveIntegerField(null=True, blank=True)
     latitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
     longitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
+    class Meta:
+        ordering=('-id',)
     def __str__(self):
         return self.nombre +"-"+self.ciudad

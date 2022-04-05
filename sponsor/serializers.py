@@ -7,7 +7,7 @@ class SucursalSerializer(ModelSerializer):
     imagen= ImageField(max_length=None, use_url=True, allow_null=True, required=False)
     class Meta:
         model = Sucursal
-        fields = ('id','codigo', 'direccion', 'nombre', 'telefono','celular','imagen','horario_apertura','horario_cierre','correo')
+        fields = ('id','codigo', 'direccion', 'nombre', 'telefono','celular','imagen','sponsor','horario_apertura','horario_cierre','correo',"activo",'fecha_inicio','fecha_fin')
 
 class SponsorSerializer(ModelSerializer):
     sucursal_set = SucursalSerializer(read_only=True, many=True)

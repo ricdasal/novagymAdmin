@@ -20,7 +20,7 @@ def generarCodigoMaquina():
         unique_code = "MCN-"+str(random.randint(1000, 9999))
         if not MaquinaReserva.objects.filter(codigo=unique_code):
             not_unique = False
-            return "MCN-"+str(unique_code)
+            return str(unique_code)
 
 class Horario(models.Model):
     id = models.AutoField(primary_key=True)
