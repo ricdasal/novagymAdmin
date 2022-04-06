@@ -70,23 +70,15 @@
             <p>Aforo: {{gimnasio.personas}}</p>
           </td>
           <td>
-            {% if gimnasio.estado == True %}
-            <span class="text-success">Activo</span>
-            {%else%}
-            <span class="text-danger">Inactivo</span>
-            {%endif%}
+            <input type="checkbox" {%if gimnasio.estado%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{%url 'gimnasio:changeState' gimnasio.id %}"
+            data-url-eliminar="{%url 'gimnasio:changeState' gimnasio.id %}"
+            >
           </td>
           <td>
             <a href="{% url 'gimnasio:update' gimnasio.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-
-            {% if gimnasio.estado == True %}
-            <a class="btn btn-sm btn-success" href="{% url 'gimnasio:changeState' gimnasio.id %}"><i
-                class="fas fa-power-off "></i></a>
-            {%else%}
-            <a class="btn btn-sm btn-danger" href="{% url 'gimnasio:changeState' gimnasio.id %}"><i
-                class="fas fa-power-off "></i></a>
-            {%endif%}
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
               data-url="{% url 'gimnasio:eliminar' gimnasio.id %}" href="#">
               <i class="fas fa-times "></i></a>
@@ -103,6 +95,14 @@
     </table>
     {% include "pagination.html" %}
   </div>
+  <hr width="100%" />
+  <div class="col-12">
+    <div class="d-flex justify-content-around">
+      <p><b>Total de gimnasios: </b> {{total}} </p>
+      <p><b>Activos: </b> {{activos}} </p>
+      <p><b>Inactivos: </b> {{inactivos}} </p>
+    </div>
+  </div>
 </div>
 {% endblock main %}
 
@@ -112,6 +112,7 @@
 <script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

@@ -17,7 +17,7 @@ class Gimnasio(models.Model):
     nombre = models.CharField(max_length=24,unique=True)
     imagen = models.ImageField(upload_to="gimnasios/", null=True, blank=True,default="images/no_image.png")
     telefono = models.CharField(validators=[phone_regex], max_length=10, blank=True,null=True)
-    celular = models.CharField(validators=[mobile_regex], max_length=10, blank=True,null=True)
+    celular = models.CharField(validators=[mobile_regex], max_length=10, blank=False,null=True)
     ubicacion = models.CharField(max_length=40)
     horario_inicio = models.TimeField(blank=False,null=False)
     horario_fin = models.TimeField(blank=False,null=False)

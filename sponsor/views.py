@@ -1,7 +1,6 @@
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
@@ -19,7 +18,7 @@ import datetime
 #SPONSOR
 
 class sponsorList(APIView):
-    def get(self, request,activo, *args, **kwargs):
+    def get(self, request,activo=None, *args, **kwargs):
         if activo=="activo":
             queryset = Sponsor.objects.all().filter(activo=1)
             serializer = SponsorSerializer(queryset, many=True, context={"request":request})
@@ -37,11 +36,15 @@ class sponsorList(APIView):
             queryset=Sponsor.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today)
             serializer = SponsorSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
+        elif activo==None:
+            queryset=Sponsor.objects.all()
+            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
         else:
             return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
 
 class sucursalList(APIView):
-    def get(self, request,activo, *args, **kwargs):
+    def get(self, request,activo=None, *args, **kwargs):
         if activo=="activo":
             queryset = Sucursal.objects.all().filter(activo=1)
             serializer = SucursalSerializer(queryset, many=True, context={"request":request})
@@ -59,6 +62,10 @@ class sucursalList(APIView):
             queryset=Sucursal.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today)
             serializer = SucursalSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
+        elif activo==None:
+            queryset=Sucursal.objects.all()
+            serializer = SucursalSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
         else:
             return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
 
@@ -70,16 +77,6 @@ class sucursalDetail(APIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
-
-""" class sponsorFecha(APIView):
-    def get(self, request, *args, **kwargs):
-        today=datetime.datetime.now().strftime("%Y-%m-%d")
-        if fechaI<= today <=fechaF:
-            queryset=Sponsor.objects.filter(fecha_inicio__level__lte=today).filter(fecha_fin__level__gte=today)
-            serializer = SponsorSerializer(queryset, many=True, context={"request":request})
-            return Response(data=serializer.data,status=status.HTTP_200_OK)
-        else:
-            return Response(data="F",status=status.HTTP_404_NOT_FOUND) """
             
 class sponsorDetail(APIView):
     def get(self, request,id, *args, **kwargs):
@@ -87,32 +84,6 @@ class sponsorDetail(APIView):
         serializer = SponsorSerializer(queryset, many=False, context={"request":request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-@api_view(["POST"])
-def sponsorCreate(request):
-    serializer=SponsorSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["POST"])
-def sponsorUpdate(request,id):
-    sponsor= Sponsor.objects.get(id=id)
-    serializer=SponsorSerializer(instance=sponsor,data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["DELETE"])
-def sponsorDelete(request,id):
-    sponsor= Sponsor.objects.get(id=id)
-    try:
-        sponsor.delete()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def createSponsor(request):
     if request.method=='POST':
@@ -136,6 +107,9 @@ class ListarSponsors(FilterView):
         context = super().get_context_data(**kwargs)
         context['title'] = "ANUNCIANTES"
         page_obj = context["page_obj"]
+        context["total"]=Sponsor.objects.all().count()
+        context["activos"]=Sponsor.objects.filter(activo=True).count()
+        context["inactivos"]=Sponsor.objects.filter(activo=False).count()
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
 
@@ -188,6 +162,9 @@ class ListarSucursales(FilterView):
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         context['sponsors'] = Sponsor.objects.all()
+        context["total"]=Sucursal.objects.all().count()
+        context["activos"]=Sucursal.objects.filter(activo=True).count()
+        context["inactivos"]=Sucursal.objects.filter(activo=False).count()
         return context
 
     def filtering(self, request, *args, **kwargs):
@@ -196,7 +173,10 @@ class ListarSucursales(FilterView):
             return data
 
     def get_queryset(self):
-        return self.model.objects.filter(sponsor=self.filtering(self.request))
+        filtro=self.filtering(self.request)
+        if filtro=='all':
+            return self.model.objects.all()
+        return self.model.objects.filter(sponsor=filtro)
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)

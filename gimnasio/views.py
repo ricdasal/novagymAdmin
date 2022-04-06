@@ -74,6 +74,9 @@ class ListarGimnasio(FilterView):
         context = super().get_context_data(**kwargs)
         context['title'] = "GIMNASIOS"
         page_obj = context["page_obj"]
+        context["total"]=Gimnasio.objects.all().count()
+        context["activos"]=Gimnasio.objects.filter(estado=True).count()
+        context["inactivos"]=Gimnasio.objects.filter(estado=False).count()
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
 
@@ -140,12 +143,18 @@ def deleteGimnasio(request,id):
 
 def changeState(request,pk):
     gimnasio=Gimnasio.objects.get(id=pk)
-    if gimnasio.estado:
-        gimnasio.estado=False
-    else:
-        gimnasio.estado=True
-    gimnasio.save()
-    return redirect('gimnasio:listar')
+    if request.POST:
+        if gimnasio.estado:
+            gimnasio.estado=False
+            messages.error(request, "Gimnasio "+gimnasio.nombre +" deshabilitado.")
+            gimnasio.save()
+            return redirect('gimnasio:listar')
+        else:
+            gimnasio.estado=True
+            messages.success(request, "Gimnasio "+gimnasio.nombre +" habilitado.")
+            gimnasio.save()
+            return redirect('gimnasio:listar')
+    return render(request, "ajax/gimnasio_confirmar_change.html", {"gimnasio": gimnasio})
 
 def changeAforo(request):
     gimnasios=Gimnasio.objects.all()

@@ -17,6 +17,7 @@
   <form action="{% url 'sponsor:listarSucursal' %}" method="get">
     <select class="form-control" name="sucursales" id="sucursales">
       <option value="inicial" selected disabled>Seleccione una sucursal</option>
+      <option value="all">Todas las sucursales</option>
       {% if sponsors %}
       {% for sponsor in sponsors %}
       <option value="{{ sponsor.id }}">{{ sponsor.nombre }}</option>
@@ -101,6 +102,14 @@
       </tbody>
     </table>
     {% include "pagination.html" %}
+  </div>
+  <hr width="100%" />
+  <div class="col-12">
+    <div class="d-flex justify-content-around">
+      <p><b>Total de sucursales: </b> {{total}} </p>
+      <p><b>Activas: </b> {{activos}} </p>
+      <p><b>Inactivas: </b> {{inactivos}} </p>
+    </div>
   </div>
 </div>
 {% endblock main %}
