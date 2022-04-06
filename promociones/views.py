@@ -1,7 +1,9 @@
+import datetime
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django_filters.views import FilterView
 from httplib2 import Response
+import pytz
 from novagym.utils import calculate_pages_to_render
 from promociones.filters import PromocionesFilter
 from promociones.forms import PromocionesForm
@@ -15,10 +17,30 @@ from rest_framework import status
 # Create your views here.
 
 class getPromociones(APIView):
-    def get(self, request, *args, **kwargs):
-        queryset=Promociones.objects.all()
-        serializer=PublicidadSerializer(queryset,many=True, context={"request":request})
-        return Response(data=serializer.data, status=status.HTTP_200_OK)
+    def get(self, request,activo=None, *args, **kwargs):
+        if activo=="activo":
+            queryset = Promociones.objects.all().filter(activo=1)
+            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="inactivo":
+            queryset = Promociones.objects.all().filter(activo=0)
+            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="todos":
+            queryset = Promociones.objects.all()
+            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        elif activo=="vigentes":
+            today=datetime.datetime.now(tz=pytz.utc).strftime("%Y-%m-%dT%H:%M")
+            queryset=Promociones.objects.filter(fecha_hora_inicio__lte=today).filter(fecha_hora_fin__gte=today)
+            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        elif activo==None:
+            queryset=Promociones.objects.all()
+            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
 
 class ListarPromociones(FilterView):
     paginate_by = 20

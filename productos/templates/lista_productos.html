@@ -12,10 +12,10 @@
 
     <a href="{% url 'productos:listarCategoria' %}" class="btn btn-primary float-right">Ver categorías <i
         class="fas fa-plus-circle"> </i></a>
- 
+
     <a href="{% url 'productos:CrearProducto' %}" class="btn btn-primary float-right" style="margin-right: 1%;">Agregar
       producto <i class="fas fa-plus-circle"> </i></a>
- 
+
 
   </div>
   <hr>
@@ -55,8 +55,8 @@
           {% else %}
           <p>NovaCoins: {{ inventario.novacoins }} NC</p>
           {% endif %}
-          {% for descuento in producto.productodescuento_set.all %}
-            <p>Descuento: {{ descuento.porcentaje_descuento }}%</p>
+          {% for descuento in producto.descuentos.all %}
+          <p>Descuento: {{ descuento.porcentaje_descuento }}%</p>
           {% endfor %}
         </td>
         <td>
@@ -77,6 +77,14 @@
       {% endif %}
     </table>
     {% include "pagination.html" %}
+  </div>
+  <hr width="100%" />
+  <div class="col-12">
+    <div class="d-flex justify-content-around">
+      <p><b>Total de productos: </b> {{total}} </p>
+      <p><b>Precio en dólares ($): </b> {{usaDolares}} </p>
+      <p><b>Precio en Novacoins (NC): </b> {{usanNovacoins}} </p>
+    </div>
   </div>
 </div>
 {% endblock main %}

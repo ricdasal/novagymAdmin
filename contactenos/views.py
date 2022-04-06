@@ -1,6 +1,4 @@
 from email.mime.image import MIMEImage
-import json
-import os
 from django.template import loader
 from django.shortcuts import render
 from django.shortcuts import render, redirect
@@ -10,14 +8,11 @@ from contactenos.filters import BuzonFilter
 from novagym.utils import calculate_pages_to_render
 from .forms import *
 from django.core.mail import send_mail, BadHeaderError, mail_admins, EmailMultiAlternatives
-from django.http import HttpResponse
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from backend.settings import env
 from django.contrib import messages
-from seguridad.models import UserDetails
-from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from .serializers import BuzonSerializer
 from rest_framework.views import APIView
@@ -124,11 +119,11 @@ def mailContent(request,body,file):
     return template.render({"body": body})
 
 def logo_data():
-    with open('./static/images/logoBlack.png', 'rb') as f:
+    with open("./static/images/logoBlack.png", "rb") as f:
         logo_data = f.read()
-    logo = MIMEImage(logo_data)
-    logo.add_header('Content-ID', '<logo>')
-    return logo
+        logo = MIMEImage(logo_data)
+        logo.add_header('Content-ID', '<logo>')
+        return logo
 
 def readMail(request,id):
     query = Buzon.objects.get(id=id)
