@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from productos.filters import CategoriaFilter, ProductoFilter
@@ -217,6 +217,13 @@ class UpdateProducto(UpdateView):
             return redirect(reverse("productos:listarProductos"))
 
 
+class Reportes(TemplateView):
+    template_name="reportes.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Reportes de productos"
+        context['list_url']=reverse_lazy('productos:reportes')
+        return context
     
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)

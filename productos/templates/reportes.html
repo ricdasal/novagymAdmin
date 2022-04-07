@@ -1,0 +1,99 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+
+<div class="row mt-4">
+    <div class="col">
+        <h2 class="text-left">{{title}}</h2>
+    </div>
+
+    <div class="col-12">
+
+
+
+        <a href="" class="btn btn-primary float-right" style="margin-right: 1%;">boton
+            <i class="fas fa-file-alt"></i></a>
+    </div>
+    <hr>
+</div>
+<div class="row mt-4 justify-content-left">
+
+    <div class="col-3">
+        <label for="daterange">Rango de fechas:</label>
+        <input type="text" class="form-control pull-right" name="daterange" />
+    </div>
+    <div class="col-12 table-container">
+        <table class="table table-responsive-lg table-condensed table-hover text-left" id="reportes">
+            <thead>
+                <tr>
+                    <th scope="col">Nº de comprobante</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Fecha</th>
+                    <th scope="col">Subtotal</th>
+                    <th scope="col">IVA</th>
+                    <th scope="col">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>valor 1</td>
+                    <td>valor 1</td>
+                    <td>valor 1</td>
+                    <td>valor 1</td>
+                    <td>valor 1</td>
+                    <td>valor 1</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    {% endblock main %}
+
+    {% block specific_scripts %}
+    <script>
+        $(function () {
+            var d = new Date();
+            var day = d.getDate
+            $('input[name="daterange"]').daterangepicker({
+                "locale": {
+                    "applyLabel": "Aceptar",
+                    "cancelLabel": "Cancelar",
+                    "daysOfWeek": [
+                        "Lu",
+                        "Ma",
+                        "Mi",
+                        "Ju",
+                        "Vi",
+                        "Sá",
+                        "Do"
+                    ],
+                    "monthNames": [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                },
+                opens: 'left',
+                startDate: day,
+                endDate: moment().add('days', 7).format('L')
+            }, function (start, end, label) {
+            });
+        });
+
+        $(document).ready(function () {
+            $('#reportes').DataTable();
+        });
+    </script>
+    {% endblock %}
