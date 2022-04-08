@@ -89,6 +89,14 @@
     </table>
     {% include "pagination.html" %}
   </div>
+  <hr width="100%" />
+  <div class="col-12">
+    <div class="d-flex justify-content-around">
+      <p><b>Total de anunciantes: </b> {{total}} </p>
+      <p><b>Activos: </b> {{activos}} </p>
+      <p><b>Inactivos: </b> {{inactivos}} </p>
+    </div>
+  </div>
 </div>
 {% endblock main %}
 

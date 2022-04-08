@@ -1,193 +1,18 @@
-from email import message
 import json
 from django.db import DatabaseError
-from django.forms import formset_factory, inlineformset_factory
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from rest_framework.decorators import api_view
-from rest_framework import status
-from rest_framework.response import Response
 from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from productos.filters import CategoriaFilter, ProductoFilter
 from productos.forms import *
 from .serializers import *
-from django.core.mail import send_mail
 from django.contrib import messages
 from .models import *
 # Create your views here.
-#Send email
-def enviarCorreo(request):
-    if request.method=="POST":
-        titulo=request.POST["titulo"]
-        receptor=request.POST["receptor"]
-        mensaje=request.POST["mensaje"]
-        send_mail(titulo,mensaje,receptor,["admin@novagym.com"])
-        return render(request,"template.html",{})
-
-#PRODUCTO
-
-@api_view(["GET"])
-def productoList(request):
-    producto= Producto.objects.all()
-    serializer=ProductoSerializer(producto,many=True)
-    return Response(serializer.data)
-
-@api_view(["GET"])
-def productoDetail(request,id):
-    producto= Producto.objects.get(id=id)
-    serializer=ProductoSerializer(producto,many=False)
-    return Response(serializer.data)
-
-@api_view(["POST"])
-def productoCreate(request):
-    serializer=ProductoSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["POST"])
-def productoUpdate(request,id):
-    producto= Producto.objects.get(id=id)
-    serializer=ProductoSerializer(instance=producto,data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["DELETE"])
-def productoDelete(request,id):
-    producto= Producto.objects.get(id=id)
-    try:
-        producto.delete()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-#Categoria
-
-@api_view(["GET"])
-def categoriaList(request):
-    categoria= Categoria.objects.all()
-    serializer=CategoriaSerializer(categoria,many=True)
-    return Response(serializer.data)
-
-@api_view(["GET"])
-def categoriaDetail(request,id):
-    categoria= Categoria.objects.get(id=id)
-    serializer=CategoriaSerializer(categoria,many=False)
-    return Response(serializer.data)
-
-@api_view(["POST"])
-def categoriaCreate(request):
-    serializer=CategoriaSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["POST"])
-def categoriaUpdate(request,id):
-    categoria= Categoria.objects.get(id=id)
-    serializer=CategoriaSerializer(instance=categoria,data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["DELETE"])
-def categoriaDelete(request,id):
-    categoria= Categoria.objects.get(id=id)
-    try:
-        categoria.delete()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-#Inventario
-
-@api_view(["GET"])
-def inventarioList(request):
-    inventario= Inventario.objects.all()
-    serializer=InventarioSerializer(inventario,many=True)
-    return Response(serializer.data)
-
-@api_view(["GET"])
-def inventarioDetail(request,id):
-    inventario= Inventario.objects.get(id=id)
-    serializer=InventarioSerializer(inventario,many=False)
-    return Response(serializer.data)
-
-@api_view(["POST"])
-def inventarioCreate(request):
-    serializer=InventarioSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["POST"])
-def inventarioUpdate(request,id):
-    inventario= Inventario.objects.get(id=id)
-    serializer=InventarioSerializer(instance=inventario,data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["DELETE"])
-def inventarioDelete(request,id):
-    inventario= Inventario.objects.get(id=id)
-    try:
-        inventario.delete()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-#ProductoDescuento
-
-@api_view(["GET"])
-def descuentoList(request):
-    descuento= ProductoDescuento.objects.all()
-    serializer=ProductoDescuentoSerializer(descuento,many=True)
-    return Response(serializer.data)
-
-@api_view(["GET"])
-def descuentoDetail(request,id):
-    descuento= ProductoDescuento.objects.get(id=id)
-    serializer=ProductoDescuentoSerializer(descuento,many=False)
-    return Response(serializer.data)
-
-@api_view(["POST"])
-def descuentoCreate(request):
-    serializer=ProductoDescuentoSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["POST"])
-def descuentoUpdate(request,id):
-    descuento= ProductoDescuento.objects.get(id=id)
-    serializer=ProductoDescuentoSerializer(instance=descuento,data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(["DELETE"])
-def descuentoDelete(request,id):
-    descuento= ProductoDescuento.objects.get(id=id)
-    try:
-        descuento.delete()
-        return Response(status=status.HTTP_200_OK)
-    except:
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def createCategoria(request):
     if request.method=='POST':
@@ -283,6 +108,9 @@ class ListarProductos(FilterView):
         context = super().get_context_data(**kwargs)
         context['title'] = "Productos"
         page_obj = context["page_obj"]
+        context["total"]=Producto.objects.count()
+        context["usanNovacoins"]=Producto.objects.filter(usaNovacoins=True).count()
+        context["usaDolares"]=Producto.objects.filter(usaNovacoins=False).count()
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
         

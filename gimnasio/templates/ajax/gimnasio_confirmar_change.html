@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Estado del gimnasio</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+<form method="POST" action="{% url 'gimnasio:changeState' gimnasio.id %}">
+  {% csrf_token %}
+
+  <div class="modal-body">
+    {% if gimnasio.estado %}
+    ¿Desea desactivar el siguiente gimnasio?
+    {% else %}
+    ¿Desea activar el siguiente gimnasio?
+    {% endif %}
+   
+    <div class="row">
+      <div class="col-3">
+        Nombre
+      </div>
+      <div class="col">
+        {{gimnasio.nombre}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Ciudad
+      </div>
+      <div class="col">
+        {{gimnasio.ciudad}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Ubicación
+      </div>
+      <div class="col">
+        {{gimnasio.ubicacion}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Imagen
+      </div>
+      <div class="col">
+        <img src="/media/{{gimnasio.imagen}}" style="width: 100px;height: 100px;" alt="">
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    {% if gimnasio.estado %}
+    <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
+    {% else %}
+    <button id="anular" class="btn btn-success mr-3" type="submit">Activar</button>
+    {% endif %}
+  </div>
+</form>
