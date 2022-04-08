@@ -20,33 +20,17 @@
 </div>
 <div class="row mt-4 justify-content-left">
 
-    <div class="col-3">
-        <label for="daterange">Rango de fechas:</label>
-        <input type="text" class="form-control pull-right" name="daterange" />
+    <div class="col-3" style="margin-bottom: 2%;">
+        <form id="theForm" method="POST">
+            <label for="daterange">Rango de fechas:</label>
+            <input type="text" class="form-control pull-right" id="daterange" name="daterange" />
+            <input class="btn btn-primary float-right" style="margin-top: 2%;margin-left: 2%;" type="submit" id="boton" value="Filtrar">
+            <input class="btn btn-primary float-right" style="margin-top: 2%;" type="submit" id="todo" value="Ver todo">
+        </form>
     </div>
-    <div class="col-12 table-container">
-        <table class="table table-responsive-lg table-condensed table-hover text-left" id="reportes">
-            <thead>
-                <tr>
-                    <th scope="col">Nº de comprobante</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Subtotal</th>
-                    <th scope="col">IVA</th>
-                    <th scope="col">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>valor 1</td>
-                    <td>valor 1</td>
-                    <td>valor 1</td>
-                    <td>valor 1</td>
-                    <td>valor 1</td>
-                    <td>valor 1</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="col-12 table-container" id="tableContainer">
+
+        {% include 'ajax/tableBody.html' %}
     </div>
 
 
@@ -88,12 +72,102 @@
                 opens: 'left',
                 startDate: day,
                 endDate: moment().add('days', 7).format('L')
-            }, function (start, end, label) {
             });
         });
-
-        $(document).ready(function () {
-            $('#reportes').DataTable();
+        $('#todo').click(function () {
+            location.reload();
         });
+        $(document).ready(function () {
+            var table = $('#reportes').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ],
+                buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
+                    titleAttr: 'Excel',
+                    className: 'btn btn-success btn-flat btn-xs'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'Descargar pdf <i class="fas fa-file-pdf"></i>',
+                    titleAttr: 'Pdf',
+                    className: 'btn btn-danger btn-flat btn-xs'
+                },
+                {
+                    extend: 'print',
+                    text: 'Imprimir <i class="fas fa-print"></i>',
+                    titleAttr: 'Print',
+                    className: 'btn btn-secondary btn-flat btn-xs'
+                },
+            ],
+                language: {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entrada(s)",
+                    "infoEmpty": "Mostrando 0 entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ entradas totales)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                
+            });
+
+
+            $('#theForm').submit(function (event) {
+                //$( "#tableContainer" ).html('').load( "{% url 'productos:update_items' %}" );
+                event.preventDefault()
+                $.ajax({
+                    // get the form data
+                    data: $(this).serializeArray(),
+                    url: "{% url 'productos:dateFilter' %}",
+
+                    // on success
+                    success: function (response) {
+                        table.clear().draw();
+                        entradas = Object.keys(response["items"])
+                        items = response["items"]
+                        for (var i = 0; i < entradas.length; i++) {
+                            console.log(items[i]);
+                            table.row.add([
+                                items[i]["id"],
+                                items[i]["nombre"],
+                                items[i]["fecha_inicio"],
+                                1,
+                                2,
+                                2
+                            ]);
+                        }
+                        table.draw();
+                        $('#boton').prop("disabled", false);
+                    },
+                    // on error
+                    error: function (response) {
+                        // alert the error if any error occured
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+
+                return false;
+            });
+
+
+        });
+
+
+
     </script>
     {% endblock %}

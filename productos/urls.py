@@ -23,4 +23,8 @@ urlpatterns = [
      path('listarCategoria/', ListarCategoria.as_view(), name='listarCategoria'),
      path('crearCategoria/', crearCategoria.as_view(), name='crearCategoria'),
      path('editarCategoria/<str:pk>', editarCategoria.as_view(), name='editarCategoria'),
+
+     #AJAX
+     path('dateFilter/', dateRangeFilter, name='dateFilter'),
+     path('update_items/', update_items, name='update_items'),
 ]
