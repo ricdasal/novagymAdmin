@@ -289,7 +289,7 @@ class Comentario(models.Model):
 class Historia(models.Model):
 
     class Meta:
-        ordering = ['-fecha_creacion']
+        ordering = ['fecha_creacion']
 
     class MediaType(models.TextChoices):
         IMAGE = 'IMG', 'Imagen'
