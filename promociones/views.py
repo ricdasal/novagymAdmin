@@ -52,7 +52,7 @@ class ListarPromociones(FilterView):
     filterset_class=PromocionesFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "PROMOCIONES"
+        context['title'] = "PUBLICIDAD"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
@@ -64,8 +64,11 @@ class CrearPromociones(CreateView):
     form_class =PromocionesForm
     model=Promociones
     template_name = 'promocion_nuevo.html'
-    title = "AGREGAR PUBLICIDAD"
     success_url = reverse_lazy('promociones:listar')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "AGREGAR ANUNCIO"
+        return context
 
 def deletePromocion(request,id):
     query = Promociones.objects.get(id=id)
@@ -79,9 +82,12 @@ def deletePromocion(request,id):
 class UpdatePromocion(UpdateView):
     form_class =PromocionesForm
     model=Promociones
-    title = "ACTUALIZAR PUBLICIDAD"
     template_name = 'promocion_nuevo.html'
     success_url = reverse_lazy('promociones:listar')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "EDITAR ANUNCIO"
+        return context
 
 def ChangeState(request,pk):
     query = Promociones.objects.get(id=pk)

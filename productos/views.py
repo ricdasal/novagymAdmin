@@ -1,17 +1,22 @@
 import json
 from django.db import DatabaseError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.core.serializers import serialize
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from productos.filters import CategoriaFilter, ProductoFilter
 from productos.forms import *
+from sponsor.filters import SponsorFilter
 from .serializers import *
 from django.contrib import messages
 from .models import *
+import datetime
+from django.forms.models import model_to_dict
+from sponsor.models import Sponsor
 # Create your views here.
 
 def createCategoria(request):
@@ -217,6 +222,17 @@ class UpdateProducto(UpdateView):
             return redirect(reverse("productos:listarProductos"))
 
 
+class Reportes(FilterView):
+    template_name="reportes.html"
+    model=Sponsor
+    context_object_name = 'page_obj'
+    filterset_class=SponsorFilter
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Reportes de productos"
+        context['items'] = Sponsor.objects.all()
+        context['list_url']=reverse_lazy('productos:reportes')
+        return context
     
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)
@@ -254,3 +270,25 @@ def getAllProducts(request):
                             "descuentoActivo":descuento.estado
                             }
     return HttpResponse(json.dumps(urls))
+
+def dateRangeFilter(request):
+    rango=request.GET.get("daterange", None)
+    token=str(rango).split("-")
+    fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
+    fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
+
+    items=Sponsor.objects.all().filter(fecha_inicio__range=[fechaI,fechaF]).values()
+        
+    response = {
+        'items':list(items),
+    }
+    return JsonResponse(response)
+
+def update_items(request):
+    rango=request.GET.get("daterange", None)
+    token=str(rango).split("-")   
+    fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
+    fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
+    items=Sponsor.objects.all().filter(fecha_inicio__range=[fechaI,fechaF])
+    print(items.values())
+    return render(request, 'ajax/tableBody.html', {'items':items})
