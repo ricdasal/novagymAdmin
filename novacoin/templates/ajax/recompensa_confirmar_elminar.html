@@ -1,42 +1,41 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar notificación</h5>
+  <h5 class="modal-title" id="ordenTitle">Deshabilitar recompensa NC</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
-<form method="POST" action="{%url 'notificaciones:eliminar_perma' notificacion.id%}">
+<form method="POST" action="{%url 'novacoin:cambiar_estado' object.id%}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Está segura/o que desea eliminar la siguiente notificación?
-    <h5>**Esta acción no puede revertirse</h5>
+    ¿Desea deshabilitar la siguiente recompensa NC?
     <div class="row">
       <div class="col-3">
         Título
       </div>
       <div class="col">
-        {{notificacion.titulo}}
+        {{object.motivo.nombre}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Frecuencia
+        Descripción
       </div>
       <div class="col">
-        {{notificacion.get_frecuencia_display}}
+        {{object.texto}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Imagen
+        Recompensa
       </div>
       <div class="col">
-        <img src="{{notificacion.imagen.url}}" alt="" class="img-thumbnail w-50">
+        {{object.coins}} NC
       </div>
     </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    <button class="btn btn-danger mr-3" type="submit"> Eliminar </button>
+    <button class="btn btn-danger mr-3" type="submit"> Deshabilitar </button>
   </div>
 </form>

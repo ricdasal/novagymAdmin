@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from novagym.models import Transaccion
+from seguridad.validators import validate_decimal_positive
 
 # Create your models here.
 
@@ -36,12 +37,19 @@ class DetalleCartera(models.Model):
 
 
 class RangoCambioCoins(models.Model):
-    texto = models.CharField(max_length=255)
-    monto_minimo = models.DecimalField(max_digits=10, decimal_places=2)
-    monto_maximo = models.DecimalField(max_digits=10, decimal_places=2)
-    coins = models.DecimalField(max_digits=10, decimal_places=2)
+    class Meta:
+        ordering = ['-created_at']
+
+    texto = models.TextField()
+    monto_minimo = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        validators=[validate_decimal_positive])
+    monto_maximo = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        validators=[validate_decimal_positive])
+    coins = models.PositiveIntegerField(validators=[validate_decimal_positive])
     estado = models.BooleanField(default=True)
-    motivo = models.ForeignKey(
+    motivo = models.OneToOneField(
         MotivoCanje, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
