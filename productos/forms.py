@@ -42,7 +42,7 @@ class ProductoForm(forms.ModelForm):
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
-            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15,'maxlength': '130'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -71,7 +71,9 @@ class InventarioForm(forms.ModelForm):
         fields = ('precio', 'precioCompra', 'novacoins', 'stock')
         model = Inventario
         labels={
-            "precioCompra": "Precio de compra"
+            "precioCompra": "Precio de compra",
+            "precio": "Precio de venta (PVP en $)",
+            "novacoins":"Precio en Novacoins (NC)"
         }
         precio = forms.DecimalField(min_value=0)
 
@@ -110,7 +112,7 @@ class DescuentoForm(forms.ModelForm):
                   'fecha_hora_hasta', 'estado')
         labels = {
             "estado": "Descuento activo",
-            'porcentaje_descuento': "Valor de descuento (Sin descuento: 0)"
+            'porcentaje_descuento': "Porcentaje(%) de descuento (Sin descuento: 0)"
         }
 
         widgets = {

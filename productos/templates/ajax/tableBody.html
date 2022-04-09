@@ -1,0 +1,26 @@
+<table class="table table-responsive-lg table-condensed table-hover text-left" id="reportes">
+    <thead>
+        <tr>
+            <th scope="col">Nº de comprobante</th>
+            <th scope="col">Cliente</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Subtotal</th>
+            <th scope="col">IVA</th>
+            <th scope="col">Total</th>
+        </tr>
+    </thead>
+    <tbody id="reportBody">
+        {% if items %}
+        {% for sponsor in items %}
+        <tr>
+            <td>{{sponsor.id}}</td>
+            <td>{{sponsor.nombre}}</td>
+            <td>{{sponsor.fecha_inicio}}</td>
+            <td>10.00</td>
+            <td>1.20</td>
+            <td>11.20</td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+    </tbody>
+</table>

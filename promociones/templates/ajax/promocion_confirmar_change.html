@@ -5,7 +5,7 @@
   </button>
 </div>
 {% csrf_token %}
-<form method="POST" action="{% url 'sponsor:change' sponsor.pk %}">
+<form method="POST" action="{% url 'promociones:changeState' promocion.pk %}">
   {% csrf_token %}
 
   <div class="modal-body">
@@ -17,18 +17,10 @@
    
     <div class="row">
       <div class="col-3">
-        Código
+        Título
       </div>
       <div class="col">
-        {{sponsor.codigo}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-3">
-        Nombre
-      </div>
-      <div class="col">
-        {{sponsor.nombre}}
+        {{promocion.titulo}}
       </div>
     </div>
     <div class="row">
@@ -36,7 +28,7 @@
         Descripción
       </div>
       <div class="col">
-        {{sponsor.descripcion}}
+        {{promocion.descripcion}}
       </div>
     </div>
     <div class="row">
@@ -44,14 +36,14 @@
         Imagen
       </div>
       <div class="col">
-        <img src="/media/{{sponsor.imagen}}" style="width: 100px;height: 100px;" alt="">
+        <img src="/media/{{promocion.imagen}}" style="width: 100px;height: 100px;" alt="">
       </div>
     </div>
   </div>
   </div>
   <div class="modal-footer">
     <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-    {% if sponsor.activo %}
+    {% if promocion.activo %}
     <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
     {% else %}
     <button id="anular" class="btn btn-success mr-3" type="submit">Activar</button>

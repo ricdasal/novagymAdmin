@@ -25,7 +25,7 @@ class SponsorForm(forms.ModelForm):
 
         widgets = {
             "imagen": forms.ClearableFileInput(),
-            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15}),
+            "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15,'maxlength': '130'}),
             "fecha_inicio": forms.DateInput(
                 format=('%Y-%m-%d'),
                 attrs={'class': 'form-control',
@@ -99,10 +99,20 @@ class SucursalForm(forms.ModelForm):
             'telefono':"Teléfono fijo",
             'direccion':"Dirección de la sucursal"
         }
-        fields = ('nombre', 'telefono', 'imagen',
+        fields = ('nombre', 'telefono', 'imagen','fecha_inicio','fecha_fin',
                   'horario_apertura', 'horario_cierre', 'sponsor','correo','celular','direccion')
 
         widgets = {
+            "fecha_inicio": forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control',
+                       'type': 'date'
+                       }),
+            "fecha_fin": forms.DateInput(
+                format=('%Y-%m-%d'),
+                attrs={'class': 'form-control',
+                       'type': 'date'
+                       }),
             "imagen": forms.ClearableFileInput(),
             "correo":forms.EmailInput(),
             'horario_apertura': TimePickerInput(),
@@ -129,6 +139,8 @@ class SucursalForm(forms.ModelForm):
                 Column('imagen', css_class='col-6'),
                 Column('horario_apertura', css_class='col-6'),
                 Column('horario_cierre', css_class='col-6 '),
+                Column('fecha_inicio', css_class='col-6 '),
+                Column('fecha_fin', css_class='col-6 '),
             ),
         )
 
@@ -136,8 +148,14 @@ class SucursalForm(forms.ModelForm):
         cleaned_data = super(SucursalForm, self).clean()
         hora_inicio = cleaned_data.get("horario_apertura")
         hora_fin = cleaned_data.get("horario_cierre")
+        fecha_inicio = cleaned_data.get("fecha_inicio")
+        fecha_fin = cleaned_data.get("fecha_fin")
         if hora_inicio and hora_fin:
             if hora_fin < hora_inicio:
                 raise forms.ValidationError(
                     "La hora de cierre no puede ser anterior a la hora de apertura.")
+        if fecha_inicio and fecha_fin:
+            if fecha_fin < fecha_inicio:
+                raise forms.ValidationError(
+                    "La fecha de fin no puede ser anterior a la fecha de inicio.")
         return cleaned_data

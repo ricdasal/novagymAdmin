@@ -17,6 +17,7 @@
   <form action="{% url 'sponsor:listarSucursal' %}" method="get">
     <select class="form-control" name="sucursales" id="sucursales">
       <option value="inicial" selected disabled>Seleccione una sucursal</option>
+      <option value="all">Todas las sucursales</option>
       {% if sponsors %}
       {% for sponsor in sponsors %}
       <option value="{{ sponsor.id }}">{{ sponsor.nombre }}</option>
@@ -26,13 +27,16 @@
       {% endif %}
     </select>
     <div class="d-flex justify-content-end">
-    <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
+      <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
     </div>
-    </form>
+  </form>
 
   <div class="col">
     <a href="{% url 'sponsor:crearSucursal' %}" class="btn btn-primary float-right">Agregar sucursal <i
         class="fas fa-plus-circle"> </i></a>
+    <a href="{% url 'sponsor:listar' %}" class="btn btn-primary float-right"
+      style="margin-right: 2%;">Regresar
+      <i class="fas fa-arrow-alt-circle-left"></i></a>
   </div>
   <hr>
 </div>
@@ -52,6 +56,7 @@
           <th scope="col">Dirección</th>
           <th scope="col">Contacto</th>
           <th scope="col">Horarios</th>
+          <th scope="col">Estado</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
@@ -64,22 +69,29 @@
           <td>{{sucursal.codigo}}</td>
           <td>{{sucursal.nombre}}</td>
           <td>{{sucursal.direccion}}</td>
-          <td>Telf: {{sucursal.telefono}} <br> 
-              Cel: {{sucursal.celular}} <br>
-              Email: {{sucursal.correo}}
+          <td>Telf: {{sucursal.telefono}} <br>
+            Cel: {{sucursal.celular}} <br>
+            Email: {{sucursal.correo}}
           </td>
           </td>
           <td>{{sucursal.horario_apertura}} - {{sucursal.horario_cierre}}</td>
+          <td class="text-center">
+            <input type="checkbox" {%if sucursal.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{%url 'sponsor:changeSucursal' sucursal.pk %}"
+            data-url-eliminar="{%url 'sponsor:changeSucursal' sucursal.pk %}"
+            >
+          </td>
           <td>
-            
+
             <a href="{% url 'sponsor:editarSucursal' sucursal.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
-              <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
               data-url="{% url 'sponsor:eliminarSucursal' sucursal.id %}" href="#">
-                <i class="fas fa-times "></i></a>
+              <i class="fas fa-times "></i></a>
           </td>
-          
+
         </tr>
         {% endfor %}
         {% else %}
@@ -91,6 +103,14 @@
     </table>
     {% include "pagination.html" %}
   </div>
+  <hr width="100%" />
+  <div class="col-12">
+    <div class="d-flex justify-content-around">
+      <p><b>Total de sucursales: </b> {{total}} </p>
+      <p><b>Activas: </b> {{activos}} </p>
+      <p><b>Inactivas: </b> {{inactivos}} </p>
+    </div>
+  </div>
 </div>
 {% endblock main %}
 
@@ -100,6 +120,7 @@
 <script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

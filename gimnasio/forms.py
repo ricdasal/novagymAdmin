@@ -23,7 +23,7 @@ class GimnasioForm(forms.ModelForm):
             "celular": forms.NumberInput(attrs={'type': "tel", "pattern": "^(09)[0-9]{8}"}),
             "telefono": forms.NumberInput(attrs={'type': "tel", "pattern": "^(0)[1-9]{1}(\s){1}[0-9]{7}"})
         }
-        fields = ('nombre', 'imagen','telefono','celular','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo','capacidad')
+        fields = ('nombre', 'imagen','telefono','celular','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo','capacidad','latitud','longitud')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -37,6 +37,8 @@ class GimnasioForm(forms.ModelForm):
                 Column('telefono', css_class='col-6'),
                 Column('celular', css_class='col-6'),
                 Column('ubicacion', css_class='col-6'),
+                Column('latitud', css_class='col-6'),
+                Column('longitud', css_class='col-6'),
                 Column('estado', css_class='col-6'),
             ),
             Row(
