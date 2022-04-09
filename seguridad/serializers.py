@@ -9,19 +9,21 @@ from seguridad.models import UserDetails
 
 class UsuarioDetallesSerializer(serializers.ModelSerializer):
     email = serializers.CharField(source='usuario.email')
+    membresia = serializers.SerializerMethodField()
     seguidores = serializers.CharField(
         source='usuario.biografia.seguidores', read_only=True)
     seguidos = serializers.CharField(
         source='usuario.biografia.seguidos', read_only=True)
-    membresia = serializers.SerializerMethodField()
+    novacoins = serializers.CharField(
+        source='usuario.cartera.saldo_coins', read_only=True)
     imagen = Base64ImageField(
         allow_empty_file=True, required=False, allow_null=True)
 
     class Meta:
         model = UserDetails
         fields = ['id', 'email', 'codigo', 'cedula', 'membresia', 'nombres', 'apellidos', 'imagen',
-                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'seguidores', 'seguidos', 'added_by',
-                  'created_at', 'updated_at', "created_from"]
+                  'telefono', 'sexo', 'tipo', 'fecha_nacimiento', 'seguidores', 'seguidos', 'novacoins',
+                  'added_by', 'created_at', 'updated_at', "created_from"]
 
     def get_membresia(self, object):
         try:
