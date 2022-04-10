@@ -1,4 +1,5 @@
 from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 from membresia.models import Membresia
@@ -6,12 +7,31 @@ from productos.models import Producto
 from seguridad.models import UserDetails
 
 
+class ObjetivoPeso(models.Model):
+    class Meta:
+        ordering = ["-created_at"]
+
+    usuario = models.ForeignKey(
+        UserDetails, on_delete=models.CASCADE, related_name="objetivo_peso")
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    titulo = models.CharField(max_length=255)
+    estado = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.titulo
+
+
 class ProgresoImc(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
     usuario = models.ForeignKey(
-        UserDetails, on_delete=models.CASCADE, related_name="progreso_imc")
+        UserDetails, on_delete=models.CASCADE)
+    objetivo = models.ForeignKey(
+        ObjetivoPeso, on_delete=models.CASCADE, related_name="progreso_imc")
     peso = models.DecimalField(max_digits=5, decimal_places=2)  # kilogramos
     estatura = models.DecimalField(max_digits=5, decimal_places=2)  # metros
     resultado = models.DecimalField(max_digits=5, decimal_places=2, blank=True)
@@ -19,7 +39,7 @@ class ProgresoImc(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def calcular_imc(self):
-        resultado = self.peso/self.estatura**2
+        resultado = self.peso/(self.estatura**2)
         return resultado
 
     def save(self, *args, **kwargs):

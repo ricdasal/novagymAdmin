@@ -3,7 +3,7 @@ from knox import views as knox_views
 from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet,
                                 HistorialMemebresiaViewset, MembresiaViewSet)
 from notificaciones.viewsets import NotificacionUsuarioViewSet
-from novagym.viewsets import ProgresoImcViewSet
+from novagym.viewsets import ProgresoImcViewSet, ObjetivoPesoViewSet
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 from rest_framework import routers
 from seguridad.viewsets import (ChangePasswordView, DetallesViewSet, LoginAPI,
@@ -14,6 +14,7 @@ from seguridad.viewsets import (ChangePasswordView, DetallesViewSet, LoginAPI,
 """
 novagym = routers.DefaultRouter()
 novagym.register('usuarios', DetallesViewSet, 'usuario')
+novagym.register('objetivo-peso', ObjetivoPesoViewSet, 'imc')
 novagym.register('imc', ProgresoImcViewSet, 'imc')
 novagym.register('membresias', MembresiaViewSet, 'membresia')
 novagym.register('membresias-usuario',
