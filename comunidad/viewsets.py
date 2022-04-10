@@ -196,7 +196,10 @@ class ReportarPublicacionView(viewsets.ViewSet):
                 publicacion.motivo = data['motivo']
                 publicacion.visible = False
                 publicacion.save()
-                publicacion.notificacion_reportar_publicacion(request.user)
+                notificacion = publicacion.notificacion_reportar_publicacion(request.user)
+
+                PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+
                 return Response(status=status.HTTP_200_OK)
             return Response({"message": "No puedes reportar tu propia publicación."} , status=status.HTTP_403_FORBIDDEN)
         except Publicacion.DoesNotExist:
@@ -228,6 +231,9 @@ class ComentarioView(viewsets.ViewSet):
         if serializer.is_valid():
             comentario = serializer.save()
             notificacion = comentario.nueva_notificacion()
+            
+            PublicacionNotificacion.objects.create(publicacion=comentario.publicacion, notificacion=notificacion)
+
             extra = {"title": notificacion.titulo }
             if notificacion.imagen:
                 extra['image'] = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
@@ -315,6 +321,9 @@ class LikeView(viewsets.ViewSet):
             like = Like.objects.create(publicacion=publicacion, usuario=usuario)
             like.incrementar_publicacion_likes()
             notificacion = like.nueva_notificacion()
+
+            PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+
             extra = {"title": notificacion.titulo }
             if notificacion.imagen:
                 extra['image'] = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
