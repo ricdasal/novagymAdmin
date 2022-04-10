@@ -315,3 +315,10 @@ class Historia(models.Model):
     def reducir_almacenamiento(self):
         reducir_almacenamiento_usuario(self.usuario, self.almacenamiento_utilizado)
         reducir_almacenamiento_global(self.almacenamiento_utilizado)
+
+
+class PublicacionNotificacion(models.Model):
+    publicacion = models.ForeignKey(
+        Publicacion, on_delete=models.CASCADE, related_name='publicacion')
+    notificacion = models.OneToOneField(
+        Notificacion, on_delete=models.CASCADE, related_name='notificacion_publicacion')
