@@ -30,9 +30,10 @@ function openModelWithContext(event) {
       var url_activar = $this.data('url-activar');
       var url_eliminar = $this.data('url-eliminar');
       url = $this.is(':checked') ? url_activar : url_eliminar;
-      callback = () => {
-        let return_og = $(this).is(':checked') ? 'off' : 'on';
-        $(this).bootstrapToggle(return_og, true);
+      callback = function() {
+        let return_og = $this.is(':checked') ? 'off' : 'on';
+        $this.bootstrapToggle(return_og, true);
+        $(target).off();
       };
       break;
     default:

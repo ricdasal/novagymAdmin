@@ -10,7 +10,7 @@ urlpatterns = [
      path('create/',createProducto,name='createProducto'),
      path('inventario/create/',createInventario,name='createInventario'),
      path('descuento/create/',createDescuento,name='createDescuento'),
-
+     path('reportes/',Reportes.as_view(),name='reportes'),
      #Producto
      path('deleteProducto/<int:id>', deleteProducto, name='deleteProducto'),
      path('UpdateProducto/<int:pk>', UpdateProducto.as_view(), name='UpdateProducto'),
@@ -23,4 +23,8 @@ urlpatterns = [
      path('listarCategoria/', ListarCategoria.as_view(), name='listarCategoria'),
      path('crearCategoria/', crearCategoria.as_view(), name='crearCategoria'),
      path('editarCategoria/<str:pk>', editarCategoria.as_view(), name='editarCategoria'),
+
+     #AJAX
+     path('dateFilter/', dateRangeFilter, name='dateFilter'),
+     path('update_items/', update_items, name='update_items'),
 ]

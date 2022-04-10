@@ -9,7 +9,6 @@
 {% endblock specific_head %}
 
 {% block main %}
-
 <div class="row mt-4">
   <div class="col">
     <h2 class="text-left">{{title|upper}}</h2>
@@ -18,7 +17,7 @@
     <a href="{% url 'novacoin:agregar' %}" class="btn btn-primary float-right">Agregar Recompensa <i
       class="fas fa-plus-circle"> </i>
     </a>
-    <a href="{% url 'novacoin:tasa' %}" class="btn btn-primary float-right mr-2">Tasa de Cambio
+    <a href="{% url 'novacoin:tasa' pk=1 %}" class="btn btn-primary float-right mr-2">Tasa de Cambio
       <i class="fas fa-arrow-down-arrow-up"></i>
     </a>
   </div>
@@ -34,12 +33,41 @@
   <div class="col-12 table-container">
     <table class="table table-responsive-lg table-hover" id="tabla-recompensa-nc">
       <tbody>
-        {% if page_obj %}
-        {% for recompensa in page_obj %}
+        {% for recompensa in recompensas %}
+        <tr>
+          <td>
+            <img src="{% static 'images/generic_coin.png' %}" alt="{{recompensa.motivo.nombre}}" class="table__image">
+          </td>
+          <td>
+            <p>{{recompensa.motivo.nombre}}</p>
+            <p>Recompensa: {{recompensa.coins}} NC</p>
+            <p>Fecha: {{recompensa.created_at}}</p>
+          </td>
+          <td style="width: 160px;">
+            <a href="{% url 'novacoin:editar' pk=recompensa.pk %}" class="btn btn-primary btn-block">
+              Editar <i class="fas fa-edit "></i>
+            </a>
+            <a href="#" class="btn btn-danger btn-block use-modal" data-toggle='modal' data-target="#mainModal"
+              data-url="{%url 'novacoin:eliminar_perma' pk=recompensa.pk%}">
+              Eliminar <i class="fas fa-skull-crossbones"></i>
+            </a>
+          </td>
+          <td class="text-center">
+            <input type="checkbox" {%if recompensa.estado%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+              data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+              data-target="#mainModal" data-url-activar="{%url 'novacoin:cambiar_estado' recompensa.pk%}" 
+              data-url-eliminar="{%url 'novacoin:cambiar_estado' recompensa.pk%}"
+            >
+          </td>
+        </tr>
+        {% empty %}
+        <h4>
+          No se encontraron datos.
+        </h4>
         {% endfor %}
-        {% endif %}
       </tbody>
     </table>
+    {% include "pagination.html" %}
   </div>
 </div>
 
