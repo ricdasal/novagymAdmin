@@ -34,7 +34,7 @@ class SendMail(APIView):
             msg_img.add_header('Content-Disposition', "attachment; filename= %s" % str(img))
             msg = EmailMultiAlternatives(subject=titulo, body=mailContent(request,mensaje,msg_img),from_email= env("E_MAIL"),to= env.list("E_MAIL"))
             msg.attach(msg_img)
-            msg.attach(logo_data())
+            #msg.attach(logo_data())
             msg.content_subtype = 'html'
             imagen.close()
             msg.send()
