@@ -12,8 +12,8 @@ class BeneficioSerializer(serializers.ModelSerializer):
 class DescuentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Descuento
-        fields = ['url', 'porcentaje_descuento', 'fecha_hora_desde', 'fecha_hora_hasta',
-                  'activo', ]
+        fields = ['id', 'url', 'porcentaje_descuento', 'fecha_hora_desde',
+                  'fecha_hora_hasta', 'activo', ]
 
 
 class HistorialSerializer(serializers.ModelSerializer):
@@ -32,8 +32,8 @@ class MembresiaSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = Membresia
-        fields = ['url', 'beneficios', 'nombre', 'descripcion',
-                  'precio', 'meses_duracion', 'estado', 'descuento']
+        fields = ['id', 'url', 'beneficios', 'nombre', 'descripcion',
+                  'precio', 'meses_duracion', 'estado', 'imagen', 'descuento']
 
     def get_descuento(self, object):
         try:
