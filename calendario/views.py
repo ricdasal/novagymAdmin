@@ -39,7 +39,6 @@ class Reservar(APIView):
         idHorario=request.data["horario"]
         idUsuario=request.data["usuario"]
         nroPosicion=request.data["posicion"]
-        
         reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario)
         horario=Horario.objects.get(id=idHorario)
         idZona=horario.zona
@@ -52,9 +51,7 @@ class Reservar(APIView):
                 posiciones.save()
                 horario.asistentes+=1
                 horario.save()
-                
                 reserva.save()
-                
             if not posiciones:
                 return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
             if horario.asistentes == horario.capacidad:
@@ -63,6 +60,27 @@ class Reservar(APIView):
                 return Response(data=request.data, status=status.HTTP_200_OK)
         else:
             return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
+
+class Horarios(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request,opcion=None, *args, **kwargs):
+        if opcion==None:
+            data=Horario.objects.all()
+            serializer = HorarioSerializer(data, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            data=Horario.objects.get(id=opcion)
+            serializer = HorarioSerializer(data, many=False, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+class HorariosReservas(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request,opcion=None, *args, **kwargs):
+        if opcion==None:
+            data=HorarioReserva.objects.all()
+            serializer = HorarioReservaSerializer(data, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        return True      
 
 class ShowCalendario(FilterView):
     paginate_by = 20

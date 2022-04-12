@@ -17,4 +17,8 @@ urlpatterns = [
     path('eliminar/<int:id>',deleteCalendario,name="eliminar"),
     path('getHorarios/',getHorarios,name="getHorarios"),
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
+    path('verClases/',Horarios.as_view(),name="verClases"),
+    path('verClases/<int:opcion>',Horarios.as_view(),name="verClases"),
+    path('verReservas/',HorariosReservas.as_view(),name="verReservas"),
+    path('verReservas/<int:opcion>',HorariosReservas.as_view(),name="verReservas"),
 ]
