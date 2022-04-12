@@ -1,4 +1,3 @@
-import math
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -12,7 +11,6 @@ from rest_framework.views import APIView
 from calendario.filters import CalendarioFilter
 from .forms import *
 from .serializers import *
-import numpy as np
 from .models import *
 from django.contrib import messages
 import json
