@@ -12,10 +12,6 @@ urlpatterns = [
      path('listar/',ListarGimnasio.as_view(),name='listar'),
      path('crear/',CrearGimnasio.as_view(),name='crear'),
      path('eliminar/<int:id>',deleteGimnasio,name='eliminar'),
-     path('gimnasio-list/', gimnasioList, name='gimnasio-overview'),
-     path('gimnasio-detail/<str:id>', gimnasioDetail, name='gimnasio-detail'),
-     path('gimnasio-create/', gimnasioCreate, name='gimnasio-create'),
-     path('gimnasio-update/<str:id>', gimnasioUpdate, name='gimnasio-update'),
-     path('gimnasio-delete/<str:id>', gimnasioDelete, name='gimnasio-delete'),
-     path('getGimnasios/', getGimnasios, name='getGimnasios'),
+     path('getGimnasios/', GetGimnasios.as_view(), name='getGimnasios'),
+     path('getGimnasios/<int:opc>', GetGimnasios.as_view(), name='getGimnasios'),
 ]
