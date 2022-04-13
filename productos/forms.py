@@ -1,10 +1,9 @@
-from cProfile import label
 import datetime
+from django.contrib import messages
 from crispy_forms.helper import FormHelper
 from django import forms
 from .models import *
-from crispy_forms.layout import Column, Div, Field, Layout, Row
-from .widgets import DateTimePickerInput
+from crispy_forms.layout import Column,Layout, Row
 from crispy_forms.bootstrap import StrictButton
 
 
@@ -154,10 +153,10 @@ class DescuentoForm(forms.ModelForm):
         if fecha_hora_desde and fecha_hora_hasta:
             if fecha_hora_hasta < fecha_hora_desde:
                 raise forms.ValidationError(
-                    "La fecha de fin no puede ser anterior a la fecha de inicio.")
+                    "La fecha de fin no puede ser anterior a la fecha de inicio.","error")
             elif fecha_hora_desde.replace(tzinfo=None) < (datetime.datetime.today() - datetime.timedelta(days=1)):
                 raise forms.ValidationError(
-                    "La fecha de inicio no puede ser anterior a la fecha actual.")
+                    "La fecha de inicio no puede ser anterior a la fecha actual.","error")
         return cleaned_data
 
 

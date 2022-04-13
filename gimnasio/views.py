@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.views import FilterView
-
+from backend.settings import env
 from gimnasio.filters import GimnasioFilter
 from .forms import *
 from .serializers import *
@@ -48,6 +48,7 @@ class CrearGimnasio(CreateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Gimnasio"
+        context['crear'] =1
         return context
 
     def post(self, request, *args, **kwargs):
@@ -74,6 +75,8 @@ class UpdateGimnasio(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Gimnasio"
+        context['crear'] = 0
+        #context['key'] = env("MAPS_API_KEY")
         return context
 
     def post(self, request, *args, **kwargs):
