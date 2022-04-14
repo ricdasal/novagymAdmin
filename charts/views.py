@@ -1,4 +1,7 @@
 import sys
+
+from novacoin.models import Cartera, DetalleCartera
+from seguridad.models import UserDetails
 sys.path.append("..")
 from django.shortcuts import render
 from productos.models import Categoria, Producto
@@ -8,8 +11,36 @@ import random as rd
 
 def listar(request):
     categorias=Categoria.objects.all()
-
     return render(request, "lista_reportes.html", {"title":"REPORTES","categorias":categorias})
+
+def listarNc(request):
+    detalle=UserDetails.objects.all()
+    return render(request, "lista_reportes.html", {"title":"REPORTES NOVACOINS","detalle":detalle})
+
+def grafico_detallescartera(request, id):
+    cartera=Cartera.objects.get(usuario_id=id)
+    productos=DetalleCartera.objects.filter(cartera_id=cartera.id)
+    name=Categoria.objects.get(id=id)
+    labels=[]
+    data=[]
+    for producto in productos:
+        labels.append(producto.nombre)
+        inventario = producto.inventario_set.all()
+        data.append(inventario[0].stock)
+
+    return JsonResponse({
+        'title': f'Stock para los productos de la categoria: {name}',
+        'data': {
+            'labels': labels,
+            
+            'datasets': [{
+                'label': 'Unidades',
+                'backgroundColor': "blue",
+                'borderColor': "black",
+                'data': data,
+            }]
+        },
+    })
 
 def grafico_categorias(request, id):
     productos=Producto.objects.filter(categoria=id).order_by("nombre")
