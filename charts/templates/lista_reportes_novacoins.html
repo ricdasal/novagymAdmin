@@ -1,160 +1,173 @@
 {% extends "main.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-{% csrf_token %}
-{% block specific_head %}
-<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
-<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
-<link rel="stylesheet" href="{% static 'css/list.css' %}">
-{% endblock specific_head %}
 
 {% block main %}
+
 <div class="row mt-4">
-  <div class="col">
-    <h2 class="text-left">{{title}}</h2>
-  </div>
-  <hr>
+    <div class="col">
+        <h2 class="text-left">{{title}}</h2>
+    </div>
+
+    <div class="col-12">
+
+
+
+        <a href="" class="btn btn-primary float-right" style="margin-right: 1%;">boton
+            <i class="fas fa-file-alt"></i></a>
+    </div>
+    <hr>
 </div>
+<div class="row mt-4 justify-content-left">
 
-<br>
-
-<div id="accordion">
-  <div class="card">
-    <div class="card-header" id="headingOne">
-      <h5 class="mb-0">
-        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne"
-          aria-expanded="true" aria-controls="collapseOne">
-          Stock de productos
-        </button>
-      </h5>
-    </div>
-
-    <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-      <div class="card-body">
-        <form action="">
-          <select name="categorias" id="categorias">
-            <option value="" selected disabled>Seleccione una categoría para mostrar</option>
-            {% for categoria in categorias %}
-            <option value="{{categoria.id}}">{{categoria.nombre}}</option>
-            {% endfor %}
-          </select>
+    <div class="col-3" style="margin-bottom: 2%;">
+        <form id="theForm" method="POST">
+            <label for="daterange">Rango de fechas:</label>
+            <input type="text" class="form-control pull-right" id="daterange" name="daterange" />
+            <input class="btn btn-primary float-right" style="margin-top: 2%;margin-left: 2%;" type="submit" id="boton" value="Filtrar">
+            <input class="btn btn-primary float-right" style="margin-top: 2%;" type="submit" id="todo" value="Ver todo">
         </form>
-        <div id="container" style="width: 75%;">
-
-          <canvas id="chartCanvas" data-url="{% url 'charts:productos' %}">
-
-          </canvas>
-        </div>
-      </div>
     </div>
-  </div>
+    <div class="col-12 table-container" id="tableContainer">
 
-
-  <div class="card">
-    <div class="card-header" id="heading2">
-      <h5 class="mb-0">
-        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse2"
-          aria-expanded="true" aria-controls="collapse2">
-          Stock de productos
-        </button>
-      </h5>
+        {% include 'ajax/tableBody.html' %}
     </div>
 
-    <div id="collapse2" class="collapse" aria-labelledby="heading2" data-parent="#accordion">
-      <div class="card-body">
-        <form action="">
-            <p>Seleccione un rango de fechas</p>
-            <input type="date" id="fechaI" required>
-            <input type="date" id="fechaF" required>
-            <a id="botonFecha" class="btn btn-primary">Buscar</a>
-        </form>
-        <div id="container" style="width: 75%;">
 
-          <canvas id="chartCanvas2" data-url="{% url 'charts:productos' %}">
+    {% endblock main %}
 
-          </canvas>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-
-</div>
-{% endblock main %}
-
-{% block specific_scripts %}
-<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
-<script>
-
-  $("#botonFecha").click(function () {
-    try {
-      dateChart.destroy();
-    } catch { }
-    var ctx2 = document.getElementById("chartCanvas2").getContext("2d");
-    dateChart = new Chart(ctx2, {
-      type: 'bar',
-      options: {
-        responsive: true,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
-      }
-    });
-    crearChart("/reportes/dateChart/"+$("#fechaI").val()+"&"+$("#fechaF").val(), dateChart);
-  });
-  $("#categorias").change(function () {
-    try {
-      categoriaChart.destroy();
-    } catch { }
-    var ctx = document.getElementById("chartCanvas").getContext("2d");
-    categoriaChart = new Chart(ctx, {
-      type: 'bar',
-      options: {
-        responsive: true,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] }
-      }
-    });
-
-    crearChart("/reportes/stockChart/" + $("#categorias option:selected").val(), categoriaChart);
-  });
-
-  function crearChart(link, chart) {
-    $.ajax({
-      url: link,
-      type: "GET",
-      dataType: "json",
-      success: (jsonResponse) => {
-
-        const title = jsonResponse.title;
-        const labels = jsonResponse.data.labels;
-        const datasets = jsonResponse.data.datasets;
-
-        // Load new data into the chart
-        chart.options.title.text = title;
-        chart.options.title.display = true;
-        chart.data.labels = labels;
-        datasets.forEach(dataset => {
-          chart.data.datasets.push(dataset);
+    {% block specific_scripts %}
+    <script>
+        $(function () {
+            var d = new Date();
+            var day = d.getDate
+            $('input[name="daterange"]').daterangepicker({
+                "locale": {
+                    "applyLabel": "Aceptar",
+                    "cancelLabel": "Cancelar",
+                    "daysOfWeek": [
+                        "Lu",
+                        "Ma",
+                        "Mi",
+                        "Ju",
+                        "Vi",
+                        "Sá",
+                        "Do"
+                    ],
+                    "monthNames": [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre"
+                    ],
+                },
+                opens: 'left',
+                startDate: day,
+                endDate: moment().add('days', 7).format('L')
+            });
         });
-        chart.update();
-      },
-      error: () => console.log("Failed to fetch chart data from " + endpoint + "!")
-    });
-  };
-</script>
+        $('#todo').click(function () {
+            location.reload();
+        });
+        $(document).ready(function () {
+            var table = $('#reportes').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ],
+                buttons: [
+                {
+                    extend: 'excelHtml5',
+                    text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
+                    titleAttr: 'Excel',
+                    className: 'btn btn-success btn-flat btn-xs'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'Descargar pdf <i class="fas fa-file-pdf"></i>',
+                    titleAttr: 'Pdf',
+                    className: 'btn btn-danger btn-flat btn-xs'
+                },
+                {
+                    extend: 'print',
+                    text: 'Imprimir <i class="fas fa-print"></i>',
+                    titleAttr: 'Print',
+                    className: 'btn btn-secondary btn-flat btn-xs'
+                },
+            ],
+                language: {
+                    "decimal": "",
+                    "emptyTable": "No hay información",
+                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entrada(s)",
+                    "infoEmpty": "Mostrando 0 entradas",
+                    "infoFiltered": "(Filtrado de _MAX_ entradas totales)",
+                    "infoPostFix": "",
+                    "thousands": ",",
+                    "lengthMenu": "Mostrar _MENU_ entradas",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "zeroRecords": "Sin resultados encontrados",
+                    "paginate": {
+                        "first": "Primero",
+                        "last": "Ultimo",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                
+            });
 
-<script>
-  $(".export").click(function () {
-    $("#export").val($(this).data('value'));
-    $('form').submit()
-  });
-  $('button[type="submit"]').click(function (e) {
-    $("#export").val('');
-  })
-</script>
 
-{% endblock %}
+            $('#theForm').submit(function (event) {
+                //$( "#tableContainer" ).html('').load( "{% url 'productos:update_items' %}" );
+                event.preventDefault()
+                $.ajax({
+                    // get the form data
+                    data: $(this).serializeArray(),
+                    url: "{% url 'productos:dateFilter' %}",
+
+                    // on success
+                    success: function (response) {
+                        table.clear().draw();
+                        entradas = Object.keys(response["items"])
+                        items = response["items"]
+                        for (var i = 0; i < entradas.length; i++) {
+                            console.log(items[i]);
+                            table.row.add([
+                                items[i]["id"],
+                                items[i]["nombre"],
+                                items[i]["fecha_inicio"],
+                                1,
+                                2,
+                                2
+                            ]);
+                        }
+                        table.draw();
+                        $('#boton').prop("disabled", false);
+                    },
+                    // on error
+                    error: function (response) {
+                        // alert the error if any error occured
+                        console.log(response.responseJSON.errors)
+                    }
+                });
+
+                return false;
+            });
+
+
+        });
+
+
+
+    </script>
+    {% endblock %}

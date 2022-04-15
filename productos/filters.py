@@ -1,6 +1,7 @@
 import django_filters
 
 from productos.forms import ProductoFilterForm
+from seguridad.models import UserDetails
 from .models import Producto,Categoria
 
 class ProductoFilter(django_filters.FilterSet):
@@ -22,4 +23,12 @@ class CategoriaFilter(django_filters.FilterSet):
         model = Categoria
         fields = ['id',
                   'nombre'
+                  ]
+class UsuarioFilter(django_filters.FilterSet):
+    class Meta:
+        model = UserDetails
+        fields = ['id',
+                  'cedula',
+                  'nombres',
+                  'apellidos'
                   ]

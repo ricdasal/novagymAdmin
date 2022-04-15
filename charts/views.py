@@ -15,21 +15,18 @@ def listar(request):
 
 def listarNc(request):
     detalle=UserDetails.objects.all()
-    return render(request, "lista_reportes.html", {"title":"REPORTES NOVACOINS","detalle":detalle})
+    return render(request, "lista_reportes_novacoins.html", {"title":"REPORTES NOVACOINS","detalle":detalle})
 
 def grafico_detallescartera(request, id):
-    cartera=Cartera.objects.get(usuario_id=id)
-    productos=DetalleCartera.objects.filter(cartera_id=cartera.id)
-    name=Categoria.objects.get(id=id)
+    #cartera=Cartera.objects.get(usuario_id=id)
+    #productos=DetalleCartera.objects.filter(cartera_id=cartera.id)
+    #name=Categoria.objects.get(id=id)
+    detalles=UserDetails.objects.all()
     labels=[]
     data=[]
-    for producto in productos:
-        labels.append(producto.nombre)
-        inventario = producto.inventario_set.all()
-        data.append(inventario[0].stock)
 
     return JsonResponse({
-        'title': f'Stock para los productos de la categoria: {name}',
+        'title': 'Registro de transacciones en NovaCoins',
         'data': {
             'labels': labels,
             

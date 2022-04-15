@@ -1,48 +1,17 @@
 <table class="table table-responsive-lg table-condensed table-hover text-left" id="reportes">
     <thead>
         <tr>
-            <th scope="col">Nº comprobante</th>
+            <th scope="col">Transacción</th>
             <th scope="col">Cliente</th>
             <th scope="col">Productos</th>
             <th scope="col">Fecha</th>
-            <th scope="col">Gimnasio</th>
-            <th scope="col">Método pago</th>
-            <th scope="col">Estado</th>
+            <th scope="col">Tipo pago</th>
             <th scope="col">Subtotal</th>
             <th scope="col">IVA</th>
             <th scope="col">Total</th>
         </tr>
     </thead>
     <tbody id="reportBody">
-        {% if items %}
-        {% for sponsor in items %}
-        <tr>
-            <td>{{sponsor.id}}</td>
-            <td>Juan Perez</td>
-            <td>Camiseta
-                Zapatos
-            </td>
-            <td>{{sponsor.fecha_inicio}}</td>
-            <td>Alborada</td>
-            <td>Tarjeta</td>
-            <td style="color:green">Entregado</td>
-            <td>$10.00</td>
-            <td>$1.20</td>
-            <td>$11.20</td>
-        </tr>
-        {% endfor %}
-        {% endif %}
-        <tr>
-            <td>4</td>
-            <td>Maria Gomez</td>
-            <td>Gorra</td>
-            <td>27/04/2022</td>
-            <td>Alborada</td>
-            <td>Canje</td>
-            <td style="color:red">Pendiente</td>
-            <td>200 NC</td>
-            <td>-</td>
-            <td>200 NC</td>
-        </tr>
+
     </tbody>
 </table>
