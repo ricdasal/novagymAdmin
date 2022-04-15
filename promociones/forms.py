@@ -47,6 +47,7 @@ class PromocionesForm(forms.ModelForm):
                 Column('nombre_contacto', css_class='col-6'),
                 Column('fecha_hora_inicio', css_class='col-6'),
                 Column('fecha_hora_fin', css_class='col-6'),
+                Column('activo', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
             ),
         )
