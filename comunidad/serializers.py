@@ -104,7 +104,7 @@ class SeguidosSerializer(serializers.ModelSerializer):
 class HistoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Historia
-        fields = ['id', 'usuario', 'texto', 'fecha_creacion', 
+        fields = ['id', 'usuario', 'texto', 'fecha_creacion', 'duracion', 
                 'archivo', 'tipo_archivo', 'almacenamiento_utilizado']
         extra_kwargs = {"usuario": {"write_only": True, 'required': True}}
 
