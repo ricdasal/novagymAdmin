@@ -26,13 +26,9 @@ class getPromociones(APIView):
             queryset = Promociones.objects.all().filter(activo=0)
             serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        elif activo=="todos":
-            queryset = Promociones.objects.all()
-            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
         elif activo=="vigentes":
             today=datetime.datetime.now(tz=pytz.utc).strftime("%Y-%m-%dT%H:%M")
-            queryset=Promociones.objects.filter(fecha_hora_inicio__lte=today).filter(fecha_hora_fin__gte=today)
+            queryset=Promociones.objects.filter(fecha_hora_inicio__lte=today).filter(fecha_hora_fin__gte=today).filter(activo=True)
             serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         elif activo==None:
