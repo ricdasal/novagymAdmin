@@ -22,6 +22,20 @@ def generarCodigoMaquina():
             not_unique = False
             return str(unique_code)
 
+
+class Zona(models.Model):
+    class Tipo(models.TextChoices):
+        MAQUINA = 'maquinas', 'Máquinas'
+        PERSONAS = 'personas', 'Personas'
+    id=models.AutoField(primary_key=True)
+    nombre=models.CharField(max_length=24)
+    espacios=models.PositiveIntegerField(max_length=2)
+    tipo=models.CharField(max_length=10,choices=Tipo.choices)
+    class Meta:
+        ordering=('-id',)
+    def __str__(self):
+        return self.nombre
+
 class Horario(models.Model):
     id = models.AutoField(primary_key=True)
     class Dia(models.TextChoices):
@@ -41,6 +55,7 @@ class Horario(models.Model):
     capacidad=models.PositiveIntegerField(max_length=2)
     asistentes=models.PositiveIntegerField(max_length=2,default=0)
     activo=models.BooleanField(default=True)
+    zona=models.ForeignKey(Zona,on_delete=models.PROTECT)
     class Meta:
         ordering=('horario_inicio',)
     def __str__(self):
@@ -64,25 +79,20 @@ class Maquina(models.Model):
     categoria=models.CharField(max_length=20, choices=Categoria.choices)  
     cantidad=models.PositiveIntegerField(max_length=2)
 
-
-class Zona(models.Model):
-    id=models.AutoField(primary_key=True)
-    nombre=models.CharField(max_length=24)
-    espacios=models.PositiveIntegerField(max_length=2)
-
-
 class Posicion(models.Model):
     id=models.AutoField(primary_key=True)
-    fila=models.CharField(max_length=1)
-    columna=models.PositiveIntegerField(max_length=2)
-    maquina=models.ForeignKey(Maquina, on_delete=models.PROTECT)
+    posicion=models.PositiveIntegerField(max_length=2)
     zona=models.ForeignKey(Zona, on_delete=models.PROTECT)
+    ocupado=models.BooleanField(default=False)
+    def __str__(self):
+        return str(self.zona)+"-"+str(self.posicion)+"-"+str(self.ocupado)
 
 class MaquinaReserva(models.Model):
     id=models.AutoField(primary_key=True)
     codigo=models.CharField(max_length=20, unique=True, default=generarCodigo, editable=False)
     maquina=models.ForeignKey(Maquina,on_delete=models.PROTECT)
-    horario=models.DateTimeField()
+    horario_inicio=models.DateTimeField()
+    horario_fin=models.DateTimeField()
     posicion=models.ForeignKey(Posicion, on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
 
@@ -91,3 +101,4 @@ class HorarioReserva(models.Model):
     codigo=models.CharField(max_length=20, unique=True, default=generarCodigo, editable=False)
     horario=models.ForeignKey(Horario,on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
+    posicion=models.ForeignKey(Posicion, on_delete=models.PROTECT, blank=True,null=True)

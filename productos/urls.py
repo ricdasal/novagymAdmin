@@ -27,4 +27,5 @@ urlpatterns = [
      #AJAX
      path('dateFilter/', dateRangeFilter, name='dateFilter'),
      path('update_items/', update_items, name='update_items'),
+     path('all/', all, name='all'),
 ]

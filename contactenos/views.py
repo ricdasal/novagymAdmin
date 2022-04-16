@@ -27,16 +27,19 @@ class SendMail(APIView):
             file_serializer.save()
             titulo=request.POST.get('titulo')
             mensaje=request.POST.get('descripcion')
-            img=request.FILES['imagen']
-            imagen=img.open('rb')
-            img_data = imagen.read()
-            msg_img = MIMEImage(img_data)
-            msg_img.add_header('Content-Disposition', "attachment; filename= %s" % str(img))
-            msg = EmailMultiAlternatives(subject=titulo, body=mailContent(request,mensaje,msg_img),from_email= env("E_MAIL"),to= env.list("E_MAIL"))
-            msg.attach(msg_img)
-            msg.attach(logo_data())
+            try:
+                img=request.FILES['imagen']
+                imagen=img.open('rb')
+                img_data = imagen.read()
+                msg_img = MIMEImage(img_data)
+                msg_img.add_header('Content-Disposition', "attachment; filename= %s" % str(img))
+                msg = EmailMultiAlternatives(subject=titulo, body=mailContent(request,mensaje),from_email= env("E_MAIL"),to= env.list("E_MAIL"))
+                msg.attach(msg_img)
+                #msg.attach(logo_data())
+                imagen.close()
+            except:
+                msg = EmailMultiAlternatives(subject=titulo, body=mailContent(request,mensaje),from_email= env("E_MAIL"),to= env.list("E_MAIL"))
             msg.content_subtype = 'html'
-            imagen.close()
             msg.send()
             return Response(file_serializer.data, status=status.HTTP_201_CREATED)
         else:
@@ -114,7 +117,7 @@ def deleteMail(request,id):
         return redirect('contactenos:buzon')
     return render(request, "ajax/mail_confirmar_elminar.html", {"mail": query})
 
-def mailContent(request,body,file):
+def mailContent(request,body):
     template=loader.get_template('mailTemplate.html')
     return template.render({"body": body})
 

@@ -1,22 +1,23 @@
 import json
+from django.db.models.functions import Coalesce
+from django.db.models import Sum
 from django.db import DatabaseError
 from django.http import HttpResponse, JsonResponse
-from django.core.serializers import serialize
 from django.shortcuts import redirect, render
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.views.generic import CreateView, UpdateView, TemplateView
+from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
-from productos.filters import CategoriaFilter, ProductoFilter
+from productos.filters import CategoriaFilter, ProductoFilter, UsuarioFilter
 from productos.forms import *
-from sponsor.filters import SponsorFilter
+from seguridad.models import UserDetails
 from .serializers import *
 from django.contrib import messages
 from .models import *
 import datetime
-from django.forms.models import model_to_dict
 from sponsor.models import Sponsor
+from novagym.models import TipoPago, Transaccion
 # Create your views here.
 
 def createCategoria(request):
@@ -224,13 +225,12 @@ class UpdateProducto(UpdateView):
 
 class Reportes(FilterView):
     template_name="reportes.html"
-    model=Sponsor
-    context_object_name = 'page_obj'
-    filterset_class=SponsorFilter
+    model=User
+    context_object_name = 'users'
+    filterset_class=UsuarioFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Reportes de productos"
-        context['items'] = Sponsor.objects.all()
         context['list_url']=reverse_lazy('productos:reportes')
         return context
     
@@ -271,16 +271,56 @@ def getAllProducts(request):
                             }
     return HttpResponse(json.dumps(urls))
 
+def all(request):
+    query=Transaccion.objects.all()
+    items=query.values()
+
+    listItems=list(items)
+    for i in listItems:
+        print(i)
+        userId=i["usuario_id"]
+        pagoId=i["tipo_pago_id"]
+        i["created_at"]=i["created_at"].replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        usuario=UserDetails.objects.get(id=userId)
+        pago=TipoPago.objects.get(id=pagoId)
+        i["usuario_id"]=usuario.nombres + " " + usuario.apellidos
+        i["tipo_pago_id"]=pago.nombre
+
+        print(i)
+    response = {
+        'items':listItems,
+        'totales':{"subtotal":query.aggregate(Sum("subtotal")).get("subtotal__sum"),
+                    "iva":query.aggregate(Sum("iva")).get("iva__sum"),
+                    "total":query.aggregate(Sum("valor_total")).get("valor_total__sum")
+                    }
+    }
+    return JsonResponse(response)
+
 def dateRangeFilter(request):
     rango=request.GET.get("daterange", None)
     token=str(rango).split("-")
     fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
     fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
 
-    items=Sponsor.objects.all().filter(fecha_inicio__range=[fechaI,fechaF]).values()
-        
+    query=Transaccion.objects.all()
+    items=query.values()
+    listItems=list(items)
+    for i in listItems:
+        print(i)
+        userId=i["usuario_id"]
+        pagoId=i["tipo_pago_id"]
+        i["created_at"]=i["created_at"].replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
+        usuario=UserDetails.objects.get(id=userId)
+        pago=TipoPago.objects.get(id=pagoId)
+        i["usuario_id"]=usuario.nombres + " " + usuario.apellidos
+        i["tipo_pago_id"]=pago.nombre
+        print(i)
     response = {
-        'items':list(items),
+        'items':listItems,
+        'totales':{"subtotal":query.aggregate(Sum("subtotal")).get("subtotal__sum"),
+                    "iva":query.aggregate(Sum("iva")).get("iva__sum"),
+                    "total":query.aggregate(Sum("valor_total")).get("valor_total__sum")
+                    }
     }
     return JsonResponse(response)
 

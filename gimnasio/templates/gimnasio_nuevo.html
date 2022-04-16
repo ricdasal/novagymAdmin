@@ -8,8 +8,8 @@
     <h2>
       <div class="row">
         <div class="col-12 col-lg-6">GIMNASIO</div>
-        {% if form.codigo.value %}
-        <div class="col-12 col-lg-6 text-right">Código: {{form.codigo.value}}</div>
+        {% if form.nombre.value %}
+        <div class="col-12 col-lg-6 text-right">Nombre: {{form.nombre.value}}</div>
         {% endif %}
       </div>
     </h2>
@@ -20,6 +20,10 @@
     <form method="POST" novalidate enctype="multipart/form-data">
       {% csrf_token %}
       {% crispy form %}
+      {% if form.latitud.value %}
+      <input type="hidden" id="latitud" value="{{ form.latitud.value }}">
+      <input type="hidden" id="longitud" value="{{ form.longitud.value }}">
+      {% endif %}
       <div class="d-none" id="img-cont">
         <b>Preview de foto</b>
         <br>
@@ -32,6 +36,40 @@
 </div>
 {% endblock main %}
 {% block specific_scripts %}
+<!-- <script async
+    src="https://maps.googleapis.com/maps/api/js?key=APY_KEY&callback=initMap">
+</script> -->
+<!-- <script>
+var map;
+var markers = [];
+
+function initMap() {
+    var location = getLocation();
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 100,
+        center: location,
+        mapTypeId: 'terrain'
+    }); 
+    addMarker(location, map);;
+}
+
+function addMarker(location, map) {
+    //setMapOnAll(null);
+    var marker = new google.maps.Marker({
+        position: location,
+        label: "*",
+        map: map
+    });
+}
+
+function getLocation() {
+    var latitud =  document.getElementById("latitud").value.replace(",",".");
+    var longitud = document.getElementById("longitud").value.replace(",",".");
+    var location = {lat: parseFloat(latitud), lng: parseFloat(longitud)};
+    return location
+}
+
+</script> -->
 <!-- <script>
   var map = L.map('map').setView([-2.19616, -79.88621], 13);
   L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiY2FyYXVtb24iLCJhIjoiY2wxMmd0bGV0MDI1bDNpcHE3Z3o5cmplMCJ9.sWGygWRUn0klvuVBPsq-Rg', {
