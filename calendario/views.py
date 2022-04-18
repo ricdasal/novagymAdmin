@@ -1,6 +1,4 @@
-from django.db import DataError
 from django.shortcuts import render
-from django.forms import BooleanField
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
@@ -13,9 +11,6 @@ from rest_framework.views import APIView
 from calendario.filters import CalendarioFilter
 from .forms import *
 from .serializers import *
-from django.core.mail import send_mail
-from novagym.utils import calculate_pages_to_render
-from datetime import date
 from .models import *
 from django.contrib import messages
 import json
@@ -43,18 +38,31 @@ class Reservar(APIView):
         reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
         idHorario=request.data["horario"]
         idUsuario=request.data["usuario"]
+        nroPosicion=request.data["posicion"]
+        
         reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario)
         horario=Horario.objects.get(id=idHorario)
+        idZona=horario.zona
+        posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
         if reserva.is_valid():
             if reservado:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
-            if horario.asistentes < horario.capacidad:
+            if horario.asistentes < horario.capacidad and posiciones.ocupado==False:
+                posiciones.ocupado=True
+                posiciones.save()
                 horario.asistentes+=1
                 horario.save()
+                
                 reserva.save()
+                
+            if not posiciones:
+                return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
+            if horario.asistentes == horario.capacidad:
+                return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response(data="Horario lleno", status=status.HTTP_200_OK)
-        return Response(reserva.data, status=status.HTTP_200_OK)
+                return Response(data=request.data, status=status.HTTP_200_OK)
+        else:
+            return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
 
 class ShowCalendario(FilterView):
     paginate_by = 20
@@ -94,8 +102,11 @@ class CrearCalendario(CreateView):
     form_class =HorarioForm
     model=Horario
     template_name = 'templates/calendario_nuevo.html'
-    title = "AGREGAR ACTIVIDAD"
     success_url = reverse_lazy('calendario:listar')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "AGREGAR ACTIVIDAD"
+        return context
 
 class UpdateCalendario(UpdateView):
     form_class =HorarioForm
@@ -103,6 +114,35 @@ class UpdateCalendario(UpdateView):
     title = "ACTUALIZAR ACTIVIDAD"
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listar')
+    
+class ShowZona(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = Zona
+    context_object_name = 'zona'
+    template_name = "templates/lista_zona.html"
+    permission_required = 'novagym.view_empleado'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "LISTAR ZONAS"
+        return context
+
+class CrearZona(CreateView):
+    form_class =ZonaForm
+    model=Zona
+    template_name = 'templates/calendario_nuevo.html'
+    success_url = reverse_lazy('calendario:listarZona')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "CREAR ZONA"
+        return context
+
+    def form_valid(self, form):
+        response = super(CrearZona, self).form_valid(form)
+        cantidad=self.object.espacios
+        for i in range(1,cantidad+1):
+            Posicion.objects.create(posicion=i,zona=self.object)
+        return response
 
 def deleteCalendario(request,id):
     query = Horario.objects.get(id=id)

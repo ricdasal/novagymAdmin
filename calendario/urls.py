@@ -9,6 +9,8 @@ app_name = CalendarioConfig.name
 
 
 urlpatterns = [
+    path('listarZona',ShowZona.as_view(),name="listarZona"),
+    path('crearZona/',CrearZona.as_view(),name="crearZona"),
     path('listar',ShowCalendario.as_view(),name="listar"),
     path('crear/',CrearCalendario.as_view(),name="crear"),
     path('editar/<int:pk>',UpdateCalendario.as_view(),name="editar"),

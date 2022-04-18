@@ -302,6 +302,7 @@ class Historia(models.Model):
     archivo = models.FileField(upload_to='historias/', blank=True, null=True)
     tipo_archivo = models.CharField(max_length=3, choices=MediaType.choices, default="")
     almacenamiento_utilizado = models.DecimalField(max_digits=10, decimal_places=2 ,default=0)
+    duracion = models.IntegerField(default=0)
 
     def delete(self, *args, **kwargs):
         if self.archivo and os.path.isfile(self.archivo.path):
