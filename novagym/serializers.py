@@ -1,4 +1,5 @@
 from decimal import Decimal
+from re import I
 
 from rest_framework import serializers
 
@@ -33,9 +34,10 @@ class ObjetivoPesoSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if attrs['fecha_inicio'] >= attrs['fecha_fin']:
-            raise serializers.ValidationError(
-                {"fecha_inicio": "Fecha de inicio no puede ser igual o mayor a la fecha de fin"})
+        if 'fecha_inicio' in attrs and 'fecha_fin' in attrs:
+            if attrs['fecha_inicio'] >= attrs['fecha_fin']:
+                raise serializers.ValidationError(
+                    {"fecha_inicio": "Fecha de inicio no puede ser igual o mayor a la fecha de fin"})
         return attrs
 
     def create(self, validated_data):
