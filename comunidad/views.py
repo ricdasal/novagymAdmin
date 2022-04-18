@@ -16,7 +16,7 @@ from novagym.utils import calculate_pages_to_render
 from comunidad.utils import enum_media
 from seguridad.models import UserDetails
 
-from .models import ArchivoPublicacion, Publicacion
+from .models import ArchivoPublicacion, Publicacion, PublicacionNotificacion
 from .forms import PublicacionForm, ArchivoFormSet
 
 import os
@@ -211,6 +211,9 @@ def bloquear_publicacion(request, pk):
             publicacion.save()
 
             notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
+
+            PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+
             GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
                 notificacion.cuerpo, extra={"title": notificacion.titulo })
             
