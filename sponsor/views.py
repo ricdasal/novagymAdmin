@@ -59,7 +59,7 @@ class sucursalList(APIView):
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         elif activo=="vigentes":
             today=datetime.datetime.now().strftime("%Y-%m-%d")
-            queryset=Sucursal.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today)
+            queryset=Sucursal.objects.filter(fecha_inicio__lte=today).filter(fecha_fin__gte=today).filter(activo=True)
             serializer = SucursalSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         elif activo==None:
