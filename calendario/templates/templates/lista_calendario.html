@@ -16,7 +16,7 @@
   <hr>
 </div>
 <div class="col-3">
-  
+
   <form action="{% url 'calendario:listar' %}" method="get">
     <select class="form-control" name="sucursales" id="sucursales">
       <option value="inicial" selected disabled>Seleccione un gimnasio</option>
@@ -29,16 +29,18 @@
       {% endif %}
     </select>
     <div class="d-flex justify-content-end">
-    <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
+      <input style="margin-top: 1%;" class="btn btn-primary" type="submit" value="Filtrar" />
     </div>
-    </form>
+  </form>
 
-    
+
 </div>
 <div class="col-12 d-flex justify-content-end">
-    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
-      <i class="fa fa-calendar-plus"></i> Agregar actividad</a>
-      </div>
+  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
+    <i class="fa fa-calendar-plus"></i> Ver zonas</a>
+  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
+    <i class="fa fa-calendar-plus"></i> Agregar actividad</a>
+</div>
 <div class="row mt-4">
   <div class="col-12 table-container" id="accordionContainer">
     {% csrf_token %}
@@ -46,12 +48,13 @@
       <div class="card">
         <div class="card-header" id="headingOne">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+              data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
               Lunes
             </button>
           </h2>
         </div>
-    
+
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
@@ -59,28 +62,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "LUNES" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>Reservas: {{calendario.asistentes}}/{{calendario.capacidad}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>Reservas: {{calendario.asistentes}}/{{calendario.capacidad}}</td>
                 <td>
-                  <h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
+                </td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
                   Seleccione un gimnasio para mostrar información.
                 </h4>
-                </td>
-                
-                {% endif %}
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -89,7 +92,8 @@
       <div class="card">
         <div class="card-header" id="headingTwo">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
               Martes
             </button>
           </h2>
@@ -101,28 +105,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "MARTES" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -131,7 +135,8 @@
       <div class="card">
         <div class="card-header" id="headingThree">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
               Miércoles
             </button>
           </h2>
@@ -143,28 +148,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "MIERCOLES" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -173,7 +178,8 @@
       <div class="card">
         <div class="card-header" id="headingFour">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
               Jueves
             </button>
           </h2>
@@ -185,28 +191,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "JUEVES" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -215,7 +221,8 @@
       <div class="card">
         <div class="card-header" id="headingFive">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
               Viernes
             </button>
           </h2>
@@ -227,28 +234,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "VIERNES" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -257,7 +264,8 @@
       <div class="card">
         <div class="card-header" id="headingSix">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
               Sábado
             </button>
           </h2>
@@ -269,28 +277,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "SABADO" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>
@@ -299,7 +307,8 @@
       <div class="card">
         <div class="card-header" id="headingSeven">
           <h2 class="mb-0">
-            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse"
+              data-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
               Domingo
             </button>
           </h2>
@@ -311,28 +320,28 @@
                 {% if page_obj %}
                 {% for calendario in page_obj %}
                 {% if calendario.dia == "DOMINGO" %}
-                <tr class="text-center">
-                  <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
-                  <td>{{calendario.nombre}}</td>
-                  <td>{{calendario.descripcion}}</td>
-                  <td>
-                    <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
-                      <i class="fas fa-edit "></i></a>
-                    <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-                      data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
-                      <i class="fas fa-times "></i></a>
-                  </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-                {% else %}
+              <tr class="text-center">
+                <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
+                <td>{{calendario.nombre}}</td>
+                <td>{{calendario.descripcion}}</td>
                 <td>
-                  <h4>
-                    Seleccione un gimnasio para mostrar información.
-                </h4>
+                  <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-edit "></i></a>
+                  <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+                    data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
+                    <i class="fas fa-times "></i></a>
                 </td>
-                
-                {% endif %}
+              </tr>
+              {% endif %}
+              {% endfor %}
+              {% else %}
+              <td>
+                <h4>
+                  Seleccione un gimnasio para mostrar información.
+                </h4>
+              </td>
+
+              {% endif %}
               </tr>
             </table>
           </div>

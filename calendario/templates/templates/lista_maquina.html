@@ -14,7 +14,7 @@
     <h2 class="text-left">{{title}}</h2>
   </div>
   <div class="col">
-    <a href="{% url 'calendario:crearZona' %}" class="btn btn-primary float-right">Agregar zona <i
+    <a href="{% url 'calendario:crearMaquina' %}" class="btn btn-primary float-right">Agregar máquina <i
         class="fas fa-plus-circle"> </i></a>
   </div>
   <hr>
@@ -29,23 +29,29 @@
     <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
       <thead class="thead-light">
         <tr>
-          <th scope="col">Id</th>
+          <th scope="col">Imágen</th>
+          <th scope="col">Código</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Espacios</th>
-          <th scope="col">Tipo</th>
+          <th scope="col">Descripción</th>
+          <th scope="col">Categoria</th>
+          <th scope="col">Cantidad</th>
+          <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
         {% if page_obj %}
-        {% for gimnasio in page_obj %}
+        {% for maquina in page_obj %}
         <tr class="text-center">
-          <td>{{gimnasio.id}}</td>
-          <td>{{gimnasio.nombre.upper}}</td>
-          <td>{{gimnasio.espacios}}</td>
-          <td>{{gimnasio.tipo|capfirst}}</td>
+          <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{maquina.imagen}}" alt=""></td>
+          <td>{{maquina.codigo}}</td>
+          <td>{{maquina.nombre.upper}}</td>
+          <td>{{maquina.descripcion}}</td>
+          <td>{{maquina.categoria|capfirst}}</td>
+          <td>{{maquina.cantidad}}   {% if maquina.reservable %}<p style="color:green">Reservable</p>{% else %}<p style="color:red">No reservable</p>{% endif %}</td>
+          <td>Activo</td>
           <td>
-            <a href="{% url 'calendario:updateZona' gimnasio.id %}" class="btn btn-sm btn-primary">
+            <a href="{%url 'calendario:editarMaquina' maquina.pk%}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
               data-url="" href="#">
@@ -67,8 +73,8 @@
   <div class="col-12">
     <div class="d-flex justify-content-around">
       <p><b>Total de zonas: </b> {{total}} </p>
-      <p><b>Zonas para clases: </b> {{clases}} </p>
-      <p><b>Zonas de máquinas: </b> {{maquinas}} </p>
+      <p><b>Zonas para clases: </b> {{activo}} </p>
+      <p><b>Zonas de máquinas: </b> {{inactivo}} </p>
     </div>
   </div>
 </div>

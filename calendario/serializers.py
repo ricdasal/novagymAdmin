@@ -1,9 +1,6 @@
-from django.contrib.auth.models import User
-from gimnasio.models import Gimnasio
-
 from seguridad.models import UserDetails
-from .models import Horario, HorarioReserva,Posicion, Zona
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from .models import Horario, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField,ImageField
 
 class ZonaSerializer(ModelSerializer):
     class Meta:
@@ -31,10 +28,36 @@ class HorarioSerializer(ModelSerializer):
 
 class HorarioReservaSerializer(ModelSerializer):
     usuario=PrimaryKeyRelatedField(queryset=UserDetails.objects.all())
-    horario=HorarioSerializer(read_only=True, many=False)
-    posicion=PosicionSerializer(read_only=True, many=False)
+    horario=PrimaryKeyRelatedField(queryset=Horario.objects.all())
+    posicion=PrimaryKeyRelatedField(queryset=Posicion.objects.all())
     class Meta:
         model = HorarioReserva
         fields = ('id','codigo','horario', 'usuario','posicion')
     def create(self, validated_data):
             return HorarioReserva.objects.create(**validated_data)
+
+class MaquinaSerializer(ModelSerializer):
+    imagen=ImageField(max_length=None, use_url=True, allow_null=True, required=False)
+    class Meta:
+        model = Maquina
+        fields = ('id','codigo','nombre','descripcion','imagen','categoria','cantidad','reservable','activo','zona')
+    def create(self, validated_data):
+            return Maquina.objects.create(**validated_data)
+
+class PosicionMaquinaSerializer(ModelSerializer):
+    zona=ZonaSerializer(read_only=True, many=False)
+    class Meta:
+        model = PosicionMaquina
+        fields = ('id','fila','coulmna','zona', 'ocupado')
+    def create(self, validated_data):
+            return PosicionMaquina.objects.create(**validated_data)  
+
+class MaquinaReservaSerializer(ModelSerializer):
+    usuario=PrimaryKeyRelatedField(queryset=UserDetails.objects.all())
+    maquina=PrimaryKeyRelatedField(queryset=Maquina.objects.all())
+    posicion=PrimaryKeyRelatedField(queryset=PosicionMaquina.objects.all())
+    class Meta:
+        model = MaquinaReserva
+        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha')
+    def create(self, validated_data):
+            return MaquinaReserva.objects.create(**validated_data)
