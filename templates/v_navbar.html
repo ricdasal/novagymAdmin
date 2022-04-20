@@ -149,14 +149,14 @@
               class="menu__image"
             />
             <div class="d-flex align-items-center">
-              <span class="menu__title">Calendario</span>
+              <span class="menu__title">Horarios</span>
             </div>
           </div>
         </a>
       </div>
     </div>
 
-    <div class="row menu-container">
+<!--     <div class="row menu-container">
       <div class="col-12">
         <a class="menu" href="">
           <div class="row">
@@ -167,6 +167,60 @@
             />
             <div class="d-flex align-items-center">
               <span class="menu__title">Reservaciones</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div> -->
+
+    <div
+      class="row  menu-container menu menu--collapsable {% if request.resolver_match.namespace == 'reservas' %}menu-container--active{% endif %}"
+      data-toggle="collapse"
+      data-target="#collaps-reservas"
+      aria-expanded="true"
+      aria-controls="collaps-reservas"
+    >
+      <div class="col-12">
+        <div class="row">
+          <img
+            src="{% static 'images/admin-icons/reservaciones_icon.png'%}"
+            alt="usuarios"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Reservaciones</span>
+            <span class="px-4">
+              <i class="fas fa-angle-down"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="collaps-reservas" class="collapse row menu menu--collapsable {% if request.resolver_match.namespace == 'reservas' %}show{% endif %} ">
+      <div class="col-12">
+        <a class="menu" href="">
+          <div class="row menu-container {% if type == 'c' %}menu-container--active{% endif %}">
+            <img
+              src="{% static 'images/admin-icons/coach_icon.png'%}"
+              alt="empleados"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Clases</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      <div class="col-12">
+        <a class="menu" href="{% url 'reservas:reservasMaquinas' %}">
+          <div class="row menu-container {% if type == 'm' %}menu-container--active{% endif %}">
+            <img
+              src="{% static 'images/admin-icons/maquina_icon.png'%}"
+              alt="clientes"
+              class="menu__image"
+            />
+            <div class="d-flex align-items-center">
+              <span class="menu__title">Máquinas</span>
             </div>
           </div>
         </a>

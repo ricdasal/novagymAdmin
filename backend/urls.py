@@ -42,4 +42,5 @@ urlpatterns = [
     path('promociones/', include('promociones.urls')),
     path('reportes/', include('charts.urls')),
     path('novacoin/', include('novacoin.urls')),
+    path('reservas/', include('reservas.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
