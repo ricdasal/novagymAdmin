@@ -323,3 +323,4 @@ class PublicacionNotificacion(models.Model):
         Publicacion, on_delete=models.CASCADE, related_name='publicacion')
     notificacion = models.OneToOneField(
         Notificacion, on_delete=models.CASCADE, related_name='notificacion_publicacion')
+    enlace_archivo = models.TextField(blank=True, default="")

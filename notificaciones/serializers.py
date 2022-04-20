@@ -19,7 +19,9 @@ class NotificacionUsuarioSerializer(serializers.ModelSerializer):
     notificacion = NotificacionSerializer()
     publicacion = serializers.IntegerField(
         source='notificacion.notificacion_publicacion.publicacion.id', read_only=True)
+    enlace_archivo = serializers.CharField(
+        source='notificacion.notificacion_publicacion.enlace_archivo', read_only=True)
 
     class Meta:
         model = NotificacionUsuario
-        fields = ('id', 'notificacion', 'publicacion')
+        fields = ('id', 'notificacion', 'publicacion', 'enlace_archivo')
