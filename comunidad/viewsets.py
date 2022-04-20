@@ -198,7 +198,11 @@ class ReportarPublicacionView(viewsets.ViewSet):
                 publicacion.save()
                 notificacion = publicacion.notificacion_reportar_publicacion(request.user)
 
-                PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+                archivos = list(publicacion.archivos.filter(publicacion=publicacion))
+                p_notificacion = PublicacionNotificacion(publicacion=publicacion, notificacion=notificacion)
+                if len(archivos) > 0:
+                    p_notificacion.enlace_archivo = request.build_absolute_uri('/') + archivos[0].archivo.url[1:]
+                p_notificacion.save()
 
                 return Response(status=status.HTTP_200_OK)
             return Response({"message": "No puedes reportar tu propia publicación."} , status=status.HTTP_403_FORBIDDEN)
@@ -232,7 +236,11 @@ class ComentarioView(viewsets.ViewSet):
             comentario = serializer.save()
             notificacion = comentario.nueva_notificacion()
             
-            PublicacionNotificacion.objects.create(publicacion=comentario.publicacion, notificacion=notificacion)
+            archivos = list(comentario.publicacion.archivos.filter(publicacion=comentario.publicacion))
+            p_notificacion = PublicacionNotificacion(publicacion=comentario.publicacion, notificacion=notificacion)
+            if len(archivos) > 0:
+                p_notificacion.enlace_archivo = request.build_absolute_uri('/') + archivos[0].archivo.url[1:]
+            p_notificacion.save()
 
             extra = {"title": notificacion.titulo }
             if notificacion.imagen:
@@ -322,7 +330,11 @@ class LikeView(viewsets.ViewSet):
             like.incrementar_publicacion_likes()
             notificacion = like.nueva_notificacion()
 
-            PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+            archivos = list(publicacion.archivos.filter(publicacion=publicacion))
+            p_notificacion = PublicacionNotificacion(publicacion=publicacion, notificacion=notificacion)
+            if len(archivos) > 0:
+                p_notificacion.enlace_archivo = request.build_absolute_uri('/') + archivos[0].archivo.url[1:]
+            p_notificacion.save()
 
             extra = {"title": notificacion.titulo }
             if notificacion.imagen:
