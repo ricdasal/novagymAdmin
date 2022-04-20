@@ -18,26 +18,22 @@ from rest_framework import status
 
 class getPromociones(APIView):
     def get(self, request,activo=None, *args, **kwargs):
+        data=Promociones.objects.all()
         if activo=="activo":
-            queryset = Promociones.objects.all().filter(activo=1)
+            queryset = data.filter(activo=1)
             serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data, status=status.HTTP_200_OK)
         elif activo=="inactivo":
             queryset = Promociones.objects.all().filter(activo=0)
             serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data, status=status.HTTP_200_OK)
-        elif activo=="todos":
-            queryset = Promociones.objects.all()
-            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
-            return Response(data=serializer.data, status=status.HTTP_200_OK)
         elif activo=="vigentes":
             today=datetime.datetime.now(tz=pytz.utc).strftime("%Y-%m-%dT%H:%M")
-            queryset=Promociones.objects.filter(fecha_hora_inicio__lte=today).filter(fecha_hora_fin__gte=today)
+            queryset=Promociones.objects.filter(fecha_hora_inicio__lte=today).filter(fecha_hora_fin__gte=today).filter(activo=True)
             serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         elif activo==None:
-            queryset=Promociones.objects.all()
-            serializer = PublicidadSerializer(queryset, many=True, context={"request":request})
+            serializer = PublicidadSerializer(data, many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         else:
             return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)

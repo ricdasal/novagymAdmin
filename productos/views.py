@@ -277,7 +277,6 @@ def all(request):
 
     listItems=list(items)
     for i in listItems:
-        print(i)
         userId=i["usuario_id"]
         pagoId=i["tipo_pago_id"]
         i["created_at"]=i["created_at"].replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
@@ -285,15 +284,25 @@ def all(request):
         pago=TipoPago.objects.get(id=pagoId)
         i["usuario_id"]=usuario.nombres + " " + usuario.apellidos
         i["tipo_pago_id"]=pago.nombre
-
-        print(i)
-    response = {
-        'items':listItems,
-        'totales':{"subtotal":query.aggregate(Sum("subtotal")).get("subtotal__sum"),
-                    "iva":query.aggregate(Sum("iva")).get("iva__sum"),
-                    "total":query.aggregate(Sum("valor_total")).get("valor_total__sum")
-                    }
-    }
+    try:
+        subtotal=query.aggregate(Sum("subtotal")).get("subtotal__sum")
+        iva=query.aggregate(Sum("iva")).get("iva__sum")
+        total=query.aggregate(Sum("valor_total")).get("valor_total__sum")
+        response = {
+            'items':listItems,
+            'totales':{"subtotal":subtotal,
+                        "iva":iva,
+                        "total":total
+                        }
+        }
+    except:
+        response = {
+            'items':listItems,
+            'totales':{"subtotal":0,
+                        "iva":0,
+                        "total":0
+                        }
+        }
     return JsonResponse(response)
 
 def dateRangeFilter(request):
@@ -302,11 +311,10 @@ def dateRangeFilter(request):
     fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
     fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
 
-    query=Transaccion.objects.all()
+    query=Transaccion.objects.filter(created_at__range=(fechaI,fechaF))
     items=query.values()
     listItems=list(items)
     for i in listItems:
-        print(i)
         userId=i["usuario_id"]
         pagoId=i["tipo_pago_id"]
         i["created_at"]=i["created_at"].replace(tzinfo=None).strftime("%d/%m/%Y %H:%M")
@@ -314,14 +322,25 @@ def dateRangeFilter(request):
         pago=TipoPago.objects.get(id=pagoId)
         i["usuario_id"]=usuario.nombres + " " + usuario.apellidos
         i["tipo_pago_id"]=pago.nombre
-        print(i)
-    response = {
-        'items':listItems,
-        'totales':{"subtotal":query.aggregate(Sum("subtotal")).get("subtotal__sum"),
-                    "iva":query.aggregate(Sum("iva")).get("iva__sum"),
-                    "total":query.aggregate(Sum("valor_total")).get("valor_total__sum")
-                    }
-    }
+    try:
+        subtotal=query.aggregate(Sum("subtotal")).get("subtotal__sum")
+        iva=query.aggregate(Sum("iva")).get("iva__sum")
+        total=query.aggregate(Sum("valor_total")).get("valor_total__sum")
+        response = {
+            'items':listItems,
+            'totales':{"subtotal":subtotal,
+                        "iva":iva,
+                        "total":total
+                        }
+        }
+    except:
+        response = {
+            'items':listItems,
+            'totales':{"subtotal":0,
+                        "iva":0,
+                        "total":0
+                        }
+        }
     return JsonResponse(response)
 
 def update_items(request):

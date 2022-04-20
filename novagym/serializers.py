@@ -1,8 +1,10 @@
 from decimal import Decimal
+from re import I
 
 from rest_framework import serializers
 
-from novagym.models import ObjetivoPeso, ProgresoImc
+from novagym.models import (DetalleTransaccionMembresia, DetalleTransaccionProducto, ObjetivoPeso,
+                            ProgresoImc, Transaccion)
 
 
 class ProgresoImcSerializer(serializers.ModelSerializer):
@@ -33,9 +35,10 @@ class ObjetivoPesoSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if attrs['fecha_inicio'] >= attrs['fecha_fin']:
-            raise serializers.ValidationError(
-                {"fecha_inicio": "Fecha de inicio no puede ser igual o mayor a la fecha de fin"})
+        if 'fecha_inicio' in attrs and 'fecha_fin' in attrs:
+            if attrs['fecha_inicio'] >= attrs['fecha_fin']:
+                raise serializers.ValidationError(
+                    {"fecha_inicio": "Fecha de inicio no puede ser igual o mayor a la fecha de fin"})
         return attrs
 
     def create(self, validated_data):
@@ -47,3 +50,105 @@ class ObjetivoPesoSerializer(serializers.ModelSerializer):
         objetivo = super().create(validated_data)
         ProgresoImc.objects.create(objetivo=objetivo, **imc)
         return objetivo
+
+
+class TransaccionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaccion
+        fields = '__all__'
+
+
+class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleTransaccionMembresia
+        exclude = ('meses','precio','descuento','subtotal','iva','total',)
+
+
+class DetalleTransaccionProductoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleTransaccionProducto
+        exclude = ('descuento', 'iva', 'subtotal', 'total',)
+
+
+class TransaccionProductoSerializer(serializers.ModelSerializer):
+    transaccion_producto = DetalleTransaccionProductoSerializer(many=True)
+
+    class Meta:
+        model = Transaccion
+        fields = ['id',
+                  'usuario',
+                  'valor_total',
+                  'descuento',
+                  'subtotal',
+                  'iva',
+                  'tipo_pago',
+                  'estado',
+                  'transaccion_producto',
+                  ]
+
+    def create(self, validated_data):
+        detalles_data = validated_data.pop('transaccion_producto')
+        transaccion = Transaccion.objects.create(**validated_data)
+        pre = str(transaccion.pk)
+        sec = '0'*(9-len(pre))+pre
+        transaccion.codigo = sec
+        for producto in detalles_data:
+            DetalleTransaccionProducto.objects.create(
+                transaccion=transaccion, **producto)
+        transaccion.save()
+        return transaccion
+
+    def update(self, instance, validated_data):
+        detalles_data = []
+        if 'transaccion_producto' in validated_data:
+          detalles_data = validated_data.pop('transaccion_producto')
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.transaccion_producto.all().delete()
+        for producto in detalles_data:
+            DetalleTransaccionProducto.objects.create(
+                transaccion=instance, **producto)
+        instance.save()
+        return instance
+
+
+class TransaccionMembresiaSerializer(serializers.ModelSerializer):
+    transaccion_membresia = DetalleTransaccionMembresiaSerializer(many=True)
+
+    class Meta:
+        model = Transaccion
+        fields = ['id',
+                  'usuario',
+                  'valor_total',
+                  'descuento',
+                  'subtotal',
+                  'iva',
+                  'tipo_pago',
+                  'estado',
+                  'transaccion_membresia',
+                  ]
+
+    def create(self, validated_data):
+        detalles_data = validated_data.pop('transaccion_membresia')
+        transaccion = Transaccion.objects.create(**validated_data)
+        pre = str(transaccion.pk)
+        sec = '0'*(9-len(pre))+pre
+        transaccion.codigo = sec
+        for membresia in detalles_data:
+            DetalleTransaccionMembresia.objects.create(
+                transaccion=transaccion, **membresia)
+        transaccion.save()
+        return transaccion
+
+    def update(self, instance, validated_data):
+        detalles_data = []
+        if 'transaccion_membresia' in validated_data:
+          detalles_data = validated_data.pop('transaccion_membresia')
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.transaccion_membresia.all().delete()
+        for producto in detalles_data:
+            DetalleTransaccionMembresia.objects.create(
+                transaccion=instance, **producto)
+        instance.save()
+        return instance

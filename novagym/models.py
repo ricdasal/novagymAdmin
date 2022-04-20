@@ -51,6 +51,9 @@ class TipoPago(models.Model):
     nombre = models.CharField(max_length=24)
     estado = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.nombre
+
 
 class Transaccion(models.Model):
     class Estado(models.TextChoices):
@@ -58,7 +61,7 @@ class Transaccion(models.Model):
         CANCEL = 'CNC', 'Anulada'
         PAID = 'PAG', 'Pagada'
         DES = 'DES', 'Despachada'
-
+    codigo = models.CharField(max_length=64, blank=True)
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2)
@@ -73,7 +76,7 @@ class Transaccion(models.Model):
 
 class DetalleTransaccionMembresia(models.Model):
     transaccion = models.ForeignKey(
-        Transaccion, on_delete=models.SET_NULL, null=True)
+        Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_membresia')
     membresia = models.ForeignKey(
         Membresia, on_delete=models.SET_NULL, null=True)
     meses = models.PositiveIntegerField()
@@ -84,7 +87,7 @@ class DetalleTransaccionMembresia(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2)
 
     def calcular_subtotal(self):
-        return self.precio * (1 - self.descuento/100)
+        return self.precio * Decimal(1 - self.descuento/100)
 
     def calcular_iva(self):
         return self.subtotal * Decimal(1.12)
@@ -101,7 +104,7 @@ class DetalleTransaccionMembresia(models.Model):
 
 class DetalleTransaccionProducto(models.Model):
     transaccion = models.ForeignKey(
-        Transaccion, on_delete=models.SET_NULL, null=True)
+        Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_producto')
     producto = models.ForeignKey(
         Producto, on_delete=models.SET_NULL, null=True)
     cantidad = models.PositiveIntegerField()
@@ -112,7 +115,7 @@ class DetalleTransaccionProducto(models.Model):
     total = models.DecimalField(max_digits=12, decimal_places=2)
 
     def calcular_subtotal(self):
-        return self.cantidad * (self.precio * (1 - self.descuento/100))
+        return self.cantidad * (self.precio * Decimal(1 - self.descuento/100))
 
     def calcular_iva(self):
         return self.subtotal * Decimal(1.12)

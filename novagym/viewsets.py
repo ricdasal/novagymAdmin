@@ -1,7 +1,7 @@
 from rest_framework import permissions, viewsets
 
-from novagym.models import ObjetivoPeso, ProgresoImc
-from novagym.serializers import ObjetivoPesoSerializer, ProgresoImcSerializer
+from novagym.models import DetalleTransaccionMembresia, DetalleTransaccionProducto, ObjetivoPeso, ProgresoImc, Transaccion
+from novagym.serializers import DetalleTransaccionMembresiaSerializer, DetalleTransaccionProductoSerializer, ObjetivoPesoSerializer, ProgresoImcSerializer, TransaccionMembresiaSerializer, TransaccionProductoSerializer
 
 
 class ProgresoImcViewSet(viewsets.ModelViewSet):
@@ -29,4 +29,32 @@ class ObjetivoPesoViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         request.data['usuario'] = request.user.detalles.pk
+        return super().create(request, *args, **kwargs)
+
+
+class TransaccionMembresiaViewset(viewsets.ModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TransaccionMembresiaSerializer
+
+    def get_queryset(self):
+        queryset = Transaccion.objects.filter(
+            usuario=self.request.user)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        request.data['usuario'] = request.user.pk
+        return super().create(request, *args, **kwargs)
+
+
+class TransaccionProductoViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = TransaccionProductoSerializer
+
+    def get_queryset(self):
+        queryset = Transaccion.objects.filter(
+            usuario=self.request.user)
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        request.data['usuario'] = request.user.pk
         return super().create(request, *args, **kwargs)
