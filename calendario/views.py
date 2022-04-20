@@ -67,8 +67,6 @@ class Reservar(APIView):
 class ReservarMaquina(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
-
-        print(request.data)
         idUsuario=request.data["usuario"]
         fila=request.data["fila"]
         columna=request.data["columna"]
@@ -142,7 +140,7 @@ class ShowCalendario(FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "CALENDARIO"
+        context['title'] = "HORARIOS"
         gimnasios=Gimnasio.objects.all()
         context["gimnasios"]=gimnasios
         #page_obj = context["page_obj"]
@@ -227,43 +225,6 @@ class CrearZona(CreateView):
                         break
         return response
 
-class ShowMaquina(FilterView):
-    paginate_by = 20
-    max_pages_render = 10
-    model = Maquina
-    context_object_name = 'maquina'
-    template_name = "templates/lista_maquina.html"
-    permission_required = 'novagym.view_empleado'
-    filterset_class=MaquinaFilter
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "LISTAR MAQUINAS"
-        context['total'] = len(Maquina.objects.all())
-        context['activo'] = len(Maquina.objects.all().filter(activo=True))
-        context['inactivo'] = len(Maquina.objects.all().filter(activo=False))
-        return context
-
-class CrearMaquina(CreateView):
-    form_class =MaquinaForm
-    model=Maquina
-    template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('calendario:listarMaquina')
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "CREAR MÁQUINA"
-        return context
-
-class UpdateMaquina(UpdateView):
-    form_class =MaquinaForm
-    model=Maquina
-    title = "ACTUALIZAR ZONA"
-    template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('calendario:listarMaquina')
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = "Editar Máquina"
-        return context
-
 def deleteCalendario(request,id):
     query = Horario.objects.get(id=id)
     if request.POST:
@@ -292,3 +253,31 @@ def getHorarios(request):
                 "horaFin":str(horario.horario_fin)
             }
     return HttpResponse(json.dumps(urls))
+
+class MaquinasDispo(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        data=Maquina.objects.all()
+        serializer = MaquinaDispoSerializer(data, many=True)
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+class HorariosDispo(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        data=Horario.objects.all()
+        serializer = HorarioDispoSerializer(data, many=True)
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+class HorariosUsuario(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request,id, *args, **kwargs):
+        data=HorarioReserva.objects.all().filter(usuario=id)
+        serializer = ReporteHorarioReservaSerializer(data, many=True)
+        return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+class MaquinaUsuario(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request,id, *args, **kwargs):
+        data=MaquinaReserva.objects.all().filter(usuario=id)
+        serializer = ReporteMaquinaReservaSerializer(data, many=True)
+        return Response(data=serializer.data,status=status.HTTP_200_OK)

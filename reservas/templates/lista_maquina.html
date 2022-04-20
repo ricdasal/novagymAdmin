@@ -13,26 +13,20 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
+  <div class="col">
+    <a href="" class="btn btn-primary float-right">Agregar máquina <i
+        class="fas fa-plus-circle"> </i></a>
+  </div>
   <hr>
 </div>
 <div class="row mt-4">
   <div class="col-12">
-    <div class="col">
-      <div class="col">
-        <a style="margin-left: 1%;" href="{% url 'reservas:crearMaquina' %}" class="btn btn-primary float-right">Agregar máquina <i
-          class="fas fa-plus-circle"> </i></a>
-        <a href="{%url 'reservas:reservasMaquinas'%}" class="btn btn-primary float-right">Regresar <i class="fa fa-arrow-circle-left"> </i></a>
-      </div>
-      
-    </div>
     <form method="get">
-      {% crispy filter.form %}
       {% include "export_records.html" %}
     </form>
-
   </div>
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="maquinas">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
       <thead class="thead-light">
         <tr>
           <th scope="col">Imágen</th>
@@ -54,11 +48,11 @@
           <td>{{maquina.codigo}}</td>
           <td>{{maquina.nombre}}</td>
           <td>{{maquina.descripcion}}</td>
-          <td>{{maquina.categoria}}</td>
-          <td>{{maquina.gimnasio.nombre}}: {{maquina.zona.nombre}}</td>
+          <td>{{promocion.categoria}}</td>
+          <td>{{promocion.gimnasio.nombre}}</td>
           <td>
             <input type="checkbox" {%if maquina.reservable%}checked{%endif%} class="use-modal" data-toggle="toggle" 
-            data-type="checkbox" data-on="Apto" data-off="No apto" data-onstyle="success" data-offstyle="danger" 
+            data-type="checkbox" data-on="Reservable" data-off="No reservable" data-onstyle="success" data-offstyle="danger" 
             data-target="#mainModal" data-url-activar=""
             data-url-eliminar=""
             >
@@ -71,7 +65,7 @@
             >
           </td>
           <td>
-            <a href="{% url 'reservas:editarMaquina' maquina.pk %}" class="btn btn-sm btn-primary">
+            <a href="" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
 
                <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
