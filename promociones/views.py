@@ -95,7 +95,7 @@ def ChangeState(request,pk):
             return redirect('promociones:listar')
         elif query.activo==1:
             query.activo=0
-            messages.success(request, "Publicidad deshabilitada.")
+            messages.error(request, "Publicidad deshabilitada.")
             query.save()
             return redirect('promociones:listar')
     return render(request, "ajax/promocion_confirmar_change.html", {"promocion": query})

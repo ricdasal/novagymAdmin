@@ -184,6 +184,18 @@ class ShowZona(FilterView):
         context['maquinas'] = len(Zona.objects.all().filter(tipo="clases"))
         return context
 
+def deleteZona(request,id):
+    try:
+        query = Zona.objects.get(id=id)
+        if request.POST:
+            query.delete()
+            messages.success(request, "Zona eliminada con éxito.")
+            return redirect('calendario:listarZona')
+        return render(request, "templates/ajax/zona_confirmar_elminar.html", {"zona": query})
+    except:
+        messages.error(request, "No se puede eliminar esta zona.")
+        return redirect('calendario:listarZona')
+
 class UpdateZona(UpdateView):
     form_class =ZonaForm
     model=Zona

@@ -7,6 +7,8 @@ from calendario.models import Maquina,MaquinaReserva,PosicionMaquina,Horario,Hor
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from django.views.generic import CreateView, UpdateView
+from django.contrib import messages
+from django.shortcuts import redirect, render
 # Create your views here.
 
 class ListarMaquinas(FilterView):
@@ -86,3 +88,45 @@ class ListarReservasHorarios(FilterView):
 
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
+
+def deleteMaquina(request,id):
+    query = Maquina.objects.get(id=id)
+    try:
+        if request.POST:
+            query.imagen.delete()
+            query.delete()
+            messages.success(request, "Máquina eliminada con éxito.")
+            return redirect('reservas:listarMaquinas')
+        return render(request, "templates/ajax/maquina_confirmar_elminar.html", {"maquina": query})
+    except:
+        messages.error(request, "No se puede eliminar esta máquina.")
+        return redirect('reservas:listarMaquinas')
+
+def ChangeState(request,pk):
+    query = Maquina.objects.get(id=pk)
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Máquina habilitada.")
+            query.save()
+            return redirect('reservas:listarMaquinas')
+        elif query.activo==1:
+            query.activo=0
+            messages.error(request, "Máquina deshabilitada.")
+            query.save()
+            return redirect('reservas:listarMaquinas')
+    return render(request, "templates/ajax/maquina_confirmar_change.html", {"maquina": query})
+
+def changeReservable(request,pk):
+    query = Maquina.objects.get(id=pk)
+
+    if query.reservable==0:
+        query.reservable=1
+        #messages.success(request, "Máquina apta para reservas.")
+        query.save()
+        #return redirect('reservas:listarMaquinas')
+    elif query.reservable==1:
+        query.reservable=0
+        #messages.error(request, "Máquina no apta para reservas.")
+        query.save()
+        #return redirect('reservas:listarMaquinas')
