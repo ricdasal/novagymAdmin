@@ -25,7 +25,5 @@ urlpatterns = [
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
-    #path('listarMaquina/',ShowMaquina.as_view(),name="listarMaquina"),
-    #path('crearMaquina/',CrearMaquina.as_view(),name="crearMaquina"),
-    #path('editarMaquina/<int:pk>',UpdateMaquina.as_view(),name="editarMaquina"),
+    path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 ]

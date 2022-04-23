@@ -1,37 +1,37 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar sponsor</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar zona</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 {% csrf_token %}
-<form method="POST" action="{% url 'promociones:eliminar' promocion.id %}">
+<form method="POST" action="{% url 'calendario:eliminarZona' zona.id %}">
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar la siguiente promoción?
+    ¿Desea eliminar la siguiente zona?
     <div class="row">
       <div class="col-3">
-        Título
+        Nombre
       </div>
       <div class="col">
-        {{promocion.titulo}}
+        {{zona.nombre}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Vigencia
+        Espacios
       </div>
       <div class="col">
-        {{promocion.fecha_hora_inicio}} - {{promocion.fecha_hora_fin}}
+        {{zona.espacios}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Imagen
+        Tipo
       </div>
       <div class="col">
-        <img src="/media/{{promocion.imagen}}" style="width: 100px;height: 100px;" alt="">
+        {{zona.tipo}}
       </div>
     </div>
   </div>

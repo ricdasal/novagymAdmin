@@ -41,20 +41,23 @@ class Reservar(APIView):
         idHorario=request.data["horario"]
         idUsuario=request.data["usuario"]
         nroPosicion=request.data["posicion"]
-        #reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario)
+        fecha=request.data["fecha"]
+        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario).filter(fecha=fecha)
         horario=Horario.objects.get(id=idHorario)
         idZona=horario.zona
         posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
         if reserva.is_valid():
-            #if reservado:
-                #return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
+            if reservado:
+                return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
             if horario.asistentes < horario.capacidad and posiciones.ocupado==False:
-                posiciones.ocupado=True
-                posiciones.save()
-                horario.asistentes+=1
-                horario.save()
-                reserva.save()
-                return Response(data=request.data, status=status.HTTP_200_OK)
+                if reserva.save():
+                    posiciones.ocupado=True
+                    posiciones.save()
+                    horario.asistentes+=1
+                    horario.save()
+                    return Response(data=request.data, status=status.HTTP_200_OK)
+                else: 
+                    return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
             elif not posiciones:
                 return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
             elif horario.asistentes == horario.capacidad:
@@ -62,7 +65,7 @@ class Reservar(APIView):
             else:
                 return Response(data="Ocurrio un error", status=status.HTTP_200_OK)
         else:
-            return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
+            return Response(data="Reserva no válida", status=status.HTTP_400_BAD_REQUEST)
 
 class ReservarMaquina(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -183,6 +186,18 @@ class ShowZona(FilterView):
         context['clases'] = len(Zona.objects.all().filter(tipo="maquinas"))
         context['maquinas'] = len(Zona.objects.all().filter(tipo="clases"))
         return context
+
+def deleteZona(request,id):
+    try:
+        query = Zona.objects.get(id=id)
+        if request.POST:
+            query.delete()
+            messages.success(request, "Zona eliminada con éxito.")
+            return redirect('calendario:listarZona')
+        return render(request, "templates/ajax/zona_confirmar_elminar.html", {"zona": query})
+    except:
+        messages.error(request, "No se puede eliminar esta zona.")
+        return redirect('calendario:listarZona')
 
 class UpdateZona(UpdateView):
     form_class =ZonaForm

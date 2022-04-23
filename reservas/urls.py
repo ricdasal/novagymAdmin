@@ -12,4 +12,10 @@ urlpatterns = [
      path('editarMaquina/<int:pk>',UpdateMaquina.as_view(),name="editarMaquina"),
      path('reservasMaquinas/', ListarReservasMaquinas.as_view(), name='reservasMaquinas'),
      path('listarHorarios/', ListarReservasHorarios.as_view(), name='listarHorarios'),
+     path('eliminarMaquina/<int:id>',deleteMaquina,name="eliminarMaquina"),
+     path('change/<int:pk>',ChangeState,name="change"),
+     path('reservable/<int:pk>',changeReservable,name="reservable"),
+     path('maquinatoday/<int:pk>',showList,name="maquinatoday"),
+     path('horariotoday/<int:pk>',showListHorario,name="horariotoday"),
+     
 ]

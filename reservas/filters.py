@@ -1,13 +1,18 @@
 import django_filters
-from calendario.models import Maquina,MaquinaReserva,PosicionMaquina,Horario,HorarioReserva,Posicion
+from calendario.forms import MaquinaFilterForm, MaquinaReservaFilterForm
+from calendario.models import Maquina, MaquinaReserva
 
-""" class MaquinaFilter(django_filters.FilterSet):
+from gimnasio.models import Gimnasio
+from seguridad.models import UserDetails
+
+class MaquinaReservaFilter(django_filters.FilterSet):
+    maquina = django_filters.ModelChoiceFilter(queryset=Maquina.objects.all())
+    usuario = django_filters.ModelChoiceFilter(queryset=UserDetails.objects.all())
+    fecha= django_filters.DateFromToRangeFilter()
     class Meta:
-        model = Maquina
-        fields = ['nombre',
-                  'categoria',
-                    'reservable',
-                    'activo',
-                  'gimnasio',
-                  'zona'
-                  ] """
+        model = MaquinaReserva
+        fields = ['usuario',
+                  'maquina',
+                  'fecha'
+                  ]
+        form = MaquinaReservaFilterForm

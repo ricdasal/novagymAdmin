@@ -59,15 +59,15 @@
           <td>
             <input type="checkbox" {%if maquina.reservable%}checked{%endif%} class="use-modal" data-toggle="toggle" 
             data-type="checkbox" data-on="Apto" data-off="No apto" data-onstyle="success" data-offstyle="danger" 
-            data-target="#mainModal" data-url-activar=""
-            data-url-eliminar=""
+            data-target="#mainModal" data-url-activar="{% url 'reservas:reservable' maquina.pk %}"
+            data-url-eliminar="{% url 'reservas:reservable' maquina.pk %}"
             >
           </td>
           <td>
             <input type="checkbox" {%if maquina.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
             data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
-            data-target="#mainModal" data-url-activar=""
-            data-url-eliminar=""
+            data-target="#mainModal" data-url-activar="{% url 'reservas:change' maquina.pk %}"
+            data-url-eliminar="{% url 'reservas:change' maquina.pk %}"
             >
           </td>
           <td>
@@ -75,8 +75,12 @@
               <i class="fas fa-edit "></i></a>
 
                <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-               data-url="" href="#">
+               data-url="{% url 'reservas:eliminarMaquina' maquina.id %}" href="#">
                  <i class="fas fa-times "></i></a>
+
+                 <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
+               data-url="{% url 'reservas:maquinatoday' maquina.pk %}" href="#">
+                 <i class="fas fa-book"></i></a>
           </td>
           
         </tr>
