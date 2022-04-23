@@ -1,14 +1,18 @@
 import datetime
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from calendario.filters import MaquinaFilter
+from calendario.filters import MaquinaFilter, MaquinaReservaFilter
 from calendario.forms import MaquinaForm
 from calendario.models import Maquina,MaquinaReserva,PosicionMaquina,Horario,HorarioReserva,Posicion
 from django_filters.views import FilterView
+from calendario.serializers import MaquinaReservaSerializer
 from novagym.utils import calculate_pages_to_render
 from django.views.generic import CreateView, UpdateView
 from django.contrib import messages
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import redirect, render
+from rest_framework.views import APIView
 # Create your views here.
 
 class ListarMaquinas(FilterView):
@@ -58,7 +62,7 @@ class ListarReservasMaquinas(FilterView):
     context_object_name = 'maquinaReserva'
     template_name = "templates/lista_maquinaReserva.html"
     permission_required = 'novagym.view_empleado'
-    #filterset_class=MaquinaFilter
+    filterset_class=MaquinaReservaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "RESERVAS DE MÁQUINAS"
@@ -130,3 +134,13 @@ def changeReservable(request,pk):
         #messages.error(request, "Máquina no apta para reservas.")
         query.save()
         #return redirect('reservas:listarMaquinas')
+
+def showList(request,pk):
+        hoy=datetime.datetime.today()
+        queryset = MaquinaReserva.objects.filter(maquina=pk).filter(fecha=hoy)
+        return render(request, "templates/ajax/maquinas_hoy.html", {"reservas": queryset})
+
+def showListHorario(request,pk):
+        hoy=datetime.datetime.today()
+        queryset = HorarioReserva.objects.filter(horario=pk)
+        return render(request, "templates/ajax/horarios_hoy.html", {"reservas": queryset})

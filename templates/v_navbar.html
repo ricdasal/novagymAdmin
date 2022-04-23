@@ -198,7 +198,7 @@
     </div>
     <div id="collaps-reservas" class="collapse row menu menu--collapsable {% if request.resolver_match.namespace == 'reservas' %}show{% endif %} ">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'reservas:listarHorarios' %}">
           <div class="row menu-container {% if type == 'c' %}menu-container--active{% endif %}">
             <img
               src="{% static 'images/admin-icons/coach_icon.png'%}"

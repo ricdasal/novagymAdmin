@@ -15,4 +15,7 @@ urlpatterns = [
      path('eliminarMaquina/<int:id>',deleteMaquina,name="eliminarMaquina"),
      path('change/<int:pk>',ChangeState,name="change"),
      path('reservable/<int:pk>',changeReservable,name="reservable"),
+     path('maquinatoday/<int:pk>',showList,name="maquinatoday"),
+     path('horariotoday/<int:pk>',showListHorario,name="horariotoday"),
+     
 ]

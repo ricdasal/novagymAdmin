@@ -123,6 +123,7 @@ class HorarioReserva(models.Model):
     horario=models.ForeignKey(Horario,on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
     posicion=models.ForeignKey(Posicion, on_delete=models.PROTECT, blank=True,null=True)
+    fecha=models.DateField()
     created_at= models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering=('-id',)

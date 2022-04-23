@@ -77,6 +77,10 @@
                <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
                data-url="{% url 'reservas:eliminarMaquina' maquina.id %}" href="#">
                  <i class="fas fa-times "></i></a>
+
+                 <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
+               data-url="{% url 'reservas:maquinatoday' maquina.pk %}" href="#">
+                 <i class="fas fa-book"></i></a>
           </td>
           
         </tr>

@@ -126,3 +126,21 @@ class MaquinaFilterForm(forms.Form):
                 )
             ),
         )
+class MaquinaReservaFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('maquina', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('fecha', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',css_class='btn btn-primary mt-1'),
+                )
+            ),
+        )

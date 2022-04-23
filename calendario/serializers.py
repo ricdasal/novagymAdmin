@@ -41,7 +41,7 @@ class HorarioReservaSerializer(ModelSerializer):
     posicion=PrimaryKeyRelatedField(queryset=Posicion.objects.all())
     class Meta:
         model = HorarioReserva
-        fields = ('id','codigo','horario', 'usuario','posicion')
+        fields = ('id','codigo','horario', 'usuario','posicion','fecha')
     def create(self, validated_data):
             return HorarioReserva.objects.create(**validated_data)
 
