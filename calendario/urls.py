@@ -1,7 +1,4 @@
-from django.conf import settings
-from django.conf.urls.static import static
-from django.contrib import admin
-from django.urls import include, path
+from django.urls import path
 from calendario.views import *
 from .apps import CalendarioConfig
 
@@ -16,5 +13,17 @@ urlpatterns = [
     path('editar/<int:pk>',UpdateCalendario.as_view(),name="editar"),
     path('eliminar/<int:id>',deleteCalendario,name="eliminar"),
     path('getHorarios/',getHorarios,name="getHorarios"),
+    path('verClases/',Horarios.as_view(),name="verClases"),
+    path('verClases/<int:opcion>',Horarios.as_view(),name="verClases"),
+    path('verReservas/',HorariosReservas.as_view(),name="verReservas"),
+    path('verReservas/<int:opcion>',HorariosReservas.as_view(),name="verReservas"),
+    path('updateZona/<int:pk>',UpdateZona.as_view(),name="updateZona"),
+
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
+    path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
+    path('maquinasDispo/',MaquinasDispo.as_view(),name="maquinasDispo"),
+    path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
+    path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
+    path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
+    path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 ]

@@ -1,0 +1,36 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Horarios reservados</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+
+<div class="modal-body">
+  <table class="table table-responsive-lg table-condensed table-hover text-center">
+    <thead>
+      <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Cédula</th>
+        <th scope="col">Posición</th>
+        <th scope="col">Horario</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if reservas %}
+      {% for reserva in reservas %}
+      <tr>
+        <td>{{reserva.usuario.nombres}} {{reserva.usuario.apellidos}}</td>
+        <td>{{reserva.usuario.cedula}}</td>
+        <td>{{reserva.posicion}}</td>
+        <td>{{reserva.horario.horario_inicio}} - {{reserva.horario.horario_fin}}</td>
+      </tr>
+      {% endfor %}
+      {% else%}
+      <h4>
+        No se encontraron datos.
+      </h4>
+      {% endif %}
+    </tbody>
+  </table>
+</div>

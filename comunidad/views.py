@@ -212,7 +212,8 @@ def bloquear_publicacion(request, pk):
 
             notificacion = publicacion.notificacion_bloquear_publicacion(request.user)
 
-            PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion)
+            enlace = request.build_absolute_uri('/') + archivo.archivo.url[1:]
+            PublicacionNotificacion.objects.create(publicacion=publicacion, notificacion=notificacion, enlace_archivo=enlace)
 
             GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
                 notificacion.cuerpo, extra={"title": notificacion.titulo })

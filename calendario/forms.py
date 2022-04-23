@@ -1,10 +1,11 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from .models import Horario, Zona
+from .models import Horario, Maquina, Zona
 from crispy_forms.layout import Column,Layout, Row
 from .widgets import TimePickerInput
-
+from crispy_forms.bootstrap import StrictButton
 class HorarioForm(forms.ModelForm):
+    zona=forms.ModelChoiceField(queryset=Zona.objects.all().filter(tipo="clases"))
     class Meta:
         model= Horario
         labels = {
@@ -67,5 +68,79 @@ class ZonaForm(forms.ModelForm):
             ),
             Row(
                 Column('tipo', css_class='col-6'),
+            ),
+        )
+
+class MaquinaForm(forms.ModelForm):
+    zona=forms.ModelChoiceField(queryset=Zona.objects.all().filter(tipo="maquinas"))
+    class Meta:
+        model= Maquina
+        fields = ('nombre','descripcion','imagen','categoria','cantidad','reservable','activo','zona','gimnasio')
+        
+        widgets = {
+                "cantidad":forms.NumberInput(attrs={'min':1}),
+                "descripcion": forms.Textarea(attrs={'rows': 4, 'cols': 15,'maxlength': '130'})
+            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('nombre', css_class='col-6'),
+                Column('categoria', css_class='col-6'),
+                Column('descripcion', css_class='col-6'),
+                Column('zona', css_class='col-6'),
+                Column('gimnasio', css_class='col-6'),
+                Column('cantidad', css_class='col-6'),
+            ),
+            Row(
+                Column('cantidad', css_class='col-6'),
+                Column('reservable', css_class='col-6'),
+                Column('activo', css_class='col-6'),
+                Column('imagen', css_class='col-6'),
+            ),
+        )
+class MaquinaFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('nombre', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('categoria', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('gimnasio', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column('zona',css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('reservable', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('activo',css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',css_class='btn btn-primary mt-1'),
+                )
+            ),
+        )
+class MaquinaReservaFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('maquina', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('fecha', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',css_class='btn btn-primary mt-1'),
+                )
             ),
         )

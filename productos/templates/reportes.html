@@ -8,14 +8,6 @@
     <div class="col">
         <h2 class="text-left">{{title}}</h2>
     </div>
-
-    <div class="col-12">
-
-
-
-        <a href="" class="btn btn-primary float-right" style="margin-right: 1%;">boton
-            <i class="fas fa-file-alt"></i></a>
-    </div>
     <hr>
 </div>
 <div class="row mt-4 justify-content-left">
@@ -24,7 +16,8 @@
         <form id="theForm" method="POST">
             <label for="daterange">Rango de fechas:</label>
             <input type="text" class="form-control pull-right" id="daterange" name="daterange" />
-            <input class="btn btn-primary float-right" style="margin-top: 2%;margin-left: 2%;" type="submit" id="boton" value="Filtrar">
+            <input class="btn btn-primary float-right" style="margin-top: 2%;margin-left: 2%;" type="submit" id="boton"
+                value="Filtrar">
             <input class="btn btn-primary float-right" style="margin-top: 2%;" type="submit" id="todo" value="Ver todo">
         </form>
     </div>
@@ -37,137 +30,42 @@
     {% endblock main %}
 
     {% block specific_scripts %}
+    <script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
     <script>
-        $(function () {
-            var d = new Date();
-            var day = d.getDate
-            $('input[name="daterange"]').daterangepicker({
-                "locale": {
-                    "applyLabel": "Aceptar",
-                    "cancelLabel": "Cancelar",
-                    "daysOfWeek": [
-                        "Lu",
-                        "Ma",
-                        "Mi",
-                        "Ju",
-                        "Vi",
-                        "Sá",
-                        "Do"
-                    ],
-                    "monthNames": [
-                        "Enero",
-                        "Febrero",
-                        "Marzo",
-                        "Abril",
-                        "Mayo",
-                        "Junio",
-                        "Julio",
-                        "Agosto",
-                        "Septiembre",
-                        "Octubre",
-                        "Noviembre",
-                        "Diciembre"
-                    ],
-                },
-                opens: 'left',
-                startDate: day,
-                endDate: moment().add('days', 7).format('L')
-            });
-        });
+        dateRangeInit("daterange");
+
         $('#todo').click(function () {
             location.reload();
         });
+
         $(document).ready(function () {
-            var table = $('#reportes').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    'excel', 'pdf', 'print'
-                ],
-                buttons: [
-                {
-                    extend: 'excelHtml5',
-                    text: 'Descargar Excel <i class="fas fa-file-excel"></i>',
-                    titleAttr: 'Excel',
-                    className: 'btn btn-success btn-flat btn-xs'
+            var table = tableInit("#reportes");
+            $.ajax({
+                data: $(this).serializeArray(),
+                url: "{% url 'productos:all' %}",
+                success: function (response) {
+                    dibujarTabla(table, response)
                 },
-                {
-                    extend: 'pdfHtml5',
-                    text: 'Descargar pdf <i class="fas fa-file-pdf"></i>',
-                    titleAttr: 'Pdf',
-                    className: 'btn btn-danger btn-flat btn-xs'
-                },
-                {
-                    extend: 'print',
-                    text: 'Imprimir <i class="fas fa-print"></i>',
-                    titleAttr: 'Print',
-                    className: 'btn btn-secondary btn-flat btn-xs'
-                },
-            ],
-                language: {
-                    "decimal": "",
-                    "emptyTable": "No hay información",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ entrada(s)",
-                    "infoEmpty": "Mostrando 0 entradas",
-                    "infoFiltered": "(Filtrado de _MAX_ entradas totales)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Mostrar _MENU_ entradas",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscar:",
-                    "zeroRecords": "Sin resultados encontrados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Ultimo",
-                        "next": "Siguiente",
-                        "previous": "Anterior"
-                    }
-                },
-                
+                error: function (response) {
+                    console.log(response.responseJSON.errors)
+                }
             });
 
-
             $('#theForm').submit(function (event) {
-                //$( "#tableContainer" ).html('').load( "{% url 'productos:update_items' %}" );
                 event.preventDefault()
                 $.ajax({
-                    // get the form data
                     data: $(this).serializeArray(),
                     url: "{% url 'productos:dateFilter' %}",
-
-                    // on success
                     success: function (response) {
-                        table.clear().draw();
-                        entradas = Object.keys(response["items"])
-                        items = response["items"]
-                        for (var i = 0; i < entradas.length; i++) {
-                            console.log(items[i]);
-                            table.row.add([
-                                items[i]["id"],
-                                items[i]["nombre"],
-                                items[i]["fecha_inicio"],
-                                1,
-                                2,
-                                2
-                            ]);
-                        }
-                        table.draw();
-                        $('#boton').prop("disabled", false);
+                        dibujarTabla(table, response)
                     },
-                    // on error
                     error: function (response) {
-                        // alert the error if any error occured
                         console.log(response.responseJSON.errors)
                     }
                 });
-
                 return false;
             });
-
-
         });
-
-
 
     </script>
     {% endblock %}

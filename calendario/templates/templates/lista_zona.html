@@ -38,17 +38,17 @@
       </thead>
       <tbody>
         {% if page_obj %}
-        {% for gimnasio in page_obj %}
+        {% for zona in page_obj %}
         <tr class="text-center">
-          <td>{{gimnasio.id}}</td>
-          <td>{{gimnasio.nombre.upper}}</td>
-          <td>{{gimnasio.espacios}}</td>
-          <td>{{gimnasio.tipo|capfirst}}</td>
+          <td>{{zona.id}}</td>
+          <td>{{zona.nombre.upper}}</td>
+          <td>{{zona.espacios}}</td>
+          <td>{{zona.tipo|capfirst}}</td>
           <td>
-            <a href="" class="btn btn-sm btn-primary">
+            <a href="{% url 'calendario:updateZona' zona.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-              data-url="" href="#">
+              data-url="{% url 'calendario:eliminarZona' zona.id %}" href="#">
               <i class="fas fa-times "></i></a>
           </td>
 
@@ -66,9 +66,9 @@
   <hr width="100%" />
   <div class="col-12">
     <div class="d-flex justify-content-around">
-      <p><b>Total de gimnasios: </b> {{total}} </p>
-      <p><b>Activos: </b> {{activos}} </p>
-      <p><b>Inactivos: </b> {{inactivos}} </p>
+      <p><b>Total de zonas: </b> {{total}} </p>
+      <p><b>Zonas para clases: </b> {{clases}} </p>
+      <p><b>Zonas de máquinas: </b> {{maquinas}} </p>
     </div>
   </div>
 </div>
