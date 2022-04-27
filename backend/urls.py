@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/', include(novagym_api)),
     path('api/', include(comunidad_api)),
     path('api/', include(almacenamiento_api)),
+    path('api/', include('cardauth.urls')),
     path('productos/', include('productos.urls')),
     path('gimnasio/', include('gimnasio.urls')),
     path('contacto/', include('contactenos.urls')),
