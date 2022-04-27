@@ -2,7 +2,7 @@ import django_filters
 from django.contrib.auth.models import Group
 from django_filters.widgets import RangeWidget
 
-from seguridad.forms import ClienteFilterForm, UsuarioFilterForm
+from seguridad.forms import ClienteFilterForm, UsuarioFilterForm,UsuarioAfiliadosFilterForm
 from seguridad.models import UserDetails
 
 
@@ -47,3 +47,15 @@ class ClienteFilter(django_filters.FilterSet):
                   "created_at",
                   ]
         form = ClienteFilterForm
+
+class UsuarioAfiliadosFilter(django_filters.FilterSet):
+    nombres = django_filters.CharFilter(lookup_expr="icontains")
+    apellidos = django_filters.CharFilter(lookup_expr="icontains")
+    class Meta:
+        model = UserDetails
+        fields = [
+                  'cedula',
+                  'nombres',
+                  'apellidos',
+                  ]
+        form = UsuarioAfiliadosFilterForm

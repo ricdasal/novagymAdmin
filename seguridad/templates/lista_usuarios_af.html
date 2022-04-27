@@ -13,47 +13,31 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
-  <div class="col-12">
-    <form method="get">
-      {% crispy filter.form %}
-
-    </form>
-  </div>
-  <div class="col">
-    <a href="{%url 'reservas:listarMaquinas'%}" class="btn btn-primary float-right">Ver máquinas <i class="fas fa-arrow-circle-right"> </i></a>
-  </div>
   <hr>
 </div>
 <div class="row mt-4">
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="reportes">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-registros">
       <thead class="thead-light">
         <tr>
-          <th scope="col">Nº comprobante</th>
           <th scope="col">Cédula</th>
-          <th scope="col">Usuario</th>
-          <th scope="col">Máquina</th>
-          <th scope="col">Posición</th>
-          <th scope="col">Gimnasio</th>
-          <th scope="col">Fecha de reserva</th>
-          <th scope="col">Horario de reserva</th>
-          <th scope="col">Fecha de creación</th>
+          <th scope="col">Nombres</th>
+          <th scope="col">Apellidos</th>
+          <th scope="col">Acción </th>
         </tr>
       </thead>
       <tbody>
         {% if page_obj %}
-        {% for reserva in page_obj %}
+        {% for usuario in page_obj %}
         <tr class="text-center">
-          <td>{{reserva.codigo}}</td>
-          <td>{{reserva.usuario.cedula}}</td>
-          <td>{{reserva.usuario.nombres|title}} {{reserva.usuario.apellidos|title}}</td>
-          <td>{{reserva.maquina.nombre|title}}</td>
-          <td>{{reserva.posicion.fila}}{{reserva.posicion.columna}}</td>
-          <td>{{reserva.maquina.gimnasio.nombre}} - {{reserva.maquina.zona.nombre|title}}</td>
-          <td>{{reserva.fecha}}</td>
-          <td>{{reserva.horario_inicio}}-{{reserva.horario_fin}}</td>
-          <td>{{reserva.created_at}}</td>
-
+          <td>{{usuario.cedula}}</td>
+          <td>{{usuario.nombres}}</td>
+          <td>{{usuario.apellidos}}</td>
+          <td>
+            <a href="#" class="btn btn-danger btn-block use-modal" data-toggle='modal' data-target="#mainModal"
+            data-url="">
+            Eliminar <i class="fas fa-skull-crossbones"></i>
+          </td>
         </tr>
         {% endfor %}
         {% else %}
@@ -63,7 +47,9 @@
         {% endif %}
       </tbody>
     </table>
+    {% include "pagination.html" %}
   </div>
+  <hr width="100%" />
 </div>
 {% endblock main %}
 
@@ -74,15 +60,6 @@
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
-<script>
-  $(document).ready(function () {
-
-    var table = tableInit("#reportes");
-
-  });
-
-</script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

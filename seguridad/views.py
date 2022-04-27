@@ -16,7 +16,7 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 
-from seguridad.filters import ClienteFilter, UsuarioFilter
+from seguridad.filters import ClienteFilter, UsuarioAfiliadosFilter, UsuarioFilter
 from seguridad.forms import (RolUsuarioForm, UsuarioDetallesForm,
                              UsuarioEditarForm, UsuarioForm)
 
@@ -435,3 +435,21 @@ def rol_permisos_template(request, pk):
         return context
 
     return render(request, "permisos.html", get_context_data())
+
+class ListarUsuarioAfiliados(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = UserDetails
+    context_object_name = 'usuario'
+    template_name = "templates/lista_usuarios_af.html"
+    permission_required = 'novagym.view_empleado'
+    filterset_class=UsuarioAfiliadosFilter
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Usuarios"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
