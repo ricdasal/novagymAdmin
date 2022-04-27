@@ -3,12 +3,14 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from calendario.filters import HorarioReservaFilter, MaquinaFilter, MaquinaReservaFilter
 from calendario.forms import MaquinaForm
-from calendario.models import Maquina,MaquinaReserva,HorarioReserva
+from calendario.models import Maquina,MaquinaReserva,HorarioReserva, PosicionMaquina
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 from django.views.generic import CreateView, UpdateView
 from django.contrib import messages
 from django.shortcuts import redirect, render
+from math import sqrt, ceil
+import string
 # Create your views here.
 
 class ListarMaquinas(FilterView):
@@ -34,18 +36,34 @@ class CrearMaquina(CreateView):
     form_class =MaquinaForm
     model=Maquina
     template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('reservas:listarMaquina')
+    success_url = reverse_lazy('reservas:listarMaquinas')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "CREAR MÁQUINA"
         return context
+
+    def form_valid(self, form):
+        response = super(CrearMaquina, self).form_valid(form)
+        cantidad=self.object.cantidad
+        abc = string.ascii_uppercase
+        raiz= ceil(sqrt(cantidad))
+        contador=0
+        for i in abc[:cantidad]:     
+            for k in range(1,raiz+1):
+                if contador < cantidad:
+                    PosicionMaquina.objects.create(fila=i,columna=str(k),maquina=self.object,zona=self.object.zona)
+                    contador+=1
+                else:
+                    self.object.save()
+                    break
+        return response
 
 class UpdateMaquina(UpdateView):
     form_class =MaquinaForm
     model=Maquina
     title = "ACTUALIZAR MÁQUINA"
     template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('reservas:listarMaquina')
+    success_url = reverse_lazy('reservas:listarMaquinas')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Máquina"

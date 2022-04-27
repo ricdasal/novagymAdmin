@@ -101,6 +101,7 @@ class PosicionMaquina(models.Model):
     columna=models.PositiveIntegerField()
     ocupado=models.BooleanField(default=False)
     maquina=models.ForeignKey(Maquina, on_delete=models.CASCADE,related_name='posiciones')
+    zona=models.ForeignKey(Zona, on_delete=models.PROTECT)
     def __str__(self):
         return str(self.maquina)+"-"+str(self.fila)+str(self.columna)
 

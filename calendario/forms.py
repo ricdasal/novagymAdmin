@@ -97,7 +97,6 @@ class MaquinaForm(forms.ModelForm):
                 Column('cantidad', css_class='col-6'),
             ),
             Row(
-                Column('cantidad', css_class='col-6'),
                 Column('reservable', css_class='col-6'),
                 Column('activo', css_class='col-6'),
                 Column('imagen', css_class='col-6'),

@@ -227,17 +227,6 @@ class CrearZona(CreateView):
         if tipo=="clases":
             for i in range(1,cantidad+1):
                 Posicion.objects.create(posicion=i,zona=self.object)
-        elif tipo=="maquinas":
-            abc = string.ascii_uppercase
-            raiz= ceil(sqrt(cantidad))
-            contador=0
-            for i in abc[:cantidad]:     
-                for k in range(1,raiz+1):
-                    if contador < cantidad:
-                        PosicionMaquina.objects.create(fila=i,columna=str(k),zona=self.object)
-                        contador+=1
-                    else:
-                        break
         return response
 
 def deleteCalendario(request,id):
