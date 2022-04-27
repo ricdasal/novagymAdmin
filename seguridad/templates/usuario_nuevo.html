@@ -24,6 +24,7 @@
     <form method="POST" novalidate enctype="multipart/form-data">
       {% csrf_token %}
       {% crispy user_form %}
+      {% crispy form %}
       {% if request.GET.type == 'E'%}
       <div class="form-row">
         <div class="col-8 col-lg-4">
@@ -51,8 +52,6 @@
       <div class="d-none" id="img-cont">
         <img id="img-id" src="#" alt="imagen cargada" class="img-thumbnail w-50" />
       </div>
-      <hr>
-      {% crispy form %}
       <hr>
       <input type="hidden" name="tipo" value="{{form.tipo.value}}">
       <input type="submit" class="btn btn-primary" value="Guardar">
