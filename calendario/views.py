@@ -49,7 +49,7 @@ class Reservar(APIView):
         if reserva.is_valid():
             if reservado:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
-            if horario.asistentes < horario.capacidad and posiciones.ocupado==False:
+            if horario.asistentes < horario.capacidad:
                 if reserva.save():
                     posiciones.ocupado=True
                     posiciones.save()
@@ -84,13 +84,11 @@ class ReservarMaquina(APIView):
         
         newDict["posicion"]=posiciones.id
         reserva = MaquinaReservaSerializer(data=newDict, many=False)
-
+        reservado=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario)
         if reserva.is_valid():
             #if reservado:
                 #return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
-            if posiciones.ocupado==False:
-                posiciones.ocupado=True
-                posiciones.save()
+            if not reservado:
                 reserva.save()
             elif not posiciones:
                 return Response(data="La máquina es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
