@@ -36,6 +36,13 @@ class UsuarioForm(UserCreationForm):
                 Column('password2', css_class='col-4'),
             ),
         )
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            self.save_m2m()
+        return user
 
 
 class UsuarioEditarForm(UserChangeForm):
