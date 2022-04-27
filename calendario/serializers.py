@@ -1,6 +1,7 @@
 from numpy import source
 from gimnasio.serializers import GimnasioSerializer
 from seguridad.models import UserDetails
+from seguridad.serializers import UsuarioDetallesSerializer
 from .models import Horario, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField,ImageField,IntegerField,CharField
 
@@ -36,9 +37,9 @@ class HorarioSerializer(ModelSerializer):
             return Horario.objects.create(**validated_data)
 
 class HorarioReservaSerializer(ModelSerializer):
-    usuario=PrimaryKeyRelatedField(queryset=UserDetails.objects.all())
-    horario=PrimaryKeyRelatedField(queryset=Horario.objects.all())
-    posicion=PrimaryKeyRelatedField(queryset=Posicion.objects.all())
+    usuario=UsuarioDetallesSerializer(read_only=True, many=False)
+    horario=HorarioSerializer(read_only=True, many=False)
+    posicion=PosicionSerializer(read_only=True, many=False)
     class Meta:
         model = HorarioReserva
         fields = ('id','codigo','horario', 'usuario','posicion','fecha')

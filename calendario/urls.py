@@ -18,6 +18,7 @@ urlpatterns = [
     path('verReservas/',HorariosReservas.as_view(),name="verReservas"),
     path('verReservas/<int:opcion>',HorariosReservas.as_view(),name="verReservas"),
     path('updateZona/<int:pk>',UpdateZona.as_view(),name="updateZona"),
+    path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
     path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
@@ -25,5 +26,4 @@ urlpatterns = [
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
-    path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 ]
