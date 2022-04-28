@@ -1,7 +1,7 @@
 from crispy_forms.helper import FormHelper
 from django import forms
 from .models import Horario, Maquina, Zona
-from crispy_forms.layout import Column,Layout, Row, Field
+from crispy_forms.layout import Column,Layout, Row, Field,HTML
 from .widgets import TimePickerInput
 from crispy_forms.bootstrap import StrictButton
 class HorarioForm(forms.ModelForm):
@@ -92,14 +92,23 @@ class MaquinaForm(forms.ModelForm):
                 Column('nombre', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
-                Column('zona', css_class='col-6'),
                 Column('gimnasio', css_class='col-6'),
-                Column('cantidad', css_class='col-6'),
             ),
             Row(
-                Column('reservable', css_class='col-6'),
-                Column('activo', css_class='col-6'),
+                Column('zona', css_class='col-6'),
+                Column(
+                    HTML("""
+                        <a href="{% url 'calendario:crearZona' %}"
+                             class="btn btn-primary use-modal mr-2" >
+                            <i class="fas fa-plus-circle"></i> Crear zona
+                        </a>
+                       """), css_class='col-auto align-self-end py-2'),
+            ),   
+            Row(
+                Column('cantidad', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
+                Column('activo', css_class='col-6'),
+                Column('reservable', css_class='col-6'),
             ),
         )
 class MaquinaFilterForm(forms.Form):

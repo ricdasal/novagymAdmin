@@ -48,6 +48,8 @@ class Sponsor(models.Model):
         ordering=('-id',)
     def __str__(self):
         return str(self.nombre)
+    def listaRedes(self):
+        return self.red_social.split(',')
 
     @property
     def compararFechas(self):

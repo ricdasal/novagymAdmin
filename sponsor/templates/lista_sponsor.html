@@ -52,12 +52,16 @@
           <td>{{sponsor.nombre}}</td>
           <td><div class="detailPanel">{{sponsor.descripcion}} </div></td>
           <td>
-            {{sponsor.nombre_contacto}} <br>
-            Telf: {{sponsor.telefono}} <br>
-            Cel: {{sponsor.celular}} <br>
-            Email: {{sponsor.correo}}
+            <p>Nombre: {{sponsor.nombre_contacto}}</p>
+            <p>Telf: {{sponsor.telefono}} </p>
+            <p>Cel: {{sponsor.celular}} </p>
+            <p>Email: {{sponsor.correo}}</p>
           </td>
-          <td>{{sponsor.url}}<br><br>{{sponsor.red_social}}
+          <td>
+            <p> {{sponsor.url}}</p> 
+            {% for red in sponsor.listaRedes %}
+              <p>{{red}}</p>
+              {% endfor %}
           </td>
           <td>{{sponsor.fecha_inicio}} - {{sponsor.fecha_fin}}</td>
           <td>{{sponsor.horario_apertura}} - {{sponsor.horario_cierre}}</td>
