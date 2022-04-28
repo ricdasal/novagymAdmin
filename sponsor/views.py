@@ -17,6 +17,12 @@ import datetime
 # Create your views here.
 #SPONSOR
 
+def redesParser(serializer):
+    newData=serializer.data
+    redes=newData['red_social'].split(",")
+    newData['red_social']=redes
+    return newData
+    
 class sponsorList(APIView):
     def get(self, request,activo=None, *args, **kwargs):
         if activo=="activo":
@@ -82,7 +88,8 @@ class sponsorDetail(APIView):
     def get(self, request,id, *args, **kwargs):
         queryset = Sponsor.objects.get(id=id)
         serializer = SponsorSerializer(queryset, many=False, context={"request":request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data=redesParser(serializer)
+        return Response(data, status=status.HTTP_200_OK)
 
 
 def createSponsor(request):

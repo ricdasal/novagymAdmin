@@ -2,6 +2,8 @@ from backend.settings import BASE_DIR
 from .models import *
 from rest_framework.serializers import ModelSerializer
 from rest_framework.serializers import ImageField
+from rest_framework import serializers
+
 
 class SucursalSerializer(ModelSerializer):
     imagen= ImageField(max_length=None, use_url=True, allow_null=True, required=False)
