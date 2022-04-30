@@ -1,5 +1,4 @@
-from numpy import source
-from gimnasio.serializers import GimnasioSerializer
+from gimnasio.serializers import GimnasioSerializer,GimnasioSmallSerializer
 from seguridad.models import UserDetails
 from seguridad.serializers import UsuarioDetallesSerializer
 from .models import Horario, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
@@ -110,3 +109,9 @@ class ReporteMaquinaReservaSerializer(ModelSerializer):
         fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha')
     def create(self, validated_data):
             return MaquinaReserva.objects.create(**validated_data)
+
+class HorarioSmallSerializer(ModelSerializer):
+    gimnasio=GimnasioSmallSerializer(read_only=True, many=False)
+    class Meta:
+        model=Horario
+        fields=('id','nombre','horario_inicio','horario_fin','gimnasio')

@@ -1,4 +1,5 @@
 import random
+from secrets import choice
 from django.db import models
 from seguridad.models import UserDetails
 from gimnasio.models import Gimnasio
@@ -46,8 +47,19 @@ class Horario(models.Model):
         VIERNES = 'VIERNES', 'VIERNES'
         SABADO = 'SABADO', 'SABADO'
         DOMINGO = 'DOMINGO', 'DOMINGO'
+
+    class Nombre(models.TextChoices):
+        Bailoterapia = 'Bailoterapia', 'Bailoterapia'
+        Bicicletas = 'Bicicletas', 'Bicicletas'
+        Crossfit = 'Crossfit', 'Crossfit'
+        Pilates = 'Pilates', 'Pilates'
+        Personal = 'Entrenamiento personal', 'Entrenamiento personal'
+        Peso = 'Peso corporal', 'Peso corporal'
+        Intensidad = 'Alta intensidad', 'Alta intensidad'
+        Funcional = 'Entrenamiento funcional', 'Bailoterapia'
+        Lifting = 'Power lifting', 'Power lifting'
     dia=models.CharField(max_length=10, choices=Dia.choices)
-    nombre = models.CharField(max_length=24)
+    nombre = models.CharField(max_length=30,choices=Nombre.choices)
     descripcion = models.CharField(max_length=255)
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)

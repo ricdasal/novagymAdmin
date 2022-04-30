@@ -20,6 +20,8 @@ urlpatterns = [
     path('updateZona/<int:pk>',UpdateZona.as_view(),name="updateZona"),
     path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 
+    path('datosHorario/',HorarioSmall.as_view(),name="datosHorario"),
+
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
     path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
     path('maquinasDispo/',MaquinasDispo.as_view(),name="maquinasDispo"),

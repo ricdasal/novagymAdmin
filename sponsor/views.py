@@ -88,8 +88,12 @@ class sponsorDetail(APIView):
     def get(self, request,id, *args, **kwargs):
         queryset = Sponsor.objects.get(id=id)
         serializer = SponsorSerializer(queryset, many=False, context={"request":request})
-        data=redesParser(serializer)
-        return Response(data, status=status.HTTP_200_OK)
+        if queryset.red_social:
+            data=redesParser(serializer)
+            return Response(data, status=status.HTTP_200_OK)
+        else:
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        
 
 
 def createSponsor(request):
