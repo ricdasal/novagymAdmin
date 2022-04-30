@@ -15,3 +15,12 @@ class ListarRegistro(FilterView):
         context = super().get_context_data(**kwargs)
         context['title'] = "Registro de novacoins otorgadas"
         return context
+
+def entregarNovacoins(request):
+    
+    print(request)
+    if request.POST:
+        print("el pepe")
+        print(request)
+    return render(request, "otorgar.html")
+    

@@ -58,10 +58,13 @@
             <p>Email: {{sponsor.correo}}</p>
           </td>
           <td>
-            <p> {{sponsor.url}}</p> 
+            <p>URL: {{sponsor.url}}</p> 
+            {% if sponsor.red_social %}
+            <p>Redes sociales:</p>   
             {% for red in sponsor.listaRedes %}
               <p>{{red}}</p>
               {% endfor %}
+            {% endif %}
           </td>
           <td>{{sponsor.fecha_inicio}} - {{sponsor.fecha_fin}}</td>
           <td>{{sponsor.horario_apertura}} - {{sponsor.horario_cierre}}</td>
