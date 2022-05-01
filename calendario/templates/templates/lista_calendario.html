@@ -58,6 +58,14 @@
         <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -65,13 +73,16 @@
               <tr class="text-center">
                 <td>{{calendario.horario_inicio}} - {{calendario.horario_fin}}</td>
                 <td>{{calendario.nombre}}</td>
-                <td>Reservas: {{calendario.asistentes}}/{{calendario.capacidad}}</td>
+                <td>Plazas: {{calendario.capacidad}}</td>
                 <td>
                   <a href="{% url 'calendario:editar' calendario.id %}" class="btn btn-sm btn-primary">
                     <i class="fas fa-edit "></i></a>
                   <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
                     data-url="{% url 'calendario:eliminar' calendario.id %}" href="#">
                     <i class="fas fa-times "></i></a>
+                    <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
+               data-url="{% url 'reservas:horariotoday' calendario.pk %}" href="#">
+                 <i class="fas fa-book"></i></a>
                 </td>
               </tr>
               {% endif %}
@@ -101,6 +112,14 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -144,6 +163,14 @@
         <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -187,6 +214,14 @@
         <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -230,6 +265,14 @@
         <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -273,6 +316,14 @@
         <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}
@@ -316,6 +367,14 @@
         <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordionExample">
           <div class="card-body">
             <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+              <thead class="thead-light">
+                <tr>
+                  <th scope="col">Horario</th>
+                  <th scope="col">Actividad</th>
+                  <th scope="col">Capacidad</th>
+                  <th scope="col">Acciones</th>
+                </tr>
+              </thead>
               <tr>
                 {% if page_obj %}
                 {% for calendario in page_obj %}

@@ -1,7 +1,7 @@
 {% extends "main.html" %}
 {% load static %}
 {% load crispy_forms_tags %}
-{% csrf_token %}
+
 {% block specific_head %}
 <link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
 <link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
@@ -13,28 +13,35 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
-  <div class="col">
-    <a href="{% url 'calendario:crearMaquina' %}" class="btn btn-primary float-right">Agregar máquina <i
-        class="fas fa-plus-circle"> </i></a>
-  </div>
   <hr>
 </div>
 <div class="row mt-4">
   <div class="col-12">
+    <div class="col">
+      <div class="col">
+        <a style="margin-left: 1%;" href="{% url 'reservas:crearMaquina' %}" class="btn btn-primary float-right">Agregar máquina <i
+          class="fas fa-plus-circle"> </i></a>
+        <a href="{%url 'reservas:reservasMaquinas'%}" class="btn btn-primary float-right">Regresar <i class="fa fa-arrow-circle-left"> </i></a>
+      </div>
+      
+    </div>
     <form method="get">
+      {% crispy filter.form %}
       {% include "export_records.html" %}
     </form>
+
   </div>
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="maquinas">
       <thead class="thead-light">
         <tr>
           <th scope="col">Imágen</th>
           <th scope="col">Código</th>
           <th scope="col">Nombre</th>
           <th scope="col">Descripción</th>
-          <th scope="col">Categoria</th>
-          <th scope="col">Cantidad</th>
+          <th scope="col">Categoría</th>
+          <th scope="col">Gimnasio</th>
+          <th scope="col">Reservable</th>
           <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
@@ -45,19 +52,37 @@
         <tr class="text-center">
           <td scope="row"><img style="width: 80px; height: 80px;" src="/media/{{maquina.imagen}}" alt=""></td>
           <td>{{maquina.codigo}}</td>
-          <td>{{maquina.nombre.upper}}</td>
+          <td>{{maquina.nombre}}</td>
           <td>{{maquina.descripcion}}</td>
-          <td>{{maquina.categoria|capfirst}}</td>
-          <td>{{maquina.cantidad}}   {% if maquina.reservable %}<p style="color:green">Reservable</p>{% else %}<p style="color:red">No reservable</p>{% endif %}</td>
-          <td>Activo</td>
+          <td>{{maquina.categoria}}</td>
+          <td>{{maquina.gimnasio.nombre}}: {{maquina.zona.nombre}}</td>
           <td>
-            <a href="{%url 'calendario:editarMaquina' maquina.pk%}" class="btn btn-sm btn-primary">
-              <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-              data-url="" href="#">
-              <i class="fas fa-times "></i></a>
+            <input type="checkbox" {%if maquina.reservable%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Apto" data-off="No apto" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{% url 'reservas:reservable' maquina.pk %}"
+            data-url-eliminar="{% url 'reservas:reservable' maquina.pk %}"
+            >
           </td>
+          <td>
+            <input type="checkbox" {%if maquina.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{% url 'reservas:change' maquina.pk %}"
+            data-url-eliminar="{% url 'reservas:change' maquina.pk %}"
+            >
+          </td>
+          <td>
+            <a href="{% url 'reservas:editarMaquina' maquina.pk %}" class="btn btn-sm btn-primary">
+              <i class="fas fa-edit "></i></a>
 
+               <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+               data-url="{% url 'reservas:eliminarMaquina' maquina.id %}" href="#">
+                 <i class="fas fa-times "></i></a>
+
+                 <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
+               data-url="{% url 'reservas:maquinatoday' maquina.pk %}" href="#">
+                 <i class="fas fa-book"></i></a>
+          </td>
+          
         </tr>
         {% endfor %}
         {% else %}
@@ -68,14 +93,6 @@
       </tbody>
     </table>
     {% include "pagination.html" %}
-  </div>
-  <hr width="100%" />
-  <div class="col-12">
-    <div class="d-flex justify-content-around">
-      <p><b>Total de zonas: </b> {{total}} </p>
-      <p><b>Zonas para clases: </b> {{activo}} </p>
-      <p><b>Zonas de máquinas: </b> {{inactivo}} </p>
-    </div>
   </div>
 </div>
 {% endblock main %}

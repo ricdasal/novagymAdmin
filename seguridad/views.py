@@ -16,7 +16,7 @@ from django.views.generic import CreateView, UpdateView
 from django_filters.views import FilterView
 from novagym.utils import calculate_pages_to_render
 
-from seguridad.filters import ClienteFilter, UsuarioFilter
+from seguridad.filters import ClienteFilter, UsuarioAfiliadosFilter, UsuarioFilter
 from seguridad.forms import (RolUsuarioForm, UsuarioDetallesForm,
                              UsuarioEditarForm, UsuarioForm)
 
@@ -28,8 +28,14 @@ APP_PERMISSIONS = {
     'seguridad': {'label': 'Usuarios', 'app': 'seguridad', 'model': 'userdetails'},
     'membresia': {'label': 'Membresia', 'app': 'membresia', 'model': 'membresia'},
     'notificaciones': {'label': 'Notificaciones', 'app': 'notificaciones', 'model': 'notificacion'},
+    'contactenos': {'label': 'Sugerencias', 'app': 'contactenos', 'model': 'buzon'},
     'sponsor': {'label': 'Negocios Afiliados', 'app': 'sponsor', 'model': 'sponsor'},
+    'calendario': {'label': 'Calendario', 'app':'calendario', 'model':'horario'},
+    # 'reservas': {'label': 'Reservaciones', 'app':'reservas', 'model':''},
     'productos': {'label': 'Productos', 'app': 'productos', 'model': 'producto'},
+    'promociones': {'label': 'Publicidad', 'app': 'promociones', 'model': 'promociones'},
+    'novacoin': {'label': 'Administrar NC', 'app': 'novacoin', 'model': 'cartera'},
+    'gimnasio': {'label': 'Gimnasios', 'app': 'gimnasio', 'model': 'gimnasio'},
     'comunidad': {'label': 'Comunidad', 'app': 'comunidad', 'model': 'biografia'},
     'almacenamiento': {'label': 'Almacenamiento', 'app': 'almacenamiento', 'model': 'almacenamientousuario'},
 }  # TODO: agregar apps:model
@@ -150,7 +156,7 @@ class CrearUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, CreateVi
         usuario_form = self.user_form_class(request.POST)
         usuario_detalles_form = self.form_class(request.POST)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save(commit=False)
+            user = usuario_form.save()
             user.groups.add(Group.objects.get(name='Todos'))
             user.email = user.username
             user.save()
@@ -206,9 +212,8 @@ class EditarUsuario(LoginRequiredMixin, UsuarioPermissionRequieredMixin, UpdateV
         usuario_form = self.user_form_class(
             request.POST, instance=self.object.usuario)
         if usuario_form.is_valid() and usuario_detalles_form.is_valid():
-            user = usuario_form.save(commit=False)
+            user = usuario_form.save()
             user.groups.add(Group.objects.get(name='Todos'))
-            user.save()
             detalles = usuario_detalles_form.save(commit=False)
             detalles.usuario = user
             detalles.save()
@@ -435,3 +440,21 @@ def rol_permisos_template(request, pk):
         return context
 
     return render(request, "permisos.html", get_context_data())
+
+class ListarUsuarioAfiliados(FilterView):
+    paginate_by = 20
+    max_pages_render = 10
+    model = UserDetails
+    context_object_name = 'usuario'
+    template_name = "templates/lista_usuarios_af.html"
+    permission_required = 'novagym.view_empleado'
+    filterset_class=UsuarioAfiliadosFilter
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Usuarios"
+        page_obj = context["page_obj"]
+        context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)

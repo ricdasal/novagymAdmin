@@ -31,6 +31,7 @@ class SponsorForm(forms.ModelForm):
                 attrs={'class': 'form-control',
                        'type': 'date'
                        }),
+            "red_social":forms.TextInput(attrs={"pattern": "([a-zA-Z-1-9-@\.-_]+(,)?)+"}),
             "correo":forms.EmailInput(),
             "url": forms.URLInput(),
             "fecha_fin": forms.DateInput(

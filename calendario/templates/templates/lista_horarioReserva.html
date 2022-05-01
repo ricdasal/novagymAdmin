@@ -1,0 +1,95 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock specific_head %}
+
+{% block main %}
+<div class="row mt-4">
+  <div class="col">
+    <h2 class="text-left">{{title}}</h2>
+  </div>
+    <div class="col-12">
+    <form method="get">
+      {% crispy filter.form %}
+
+    </form>
+  </div>
+  <div class="col">
+    <a href="{%url 'calendario:listar'%}" class="btn btn-primary float-right">Ver horarios <i class="fas fa-arrow-circle-right"> </i></a>
+  </div>
+  <hr>
+</div>
+<div class="row mt-4">
+  <div class="col-12 table-container">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="reportes">
+      <thead class="thead-light">
+        <tr>
+          <th scope="col">Código</th>
+          <th scope="col">Cédula</th>
+          <th scope="col">Usuario</th>
+          <th scope="col">Horario</th>
+          <th scope="col">Posición</th>
+          <th scope="col">Gimnasio</th>
+          <th scope="col">Fecha de reserva</th>
+          <th scope="col">Horario de reserva</th>
+          <th scope="col">Fecha de creación</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if page_obj %}
+        {% for reserva in page_obj %}
+        <tr class="text-center">
+          <td>{{reserva.codigo}}</td>
+          <td>{{reserva.usuario.cedula}}</td>
+          <td>{{reserva.usuario.nombres|title}} {{reserva.usuario.apellidos|title}}</td>
+          <td>{{reserva.horario.nombre|title}}</td>
+          <td>{{reserva.posicion.posicion}}</td>
+          <td>{{reserva.horario.gimnasio.nombre}} - {{reserva.horario.zona.nombre|title}}</td>
+          <td>{{reserva.fecha}}</td>
+          <td>{{reserva.horario.horario_inicio}}-{{reserva.horario.horario_fin}}</td>
+          <td>{{reserva.created_at}}</td>
+
+        </tr>
+        {% endfor %}
+        {% else %}
+        <h4>
+          No se encontraron datos.
+        </h4>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/moment.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/daterangepicker.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
+<script>
+  $(document).ready(function () {
+    
+    var table = tableInit("#reportes");
+
+  });
+
+</script>
+<script>
+  $(".export").click(function () {
+    $("#export").val($(this).data('value'));
+    $('form').submit()
+  });
+  $('button[type="submit"]').click(function (e) {
+    $("#export").val('');
+  })
+</script>
+{% endblock %}

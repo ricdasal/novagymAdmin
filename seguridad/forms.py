@@ -36,6 +36,13 @@ class UsuarioForm(UserCreationForm):
                 Column('password2', css_class='col-4'),
             ),
         )
+    
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            self.save_m2m()
+        return user
 
 
 class UsuarioEditarForm(UserChangeForm):
@@ -201,4 +208,21 @@ class RolUsuarioForm(forms.ModelForm):
             Row(
                 Column('name', css_class='col-12 col-md-4'),
             ),
+        )
+
+class UsuarioAfiliadosFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.disable_csrf = True
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    'cedula', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    'nombres', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),    
+                Column('apellidos', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                
+            )
         )

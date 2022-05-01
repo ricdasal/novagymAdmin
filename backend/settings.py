@@ -67,7 +67,10 @@ INSTALLED_APPS = [
     'calendario',
     'almacenamiento',
     'promociones',
-    'charts'
+    'charts',
+    'afiliados',
+    'reservas',
+    'cardauth'
 ]
 
 MIDDLEWARE = [

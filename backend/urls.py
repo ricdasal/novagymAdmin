@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/', include(novagym_api)),
     path('api/', include(comunidad_api)),
     path('api/', include(almacenamiento_api)),
+    path('api/', include('cardauth.urls')),
     path('productos/', include('productos.urls')),
     path('gimnasio/', include('gimnasio.urls')),
     path('contacto/', include('contactenos.urls')),
@@ -42,4 +43,6 @@ urlpatterns = [
     path('promociones/', include('promociones.urls')),
     path('reportes/', include('charts.urls')),
     path('novacoin/', include('novacoin.urls')),
+    path('reservas/', include('reservas.urls')),
+    path('afiliados/', include('afiliados.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
