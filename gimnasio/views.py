@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.views import FilterView
 from backend.settings import env
+from calendario.models import Horario
 from gimnasio.filters import GimnasioFilter
 from .forms import *
 from .serializers import *
@@ -84,6 +85,9 @@ class UpdateGimnasio(UpdateView):
         aforo=request.POST.get('aforo')
         capacidad=request.POST.get('capacidad')
         calcularAforo(gimnasio,aforo,capacidad)
+        horarios=Horario.objects.all().filter(gimnasio=gimnasio)
+        for horario in horarios:
+            horario.setAforo(int(aforo))
         messages.success(request, "Gimnasio actualizado con éxito.")
         return super(UpdateGimnasio, self).post(request, *args, **kwargs)
 
@@ -122,6 +126,9 @@ def changeAforo(request):
             gimnasio.aforo=aforoGlobal
             gimnasio.save()
             calcularAforo(gimnasio.id,gimnasio.aforo,gimnasio.capacidad)
+            horarios=Horario.objects.filter(gimnasio=gimnasio.id)
+            for horario in horarios:
+                horario.setAforo(int(aforoGlobal))
     return redirect('gimnasio:listar')
 
 class GetGimnasios(APIView):
