@@ -10,15 +10,16 @@ class HorarioForm(forms.ModelForm):
         model= Horario
         labels = {
             "imagen": "Logo del sponsor",
-            "descripcion": "Descripción de la actividad"
+            "descripcion": "Descripción de la actividad",
+            "capacidadMaxima":"Capacidad"
         }
-        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidad','zona')
+        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidadMaxima','zona')
 
         widgets = {
             "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
             "horario_inicio": TimePickerInput(),
             "horario_fin": TimePickerInput(),
-            "capacidad":forms.NumberInput(attrs={'min':1})
+            "capacidadMaxima":forms.NumberInput(attrs={'min':1})
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,7 +31,7 @@ class HorarioForm(forms.ModelForm):
                 Column('dia', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
-                Column('capacidad', css_class='col-6'),
+                Column('capacidadMaxima', css_class='col-6'),
             ),
             Row(
                 Column('gimnasio', css_class='col-6'),
