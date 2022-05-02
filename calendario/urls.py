@@ -21,6 +21,7 @@ urlpatterns = [
     path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 
     path('datosHorario/',HorarioSmall.as_view(),name="datosHorario"),
+    path('datosHorario/<int:opc>',HorarioSmall.as_view(),name="datosHorario"),
 
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
     path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
@@ -28,4 +29,5 @@ urlpatterns = [
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
+
 ]

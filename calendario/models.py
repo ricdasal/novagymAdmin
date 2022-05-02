@@ -64,7 +64,8 @@ class Horario(models.Model):
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)
     gimnasio=models.ForeignKey(Gimnasio, on_delete=models.PROTECT)
-    capacidad=models.PositiveIntegerField()
+    capacidadMaxima=models.PositiveIntegerField(blank=False,null=False)
+    capacidad=models.PositiveIntegerField(blank=True,null=True)
     asistentes=models.PositiveIntegerField(default=0)
     activo=models.BooleanField(default=True)
     zona=models.ForeignKey(Zona,on_delete=models.PROTECT)
@@ -72,7 +73,16 @@ class Horario(models.Model):
         ordering=('horario_inicio',)
     def __str__(self):
         return self.nombre
-
+    def setAforo(self,aforo):
+        valor=aforo/100
+        newCapacidad=int(self.capacidadMaxima*valor)
+        self.capacidad=newCapacidad
+        self.save()
+    def save(self, *args, **kwargs):
+        print(self.capacidad)
+        if self.capacidad==None:
+            self.capacidad = int(self.capacidadMaxima)
+        super(Horario, self).save(*args, **kwargs)
 
 
 class Maquina(models.Model):

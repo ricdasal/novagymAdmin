@@ -287,15 +287,53 @@ class MaquinaUsuario(APIView):
 
 class HorarioSmall(APIView):
     parser_classes = (MultiPartParser, FormParser)
+    def get(self, request,opc=None, *args, **kwargs):
+        if opc==None:
+            data=Horario.objects.all().filter(activo=True)
+            serializer = HorarioSmallSerializer(data, many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        else:
+            data=Horario.objects.get(id=opc)
+            serializer = HorarioSmallSerializer(data, many=False, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+
+class MaquinasDispo(APIView):
+    parser_classes = (MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
-        data=Horario.objects.all().filter(activo=True)
-        serializer = HorarioSmallSerializer(data, many=True, context={"request":request})
+        maquinaId=request.data["maquina"]
+        fecha=request.data["fecha"]
+
+        reservas=MaquinaReserva.objects.all().filter(fecha=fecha).filter(maquina=maquinaId)
+        maquinas=PosicionMaquina.objects.all().filter(maquina=maquinaId)
+
+        for maquina in maquinas:
+            maquina.ocupado=False
+            maquina.save()
+        
+        for reserva in reservas:
+            idPosicion=reserva.posicion.id
+
+            posicion=PosicionMaquina.objects.get(id=idPosicion)
+            posicion.ocupado=True
+            posicion.save()
+
+        maquinas=PosicionMaquina.objects.all().filter(maquina=maquinaId)
+        serializer = PosicionMaquinaSerializer(maquinas, many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
-
-
-
-
+class HorariosDispo(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        idHorario=request.data["horario"]
+        fecha=request.data["fecha"]
+        horario=Horario.objects.get(id=idHorario)
+        capacidad=horario.capacidad
+        data=HorarioReserva.objects.all().filter(fecha=fecha).filter(horario=idHorario)
+        disponibles=capacidad-len(data)
+        datas={'id':horario.id,'nombre':horario.nombre,'aforo':str(horario.gimnasio.aforo)+"%",'espacios':capacidad,'disponibles':disponibles}
+        #serializer = HorarioReservaSerializer(data, many=True)
+        return Response(data=datas,status=status.HTTP_200_OK)
 
 
 
