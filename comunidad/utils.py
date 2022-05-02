@@ -1,4 +1,6 @@
 from django.core.files.base import ContentFile
+from django.conf import settings
+from moviepy.editor import VideoFileClip
 import base64
 import os
 
@@ -14,6 +16,7 @@ tipo_archivo = {
     'x-wav': 'wav',
     'x-msvideo': 'avi',
     'x-ms-wmv': 'wmv',
+    'x-ms-asf': 'wmv',
     'x-flv': 'flv',
     'mp4': 'mp4'
 }
@@ -22,6 +25,13 @@ enum_media = {
     'image': 'IMG',
     'audio': 'AUD',
     'video': 'VID'
+}
+
+video_codecs = {
+    "mp4": "libx264",
+    "avi": "mpeg4",
+    "wmv": "mpeg4",
+    "flv": "libx264"
 }
 
 
@@ -50,3 +60,16 @@ def eliminar_archivo(archivo):
     if archivo and os.path.exists(archivo.path):
         if archivo.name != 'avatar.png' and archivo.name != 'portada.jpg':
             os.remove(archivo.path)
+
+
+def procesar_video(id, path, name):
+    video = VideoFileClip(path)
+    video_resized = video.resize(0.5)
+    filebasename = os.path.basename(name)
+    old_filename = filebasename.split(".")[0]
+    old_extension = filebasename.split(".")[1]
+    new_filename = f'{old_filename}_{id}_resized.{old_extension}'
+    ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
+    video_resized.write_videofile(ruta, rewrite_audio=False, preset='faster', codec=video_codecs[old_extension])
+    video_resized.close()
+    return new_filename
