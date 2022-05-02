@@ -1,6 +1,6 @@
 from django.core.files.base import ContentFile
 from django.conf import settings
-from moviepy.editor import VideoFileClip
+# from moviepy.editor import    
 import base64
 import os
 
@@ -63,13 +63,13 @@ def eliminar_archivo(archivo):
 
 
 def procesar_video(id, path, name):
-    video = VideoFileClip(path)
-    video_resized = video.resize(0.5)
+    # video = VideoFileClip(path)
+    # video_resized = video.resize(0.5)
     filebasename = os.path.basename(name)
     old_filename = filebasename.split(".")[0]
     old_extension = filebasename.split(".")[1]
     new_filename = f'{old_filename}_{id}_resized.{old_extension}'
-    ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
-    video_resized.write_videofile(ruta, rewrite_audio=False, preset='faster', codec=video_codecs[old_extension])
-    video_resized.close()
+    # ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
+    # video_resized.write_videofile(ruta, rewrite_audio=False, preset='faster', codec=video_codecs[old_extension])
+    # video_resized.close()
     return new_filename
