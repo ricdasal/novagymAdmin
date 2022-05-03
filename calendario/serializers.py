@@ -67,7 +67,7 @@ class MaquinaReservaSerializer(ModelSerializer):
     posicion=PrimaryKeyRelatedField(queryset=PosicionMaquina.objects.all())
     class Meta:
         model = MaquinaReserva
-        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha')
+        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha','gimnasio')
     def create(self, validated_data):
             return MaquinaReserva.objects.create(**validated_data)
 
@@ -106,7 +106,7 @@ class ReporteMaquinaReservaSerializer(ModelSerializer):
     posicion=CharField(read_only=True)
     class Meta:
         model = MaquinaReserva
-        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha')
+        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha','gimnasio')
     def create(self, validated_data):
             return MaquinaReserva.objects.create(**validated_data)
 

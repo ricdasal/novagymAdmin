@@ -30,7 +30,7 @@ class ProductoSerializer(serializers.ModelSerializer):
     usaNovacoins=serializers.BooleanField()
     class Meta:
         model = Producto
-        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins')
+        fields = ('id','codigo','nombre', 'descripcion','precio_referencial','imagen','categoria_id', 'valor_presentacion','talla','unidad_presentacion','usaNovacoins','envio')
 
 
 

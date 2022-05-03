@@ -14,6 +14,8 @@ from django.contrib import messages
 from promociones.serializers import PublicidadSerializer
 from rest_framework.response import Response
 from rest_framework import status
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 
 class getPromociones(APIView):
@@ -38,7 +40,7 @@ class getPromociones(APIView):
         else:
             return Response(data="bad_request",status=status.HTTP_400_BAD_REQUEST)
 
-class ListarPromociones(FilterView):
+class ListarPromociones(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Promociones

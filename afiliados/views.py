@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django_filters.views import FilterView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 from afiliados.models import RegistroNovacoin
 # Create your views here.
 
-class ListarRegistro(FilterView):
+class ListarRegistro(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = RegistroNovacoin
