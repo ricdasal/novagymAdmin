@@ -11,9 +11,11 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from math import sqrt, ceil
 import string
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 
-class ListarMaquinas(FilterView):
+class ListarMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Maquina
@@ -69,7 +71,7 @@ class UpdateMaquina(UpdateView):
         context['title'] = "Editar Máquina"
         return context
 
-class ListarReservasMaquinas(FilterView):
+class ListarReservasMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = MaquinaReserva
@@ -88,7 +90,7 @@ class ListarReservasMaquinas(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ListarReservasHorarios(FilterView):
+class ListarReservasHorarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = HorarioReserva

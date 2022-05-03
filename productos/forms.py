@@ -30,14 +30,15 @@ class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = ('presentacion', 'nombre', 'descripcion',
-                  'imagen', 'categoria', 'talla', 'usaNovacoins')
+                  'imagen', 'categoria', 'talla', 'usaNovacoins','envio')
 
         valor_presentacion = forms.DecimalField(min_value=0),
         precio_referencial = forms.DecimalField(min_value=0)
         labels = {
             "usaNovacoins": "Este producto se adquiere con Novacoins",
             "imagen": "Imagen del producto",
-            "presentacion": "Presentación del producto"
+            "presentacion": "Presentación del producto",
+            "envio":"Aplica envío a domicilio"
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
@@ -56,12 +57,12 @@ class ProductoForm(forms.ModelForm):
                 Column('descripcion', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('talla', css_class='col-6'),
-            ),
-            Row(
                 Column('imagen', css_class='col-6'),
             ),
             Row(
-                Column('usaNovacoins', css_class='col-6'),            ),
+               Column('usaNovacoins', css_class='col-6'),  
+               Column('envio', css_class='col-6'),  
+            ),
         )
 
 

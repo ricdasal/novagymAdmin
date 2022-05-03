@@ -61,8 +61,8 @@
             <p>URL: {{sponsor.url}}</p> 
             {% if sponsor.red_social %}
             <p>Redes sociales:</p>   
-            {% for red in sponsor.listaRedes %}
-              <p>{{red}}</p>
+            {% for red,nombre in sponsor.listaRedes.items %}
+              <p>{{red}}: {{nombre}}</p>
               {% endfor %}
             {% endif %}
           </td>
