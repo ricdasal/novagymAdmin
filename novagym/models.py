@@ -79,6 +79,7 @@ class DetalleTransaccionMembresia(models.Model):
         Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_membresia')
     membresia = models.ForeignKey(
         Membresia, on_delete=models.SET_NULL, null=True)
+    dias = models.PositiveIntegerField()
     meses = models.PositiveIntegerField()
     precio = models.DecimalField(max_digits=12, decimal_places=2)
     descuento = models.PositiveIntegerField()
@@ -93,6 +94,7 @@ class DetalleTransaccionMembresia(models.Model):
         return self.subtotal * Decimal(1.12)
 
     def save(self, *args, **kwargs):
+        self.dias = self.membresia.dias_duracion
         self.meses = self.membresia.meses_duracion
         self.precio = self.membresia.precio
         self.descuento = self.membresia.descuento_activo
