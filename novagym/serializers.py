@@ -1,9 +1,12 @@
 from decimal import Decimal
-from re import I
 
+from dateutil.relativedelta import relativedelta
+from django.utils import timezone
+from membresia.models import Historial
 from rest_framework import serializers
 
-from novagym.models import (DetalleTransaccionMembresia, DetalleTransaccionProducto, ObjetivoPeso,
+from novagym.models import (DetalleTransaccionMembresia,
+                            DetalleTransaccionProducto, ObjetivoPeso,
                             ProgresoImc, Transaccion)
 
 
@@ -61,7 +64,8 @@ class TransaccionSerializer(serializers.ModelSerializer):
 class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleTransaccionMembresia
-        exclude = ('meses','precio','descuento','subtotal','iva','total',)
+        exclude = ('dias', 'meses', 'precio', 'descuento',
+                   'subtotal', 'iva', 'total',)
 
 
 class DetalleTransaccionProductoSerializer(serializers.ModelSerializer):
@@ -101,7 +105,7 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         detalles_data = []
         if 'transaccion_producto' in validated_data:
-          detalles_data = validated_data.pop('transaccion_producto')
+            detalles_data = validated_data.pop('transaccion_producto')
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.transaccion_producto.all().delete()
@@ -134,16 +138,33 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
         pre = str(transaccion.pk)
         sec = '0'*(9-len(pre))+pre
         transaccion.codigo = sec
-        for membresia in detalles_data:
+        for membresia_data in detalles_data:
             DetalleTransaccionMembresia.objects.create(
-                transaccion=transaccion, **membresia)
+                transaccion=transaccion, **membresia_data)
         transaccion.save()
+        membresia = transaccion.transaccion_membresia.all()[0].membresia
+        fecha_inicio = timezone.now()
+        usuario = transaccion.usuario.detalles
+        if usuario.tiene_membresia:
+            current_membresia = usuario.membresia
+            current_membresia.activa = False
+            current_membresia.save()
+        Historial.objects.create(
+            usuario=usuario,
+            membresia=membresia,
+            fecha_inicio=fecha_inicio,
+            fecha_fin = fecha_inicio + \
+            relativedelta(months=membresia.dias_duracion,
+                          days=membresia.meses_duracion),
+            costo = membresia.precio,
+            activa = True
+        )
         return transaccion
 
     def update(self, instance, validated_data):
         detalles_data = []
         if 'transaccion_membresia' in validated_data:
-          detalles_data = validated_data.pop('transaccion_membresia')
+            detalles_data = validated_data.pop('transaccion_membresia')
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.transaccion_membresia.all().delete()

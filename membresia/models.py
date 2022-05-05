@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from seguridad.models import UserDetails
-from seguridad.validators import validate_decimal_positive
+from seguridad.validators import validate_decimal_positive, validate_decimal_positive_include
 
 # Create your models here.
 
@@ -19,8 +19,10 @@ class Membresia(models.Model):
     descripcion = models.TextField(blank=True)
     precio = models.DecimalField(max_digits=12, decimal_places=2, validators=[
                                  validate_decimal_positive])
+    dias_duracion = models.PositiveIntegerField(
+        validators=[validate_decimal_positive_include], blank=True)
     meses_duracion = models.PositiveIntegerField(
-        validators=[validate_decimal_positive])
+        validators=[validate_decimal_positive_include], blank=True)
     beneficios = models.ManyToManyField(Beneficio, related_name='membresia')
     estado = models.BooleanField(default=True)
     imagen = models.ImageField(upload_to='membresia/', null=True, blank=True)
@@ -31,9 +33,9 @@ class Membresia(models.Model):
     @property
     def descuento_activo(self):
         try:
-          return self.descuentos.get(activo=True).porcentaje_descuento
+            return self.descuentos.get(activo=True).porcentaje_descuento
         except:
-          return 0
+            return 0
 
     def __str__(self):
         return self.nombre
