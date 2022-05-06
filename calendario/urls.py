@@ -29,5 +29,5 @@ urlpatterns = [
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
-
+    path('verificarMaquina/',VerificarMaquina.as_view(),name="verificarMaquina"),
 ]

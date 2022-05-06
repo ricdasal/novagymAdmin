@@ -5,7 +5,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django_filters.views import FilterView
-from backend.settings import env
 from calendario.models import Horario
 from gimnasio.filters import GimnasioFilter
 from .forms import *
@@ -14,11 +13,12 @@ from novagym.utils import calculate_pages_to_render
 from .models import *
 from django.contrib import messages
 from django.views.generic import CreateView, UpdateView
-
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 #Gimnasio - Contacto
 
-class ListarGimnasio(FilterView):
+class ListarGimnasio(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Gimnasio

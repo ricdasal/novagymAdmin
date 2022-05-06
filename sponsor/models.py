@@ -24,7 +24,8 @@ def generarCodigoS():
 class Sponsor(models.Model):
     phone_regex = RegexValidator(regex=r'^(0)[1-9]{1}(\s){1}[0-9]{7}', message="Ingrese el número en el formato correcto: 04 1234567")
     mobile_regex = RegexValidator(regex=r'^(09)[0-9]{8}', message="Ingrese el número en el formato correcto: 091234567")
-    red_regex=RegexValidator(regex=r'([a-zA-Z-1-9-@\.-_]+(,)?)+', message="Ingrese las redes sociales separadas por comas sin espacios")
+    red_regex=RegexValidator(regex=r'((,)?\b(instagram|facebook|twitter|tiktok|youtube)\b:[a-zA-Z-1-9-@\.-_]+)+', message="Ingrese las redes sociales separadas por comas sin espacios")
+    #red_regex=RegexValidator(regex=r'([a-zA-Z-1-9-@\.-_]+(,)?)+', message="Ingrese las redes sociales separadas por comas sin espacios")
 
     id = models.AutoField(primary_key=True,unique=True)
     codigo = models.CharField(max_length=20,unique=True,default=generarCodigo,editable=False)
@@ -49,7 +50,12 @@ class Sponsor(models.Model):
     def __str__(self):
         return str(self.nombre)
     def listaRedes(self):
-        return self.red_social.split(',')
+        redes=self.red_social.split(',')
+        lista={}
+        for red in redes:
+            token=red.split(":")
+            lista[token[0]]=token[1]
+        return lista
 
     @property
     def compararFechas(self):

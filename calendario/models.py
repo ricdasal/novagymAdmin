@@ -137,6 +137,7 @@ class MaquinaReserva(models.Model):
     posicion=models.ForeignKey(PosicionMaquina, on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
     created_at= models.DateTimeField(auto_now_add=True)
+    gimnasio=models.ForeignKey(Gimnasio,on_delete=models.PROTECT)
     class Meta:
         ordering=('-id',)
 

@@ -14,13 +14,19 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 from .filters import SponsorFilter, SucursalFilter
 import datetime
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 #SPONSOR
 
 def redesParser(serializer):
     newData=serializer.data
     redes=newData['red_social'].split(",")
-    newData['red_social']=redes
+    lista={}
+    for red in redes:
+        token=red.split(":")
+        lista[token[0]]=token[1]
+    newData['red_social']=lista
     return newData
     
 class sponsorList(APIView):
@@ -106,7 +112,7 @@ def createSponsor(request):
         form=SponsorForm()
     return render(request,'createSponsor.html',{'form':form})
 
-class ListarSponsors(FilterView):
+class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Sponsor
@@ -137,12 +143,13 @@ def deleteSponsor(request,id):
         return redirect('sponsor:listar')
     return render(request, "ajax/sponsor_confirmar_elminar.html", {"sponsor": query})
 
-class CrearSponsor(CreateView):
+class CrearSponsor(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =SponsorForm
     model=Sponsor
     template_name = 'sponsor_nuevo.html'
     title = "CREAR ANUNCIANTE"
     success_url = reverse_lazy('sponsor:listar')
+    permission_required = 'novagym.view_empleado'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Anunciante"
@@ -159,7 +166,7 @@ class UpdateSponsor(UpdateView):
         context['title'] = "Editar Anunciante"
         return context
 
-class ListarSucursales(FilterView):
+class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Sucursal

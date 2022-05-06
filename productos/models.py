@@ -56,6 +56,7 @@ class Producto(models.Model):
     presentacion = models.CharField(
         max_length=10, choices=Presentacion.choices)
     usaNovacoins = models.BooleanField()
+    envio = models.BooleanField()
     class Meta:
         ordering=('-id',)
     @property

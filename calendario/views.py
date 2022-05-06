@@ -1,4 +1,3 @@
-import string
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -9,17 +8,16 @@ from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
 from rest_framework.views import APIView
-from calendario.filters import CalendarioFilter, MaquinaFilter
-from membresia.models import Historial
+from calendario.filters import CalendarioFilter
 from .forms import *
 from .serializers import *
 from .models import *
 from django.contrib import messages
 import json
-from django.contrib.auth.decorators import login_required
 from django.views.generic import CreateView, UpdateView
 from rest_framework.parsers import MultiPartParser, FormParser
-from math import sqrt, ceil
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 
 @api_view(["GET"])
@@ -78,23 +76,31 @@ class ReservarMaquina(APIView):
         hora_fin=request.data["horario_fin"]
         fecha=request.data["fecha"]
         maquina=request.data["maquina"]
-
+        gimnasio=request.data["gimnasio"]
         #reservado=MaquinaReserva.objects.all().filter(maquina_id=maquina).filter(usuario_id=idUsuario)
-        posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
-        newDict=request.data.copy()
+        #posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
         
-        newDict["posicion"]=posiciones.id
+        reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario_inicio=hora_inicio)
+        posiciones=PosicionMaquina.objects.filter(maquina=maquina)
+        posicion=posiciones.filter(fila=fila).filter(columna=columna).get()
+        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario_inicio__lte=hora_fin).filter(horario_fin__gte=hora_inicio)
+        newDict=request.data.copy()
+        newDict["posicion"]=posicion.id
         reserva = MaquinaReservaSerializer(data=newDict, many=False)
-        reservado=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario)
         if reserva.is_valid():
-            #if reservado:
-                #return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
-            if not reservado:
+            if reservados.filter(usuario=idUsuario):
+                return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
+            elif len(otrasReservas)>0:
+                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
+            elif len(reservados)>=len(posiciones):
+                return Response(data="Horario lleno", status=status.HTTP_200_OK)
+            for reservado in reservados:
+                if reservado.posicion.id==posicion.id:
+                    return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
+            #elif posiciones.ocupado==True:
+                #return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
+            else:
                 reserva.save()
-            elif not posiciones:
-                return Response(data="La máquina es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
-            elif posiciones.ocupado==True:
-                return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
             return Response(data=request.data, status=status.HTTP_200_OK)
         else:
             return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
@@ -120,7 +126,7 @@ class HorariosReservas(APIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         return True      
 
-class ShowCalendario(FilterView):
+class ShowCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Horario
@@ -171,7 +177,7 @@ class UpdateCalendario(UpdateView):
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listar')
     
-class ShowZona(FilterView):
+class ShowZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Zona
@@ -335,7 +341,21 @@ class HorariosDispo(APIView):
         #serializer = HorarioReservaSerializer(data, many=True)
         return Response(data=datas,status=status.HTTP_200_OK)
 
-
+class VerificarMaquina(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        fecha=request.data["fecha"]
+        gimnasio=request.data["gimnasio"]
+        hora=request.data["hora"]
+        maquina=request.data["maquina"]
+        reservas=MaquinaReserva.objects.all().filter(fecha=fecha).filter(maquina=maquina).filter(horario_inicio=hora).filter(gimnasio=gimnasio)
+        espacios=PosicionMaquina.objects.all().filter(maquina=maquina)
+        if len(reservas)<len(espacios):
+            data={'reservas':len(reservas),'espacios':len(espacios),'completo':False}
+            return Response(data=data,status=status.HTTP_200_OK)
+        else:
+            data={'reservas':len(reservas),'espacios':len(espacios),'completo':True}
+            return Response(data=data,status=status.HTTP_400_BAD_REQUEST)
 
 
 """ class Reservar(APIView):

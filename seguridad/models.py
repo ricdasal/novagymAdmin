@@ -49,3 +49,7 @@ class UserDetails(models.Model):
     @property
     def membresia(self):
         return self.historial_membresia.get(activa=True)
+      
+    @property
+    def tiene_membresia(self):
+        return self.historial_membresia.filter(activa=True).count() > 0
