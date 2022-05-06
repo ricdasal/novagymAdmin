@@ -81,5 +81,5 @@ def cortar_video(id, path, name):
     old_extension = filebasename.split(".")[1]
     new_filename = f'{old_filename}_{id}_cortado.{old_extension}'
     ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
-    ffmpeg_extract_subclip(path, 0, 5, targetname=ruta)
+    ffmpeg_extract_subclip(path, 0, 30, targetname=ruta)
     return new_filename
