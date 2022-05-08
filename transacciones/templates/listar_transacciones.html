@@ -1,0 +1,70 @@
+{% extends "main.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block specific_head %}
+<link rel="stylesheet" href="{% static 'css/external/bootstrap4-toggle.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/external/daterangepicker.css' %}">
+<link rel="stylesheet" href="{% static 'css/list.css' %}">
+{% endblock specific_head %}
+
+{% block main %}
+<div class="row mt-4">
+  <div class="col">
+    <h2 class="text-left">{{title|upper}}</h2>
+  </div>
+</div>
+<hr>
+<div class="row mt-4">
+  <div class="col-12 table-container">
+    <table class="table table-responsive-lg table-hover" id="tabla-notificacion">
+      
+      {% if page_obj %}
+      {% for transaccion in page_obj %}
+      <tr>
+        <td>
+          <p><b>Codigo:</b> {{transaccion.codigo}}</p>
+          <p><b>usuario:</b> {{transaccion.usuario}}</p>
+        </td>
+        <td>
+          <p><b>Autorizacion:</b> {{transaccion.auth_code}}</p>
+          <p><b>id Tramite:</b> {{transaccion.id_tramite}}</p>
+        </td>
+        <td>
+          <p><b>Subtotal:</b> {{transaccion.subtotal}}</p>
+          <p><b>Descuento:</b> {{transaccion.descuento}}</p>
+          <p><b>IVA:</b> {{transaccion.iva}}</p>
+          <p><b>Total:</b> {{transaccion.valor_total}}</p>
+        </td>
+        <td>
+          <p><b>{{transaccion.estado}}</b> </p>
+        </td>
+        <td style="width: 160px;">
+          <a href="#" class="btn btn-primary btn-block use-modal btn-sm" data-toggle='modal' data-target="#mainModal"
+            data-url="{%url 'transacciones:detalles' id=transaccion.id%}">
+            Ver Detalle <i class="fas fa-bullhorn"></i>
+          </a>
+          {% if transaccion.estado != 'CNC' %}
+          <a href="#" class="btn btn-danger btn-block use-modal btn-sm" data-toggle='modal' data-target="#mainModal"
+            data-url="{%url 'transacciones:anular' id=transaccion.id%}">
+            Anular <i class="fas fa-skull-crossbones"></i>
+          </a>
+          {% endif%}
+        </td>
+      </tr>
+      {% endfor %}
+      {% else %}
+      <h4>
+        No se encontraron datos.
+      </h4>
+      {% endif %}
+    </table>
+    {% include "pagination.html" %}
+  </div>
+</div>
+{% endblock main %}
+
+{% block specific_scripts %}
+<script type="text/javascript" src="{% static 'js/bootstrap4-toggle.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+{% endblock %}

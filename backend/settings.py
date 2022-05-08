@@ -68,7 +68,8 @@ INSTALLED_APPS = [
     'almacenamiento',
     'promociones',
     'charts',
-    'cardauth'
+    'cardauth',
+    'transacciones'
 ]
 
 MIDDLEWARE = [

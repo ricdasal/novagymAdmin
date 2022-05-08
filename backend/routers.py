@@ -10,6 +10,7 @@ from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
 from rest_framework import routers
 from seguridad.viewsets import (ChangePasswordView, DetallesViewSet, LoginAPI,
                                 RegistrarAPI)
+from transacciones.viewset import TransaccionViewSet
 
 """
  APIS Gym
@@ -30,6 +31,8 @@ novagym.register('transaccion-producto',
                  TransaccionProductoViewSet, 'transaccion-producto')
 novagym.register('transaccion-membresia',
                  TransaccionMembresiaViewset, 'transaccion-membresia')
+novagym.register('transaccion',
+                 TransaccionViewSet, 'transaccion')
 novagym_api = novagym.urls
 
 """
