@@ -68,6 +68,8 @@ INSTALLED_APPS = [
     'almacenamiento',
     'promociones',
     'charts',
+    'afiliados',
+    'reservas',
     'cardauth',
     'transacciones'
 ]

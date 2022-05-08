@@ -1,7 +1,7 @@
 from crispy_forms.helper import FormHelper
 from django import forms
 from .models import Horario, Maquina, Zona
-from crispy_forms.layout import Column,Layout, Row
+from crispy_forms.layout import Column,Layout, Row, Field,HTML
 from .widgets import TimePickerInput
 from crispy_forms.bootstrap import StrictButton
 class HorarioForm(forms.ModelForm):
@@ -10,15 +10,16 @@ class HorarioForm(forms.ModelForm):
         model= Horario
         labels = {
             "imagen": "Logo del sponsor",
-            "descripcion": "Descripción de la actividad"
+            "descripcion": "Descripción de la actividad",
+            "capacidadMaxima":"Capacidad"
         }
-        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidad','zona')
+        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidadMaxima','zona')
 
         widgets = {
             "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
             "horario_inicio": TimePickerInput(),
             "horario_fin": TimePickerInput(),
-            "capacidad":forms.NumberInput(attrs={'min':1})
+            "capacidadMaxima":forms.NumberInput(attrs={'min':1})
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,7 +31,7 @@ class HorarioForm(forms.ModelForm):
                 Column('dia', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
-                Column('capacidad', css_class='col-6'),
+                Column('capacidadMaxima', css_class='col-6'),
             ),
             Row(
                 Column('gimnasio', css_class='col-6'),
@@ -92,15 +93,23 @@ class MaquinaForm(forms.ModelForm):
                 Column('nombre', css_class='col-6'),
                 Column('categoria', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
-                Column('zona', css_class='col-6'),
                 Column('gimnasio', css_class='col-6'),
-                Column('cantidad', css_class='col-6'),
             ),
             Row(
+                Column('zona', css_class='col-6'),
+                Column(
+                    HTML("""
+                        <a href="{% url 'calendario:crearZona' %}"
+                             class="btn btn-primary use-modal mr-2" >
+                            <i class="fas fa-plus-circle"></i> Crear zona
+                        </a>
+                       """), css_class='col-auto align-self-end py-2'),
+            ),   
+            Row(
                 Column('cantidad', css_class='col-6'),
-                Column('reservable', css_class='col-6'),
-                Column('activo', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
+                Column('activo', css_class='col-6'),
+                Column('reservable', css_class='col-6'),
             ),
         )
 class MaquinaFilterForm(forms.Form):
@@ -136,11 +145,40 @@ class MaquinaReservaFilterForm(forms.Form):
             Row(
                 Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
                 Column('maquina', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
-                Column('fecha', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    Field('fecha', template="forms/fields/range-filter.html",
+                          css_class="form-control"), css_class='col-12 col-md-6 col-lg-3'
+                ),
             ),
             Row(
                 Column(
-                    StrictButton("Buscar", type='submit',css_class='btn btn-primary mt-1'),
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
+
+class HorarioReservaFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('horario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column(
+                    Field('fecha', template="forms/fields/range-filter.html",
+                          css_class="form-control"), css_class='col-12 col-md-6 col-lg-3'
+                ),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
                 )
             ),
         )

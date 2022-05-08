@@ -7,6 +7,7 @@
 {% csrf_token %}
 
 <div class="modal-body">
+  {% if reservas %}
   <table class="table table-responsive-lg table-condensed table-hover text-center">
     <thead>
       <tr>
@@ -17,7 +18,7 @@
       </tr>
     </thead>
     <tbody>
-      {% if reservas %}
+      
       {% for reserva in reservas %}
       <tr>
         <td>{{reserva.usuario.nombres}} {{reserva.usuario.apellidos}}</td>

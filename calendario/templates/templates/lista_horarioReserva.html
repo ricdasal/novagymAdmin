@@ -13,6 +13,12 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
+    <div class="col-12">
+    <form method="get">
+      {% crispy filter.form %}
+
+    </form>
+  </div>
   <div class="col">
     <a href="{%url 'calendario:listar'%}" class="btn btn-primary float-right">Ver horarios <i class="fas fa-arrow-circle-right"> </i></a>
   </div>
@@ -71,7 +77,7 @@
 <script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
 <script>
   $(document).ready(function () {
-
+    
     var table = tableInit("#reportes");
 
   });

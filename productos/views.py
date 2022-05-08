@@ -1,5 +1,6 @@
 import json
-from django.db.models.functions import Coalesce
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 from django.db.models import Sum
 from django.db import DatabaseError
 from django.http import HttpResponse, JsonResponse
@@ -84,7 +85,7 @@ class editarCategoria(UpdateView):
         context['title'] = "Editar Categoría"
         return context
 
-class ListarCategoria(FilterView):
+class ListarCategoria(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Categoria
@@ -102,7 +103,7 @@ class ListarCategoria(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ListarProductos(FilterView):
+class ListarProductos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Producto
@@ -215,7 +216,6 @@ class UpdateProducto(UpdateView):
         first_form = self.get_form(form_class)
         second_forms = ProductoMetaU(self.request.POST,instance=self.object)
         third_forms = DescuentoMetaU(self.request.POST,instance=self.object)
-        print(first_form.errors,second_forms.errors,third_forms.errors)
         if first_form.is_valid() and second_forms.is_valid() and third_forms.is_valid():
             return self.forms_valid(first_form , second_forms,third_forms)
         else:
@@ -223,7 +223,7 @@ class UpdateProducto(UpdateView):
             return redirect(reverse("productos:listarProductos"))
 
 
-class Reportes(FilterView):
+class Reportes(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     template_name="reportes.html"
     model=User
     context_object_name = 'users'
@@ -264,6 +264,7 @@ def getAllProducts(request):
                             "stock":producto.stock,
                             "novacoins":producto.novacoins,
                             "usaNovacoins":producto.producto.usaNovacoins,
+                            "envio":producto.producto.envio,
                             "porcentajeDescuento":str(descuento.porcentaje_descuento)+"%",
                             "fechaHoraDesde":str(descuento.fecha_hora_desde),
                             "fechaHoraHasta":str(descuento.fecha_hora_hasta),
@@ -349,5 +350,4 @@ def update_items(request):
     fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
     fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
     items=Sponsor.objects.all().filter(fecha_inicio__range=[fechaI,fechaF])
-    print(items.values())
     return render(request, 'ajax/tableBody.html', {'items':items})

@@ -1,4 +1,5 @@
 import random
+from secrets import choice
 from django.db import models
 from seguridad.models import UserDetails
 from gimnasio.models import Gimnasio
@@ -46,13 +47,25 @@ class Horario(models.Model):
         VIERNES = 'VIERNES', 'VIERNES'
         SABADO = 'SABADO', 'SABADO'
         DOMINGO = 'DOMINGO', 'DOMINGO'
+
+    class Nombre(models.TextChoices):
+        Bailoterapia = 'Bailoterapia', 'Bailoterapia'
+        Bicicletas = 'Bicicletas', 'Bicicletas'
+        Crossfit = 'Crossfit', 'Crossfit'
+        Pilates = 'Pilates', 'Pilates'
+        Personal = 'Entrenamiento personal', 'Entrenamiento personal'
+        Peso = 'Peso corporal', 'Peso corporal'
+        Intensidad = 'Alta intensidad', 'Alta intensidad'
+        Funcional = 'Entrenamiento funcional', 'Bailoterapia'
+        Lifting = 'Power lifting', 'Power lifting'
     dia=models.CharField(max_length=10, choices=Dia.choices)
-    nombre = models.CharField(max_length=24)
+    nombre = models.CharField(max_length=30,choices=Nombre.choices)
     descripcion = models.CharField(max_length=255)
     horario_inicio = models.TimeField(blank=False)
     horario_fin = models.TimeField(blank=False)
     gimnasio=models.ForeignKey(Gimnasio, on_delete=models.PROTECT)
-    capacidad=models.PositiveIntegerField()
+    capacidadMaxima=models.PositiveIntegerField(blank=False,null=False)
+    capacidad=models.PositiveIntegerField(blank=True,null=True)
     asistentes=models.PositiveIntegerField(default=0)
     activo=models.BooleanField(default=True)
     zona=models.ForeignKey(Zona,on_delete=models.PROTECT)
@@ -60,7 +73,16 @@ class Horario(models.Model):
         ordering=('horario_inicio',)
     def __str__(self):
         return self.nombre
-
+    def setAforo(self,aforo):
+        valor=aforo/100
+        newCapacidad=int(self.capacidadMaxima*valor)
+        self.capacidad=newCapacidad
+        self.save()
+    def save(self, *args, **kwargs):
+        print(self.capacidad)
+        if self.capacidad==None:
+            self.capacidad = int(self.capacidadMaxima)
+        super(Horario, self).save(*args, **kwargs)
 
 
 class Maquina(models.Model):
@@ -101,6 +123,7 @@ class PosicionMaquina(models.Model):
     columna=models.PositiveIntegerField()
     ocupado=models.BooleanField(default=False)
     maquina=models.ForeignKey(Maquina, on_delete=models.CASCADE,related_name='posiciones')
+    zona=models.ForeignKey(Zona, on_delete=models.PROTECT)
     def __str__(self):
         return str(self.maquina)+"-"+str(self.fila)+str(self.columna)
 
@@ -114,6 +137,7 @@ class MaquinaReserva(models.Model):
     posicion=models.ForeignKey(PosicionMaquina, on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
     created_at= models.DateTimeField(auto_now_add=True)
+    gimnasio=models.ForeignKey(Gimnasio,on_delete=models.PROTECT)
     class Meta:
         ordering=('-id',)
 

@@ -55,7 +55,9 @@
             <p><b>Rol:</b>
               {% if usuario.usuario.groups.all %}
                 {% for grupo in usuario.usuario.groups.all %}
+                  {% if grupo.name != "Todos"%}
                   <span>{{grupo}} </span>
+                  {% endif %}
                 {% endfor %}
               {% endif %}
             </p>

@@ -1,21 +1,21 @@
 import datetime
 from django.shortcuts import render
 from django.urls import reverse_lazy
-from calendario.filters import MaquinaFilter, MaquinaReservaFilter
+from calendario.filters import HorarioReservaFilter, MaquinaFilter, MaquinaReservaFilter
 from calendario.forms import MaquinaForm
-from calendario.models import Maquina,MaquinaReserva,PosicionMaquina,Horario,HorarioReserva,Posicion
+from calendario.models import Maquina,MaquinaReserva,HorarioReserva, PosicionMaquina
 from django_filters.views import FilterView
-from calendario.serializers import MaquinaReservaSerializer
 from novagym.utils import calculate_pages_to_render
 from django.views.generic import CreateView, UpdateView
 from django.contrib import messages
-from rest_framework.response import Response
-from rest_framework import status
 from django.shortcuts import redirect, render
-from rest_framework.views import APIView
+from math import sqrt, ceil
+import string
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 
-class ListarMaquinas(FilterView):
+class ListarMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Maquina
@@ -38,24 +38,40 @@ class CrearMaquina(CreateView):
     form_class =MaquinaForm
     model=Maquina
     template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('reservas:listarMaquina')
+    success_url = reverse_lazy('reservas:listarMaquinas')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "CREAR MÁQUINA"
         return context
+
+    def form_valid(self, form):
+        response = super(CrearMaquina, self).form_valid(form)
+        cantidad=self.object.cantidad
+        abc = string.ascii_uppercase
+        raiz= ceil(sqrt(cantidad))
+        contador=0
+        for i in abc[:cantidad]:     
+            for k in range(1,raiz+1):
+                if contador < cantidad:
+                    PosicionMaquina.objects.create(fila=i,columna=str(k),maquina=self.object,zona=self.object.zona)
+                    contador+=1
+                else:
+                    self.object.save()
+                    break
+        return response
 
 class UpdateMaquina(UpdateView):
     form_class =MaquinaForm
     model=Maquina
     title = "ACTUALIZAR MÁQUINA"
     template_name = 'templates/calendario_nuevo.html'
-    success_url = reverse_lazy('reservas:listarMaquina')
+    success_url = reverse_lazy('reservas:listarMaquinas')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Máquina"
         return context
 
-class ListarReservasMaquinas(FilterView):
+class ListarReservasMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = MaquinaReserva
@@ -74,14 +90,14 @@ class ListarReservasMaquinas(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ListarReservasHorarios(FilterView):
+class ListarReservasHorarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = HorarioReserva
     context_object_name = 'horarioReserva'
     template_name = "templates/lista_horarioReserva.html"
     permission_required = 'novagym.view_empleado'
-    #filterset_class=MaquinaFilter
+    filterset_class=HorarioReservaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "RESERVAS DE CLASES"
@@ -142,5 +158,5 @@ def showList(request,pk):
 
 def showListHorario(request,pk):
         hoy=datetime.datetime.today()
-        queryset = HorarioReserva.objects.filter(horario=pk)
+        queryset = HorarioReserva.objects.filter(horario=pk).filter(fecha=hoy)
         return render(request, "templates/ajax/horarios_hoy.html", {"reservas": queryset})

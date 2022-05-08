@@ -35,7 +35,8 @@ class MembresiaForm(forms.ModelForm):
         exclude = ('estado',)
         labels = {
             'descripcion': 'Descripción',
-            'meses_duracion': 'Duración (meses)'
+            'meses_duracion': 'Duración (meses)',
+            'dias_duracion': 'Duración (dias)'
         }
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 2}),
@@ -56,11 +57,12 @@ class MembresiaForm(forms.ModelForm):
             Row(
                 Column(PrependedText('precio', '$'),
                        css_class='col-6 col-md-3'),
-                Column('meses_duracion', css_class='col-6 col-md-3'),
+                Column('meses_duracion', css_class='col-6 col-md-2'),
+                Column('dias_duracion', css_class='col-6 col-md-2'),
             ),
             Row(
                 Column(Field('beneficios', multiple="true",
-                       css_class="select2"), css_class="col-12 col-md-6"),
+                       css_class="select2"), css_class="col-12 col-md-7"),
                 Column(
                     HTML("""
                         <a href="#" data-url="{% url 'membresia:listar_beneficio' %}" 
@@ -73,6 +75,27 @@ class MembresiaForm(forms.ModelForm):
                 Column('imagen', css_class='col-12 col-md-7')
             ),
         )
+
+    def clean_meses_duracion(self):
+        data = self.cleaned_data["meses_duracion"]
+        if not data:
+            data = 0
+        return data
+
+    def clean_dias_duracion(self):
+        data = self.cleaned_data["dias_duracion"]
+        if not data:
+            data = 0
+        return data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        meses_duracion = cleaned_data.get('meses_duracion')
+        dias_duracion = cleaned_data.get('dias_duracion')
+        if not (meses_duracion or dias_duracion):
+            self.add_error('meses_duracion', forms.ValidationError(
+                'Debe agregar al menos un valor en días o meses'))
+        return cleaned_data
 
 
 class BeneficioForm(forms.ModelForm):

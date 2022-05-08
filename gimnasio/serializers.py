@@ -12,3 +12,8 @@ class GimnasioSerializer(serializers.ModelSerializer):
         ,'horario_inicio', 'horario_fin'
         ,'estado','ciudad','aforo','capacidad','personas',
         'latitud','longitud')
+    
+class GimnasioSmallSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gimnasio
+        fields = ('id','nombre','ciudad')

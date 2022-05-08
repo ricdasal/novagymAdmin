@@ -7,7 +7,7 @@ from contactenos.models import Buzon
 from contactenos.filters import BuzonFilter
 from novagym.utils import calculate_pages_to_render
 from .forms import *
-from django.core.mail import send_mail, BadHeaderError, mail_admins, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
@@ -17,6 +17,8 @@ from rest_framework.response import Response
 from .serializers import BuzonSerializer
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.contrib.auth.mixins import LoginRequiredMixin
+from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
 
 class SendMail(APIView):
@@ -45,7 +47,7 @@ class SendMail(APIView):
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ShowBuzon(FilterView):
+class ShowBuzon(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Buzon
@@ -65,7 +67,7 @@ class ShowBuzon(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ShowBuzonNoLeidos(FilterView):
+class ShowBuzonNoLeidos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Buzon
@@ -86,7 +88,7 @@ class ShowBuzonNoLeidos(FilterView):
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class ShowBuzonLeidos(FilterView):
+class ShowBuzonLeidos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
     model = Buzon

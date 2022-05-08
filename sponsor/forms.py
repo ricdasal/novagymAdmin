@@ -18,7 +18,8 @@ class SponsorForm(forms.ModelForm):
             'horario_apertura': "Horario de apertura de la matriz",
             'correo': "Correo electrónico",
             'celular': "Teléfono móvil",
-            'telefono':"Teléfono fijo"
+            'telefono':"Teléfono fijo",
+            'red_social':"Redes sociales (formato=instagram:@soy.ejemplo)"
         }
         fields = ('nombre','direccion', 'descripcion', 'telefono', 'nombre_contacto', 'url', 'imagen',
                   'fecha_inicio', 'fecha_fin', 'horario_apertura', 'horario_cierre', 'red_social','correo',"celular")
@@ -31,6 +32,7 @@ class SponsorForm(forms.ModelForm):
                 attrs={'class': 'form-control',
                        'type': 'date'
                        }),
+            "red_social":forms.TextInput(attrs={"pattern": "((,)?\b(instagram|facebook|twitter|tiktok|youtube)\b:[a-zA-Z-1-9-@\.-_]+)+"}),
             "correo":forms.EmailInput(),
             "url": forms.URLInput(),
             "fecha_fin": forms.DateInput(
