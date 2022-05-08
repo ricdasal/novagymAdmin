@@ -45,4 +45,5 @@ urlpatterns = [
     path('novacoin/', include('novacoin.urls')),
     path('reservas/', include('reservas.urls')),
     path('afiliados/', include('afiliados.urls')),
+   path('transacciones/', include('transacciones.urls'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
