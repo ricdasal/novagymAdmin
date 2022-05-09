@@ -1,6 +1,7 @@
 from django.core.files.base import ContentFile
 from django.conf import settings
 # from moviepy.editor import    
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 import base64
 import os
 
@@ -72,4 +73,13 @@ def procesar_video(id, path, name):
     # ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
     # video_resized.write_videofile(ruta, rewrite_audio=False, preset='faster', codec=video_codecs[old_extension])
     # video_resized.close()
+    return new_filename
+
+def cortar_video(id, path, name):
+    filebasename = os.path.basename(name)
+    old_filename = filebasename.split(".")[0]
+    old_extension = filebasename.split(".")[1]
+    new_filename = f'{old_filename}_{id}_cortado.{old_extension}'
+    ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
+    ffmpeg_extract_subclip(path, 0, 30, targetname=ruta)
     return new_filename

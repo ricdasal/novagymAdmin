@@ -1,0 +1,18 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="ordenTitle">Anular Pago</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form method="POST" action="{%url 'transacciones:refound' data.id%}">
+    {% csrf_token %}
+    <div class="modal-body">
+      ¿Está segura/o que desea Anular el pago de la Transaccion?
+      <h5>**Esta acción no puede revertirse</h5>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      <button class="btn btn-danger mr-3" type="submit"> Eliminar </button>
+    </div>
+  </form>
+  

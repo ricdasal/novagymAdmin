@@ -33,7 +33,7 @@ class MembresiaSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Membresia
         fields = ['id', 'url', 'beneficios', 'nombre', 'descripcion',
-                  'precio', 'meses_duracion', 'estado', 'imagen', 'descuento']
+                  'precio', 'meses_duracion', 'dias_duracion','estado', 'imagen', 'descuento']
 
     def get_descuento(self, object):
         try:

@@ -52,3 +52,15 @@ def validate_decimal_positive(value):
             '%(value)s no es válido. Ingrese un valor mayor a 0.',
             params={'value': value},
         )
+        
+def validate_decimal_positive_include(value):
+    if re.search('[a-zA-Z]', str(value)):
+        raise ValidationError(
+            '%(value)s no es válido. Solo se aceptan valores numéricos.',
+            params={'value': value},
+        )
+    if value < 0:
+        raise ValidationError(
+            '%(value)s no es válido. Ingrese un valor mayor o igual a 0.',
+            params={'value': value},
+        )

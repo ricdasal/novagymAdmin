@@ -1,6 +1,6 @@
 from dataclasses import fields
 from rest_framework import serializers
-from .utils import eliminar_archivo, procesar_video
+from .utils import cortar_video, eliminar_archivo, procesar_video
 from django.conf import settings
 from decimal import Decimal
 from almacenamiento.models import *
@@ -114,13 +114,16 @@ class HistoriaSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         historia = Historia.objects.create(**validated_data)
         if historia.archivo:
+            if historia.duracion > 30:
+                new_filename = cortar_video(historia.id, historia.archivo.path, historia.archivo.name)
             # if historia.tipo_archivo == "VID" and historia.almacenamiento_utilizado > Decimal("1000.00"):
             #     new_filename = procesar_video(historia.id, historia.archivo.path, historia.archivo.name)
-            #     eliminar_archivo(historia.archivo)
-            #     historia.archivo.name = f'historias/{new_filename}'
-            #     ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
-            #     almacenamiento = Decimal(str(round(os.path.getsize(ruta) * 0.001, 2)))
-            #     historia.almacenamiento_utilizado = almacenamiento
-            #     historia.save()    
+                eliminar_archivo(historia.archivo)
+                historia.archivo.name = f'historias/{new_filename}'
+                ruta = f'{settings.MEDIA_ROOT}/historias/{new_filename}'
+                almacenamiento = Decimal(str(round(os.path.getsize(ruta) * 0.001, 2)))
+                historia.almacenamiento_utilizado = almacenamiento
+                historia.duracion = 30
+                historia.save()    
             historia.aumentar_almacenamiento()
         return historia

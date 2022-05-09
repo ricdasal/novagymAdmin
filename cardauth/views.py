@@ -1,3 +1,5 @@
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Count
@@ -8,6 +10,7 @@ from .models import Cardauth
 # Create your views here.
 
 #aqui es donde se añade una credencial mediante mysql
+@csrf_exempt
 def addCodigoAuth(request):
     if request.method == 'POST':
         response = json.loads(request.body)
@@ -39,6 +42,7 @@ def addCodigoAuth(request):
     return JsonResponse(response_data,safe=False)
 
 # aqui es donde se busca una credencial por token mediane mysql
+@csrf_exempt
 def getCodigoAuth(request):
     if request.method == 'GET':
         valor = request.GET.get("token")
@@ -49,6 +53,7 @@ def getCodigoAuth(request):
     return HttpResponse(status=400)
 
 # aqui es donde se elimina una credencial por token
+@csrf_exempt
 def delCodigoAuth(request):
     if request.method == 'POST':
         response = json.loads(request.body)
