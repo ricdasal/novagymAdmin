@@ -30,4 +30,12 @@ urlpatterns = [
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
     path('verificarMaquina/',VerificarMaquina.as_view(),name="verificarMaquina"),
+
+    path('agregarHorario/', CrearHorarioMaquina.as_view(), name='agregarHorario'),
+
+    path('verHorariosMaquinas/',VerHorariosMaquinas.as_view(),name="verHorariosMaquinas"),
+    path('verHorariosClase/',VerHorariosClase.as_view(),name="verHorariosClase"),
+
+    path('listarActividades/',ListarActividades.as_view(),name="listarActividades"),
+    path('crearHorarioActividad/',CrearHorarioHorario.as_view(),name="crearHorarioActividad"),
 ]

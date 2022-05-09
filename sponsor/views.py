@@ -10,7 +10,7 @@ from novagym.utils import calculate_pages_to_render
 from .models import *
 from django.contrib import messages
 from rest_framework.views import APIView
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.views.generic import CreateView, UpdateView
 from .filters import SponsorFilter, SucursalFilter
 import datetime
@@ -118,7 +118,7 @@ class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     model = Sponsor
     context_object_name = 'sponsor'
     template_name = "lista_sponsor.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'sponsor.view_sponsor'
     filterset_class=SponsorFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -133,7 +133,8 @@ class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-@login_required()
+@login_required
+@permission_required('sponsor.delete_sponsor')
 def deleteSponsor(request,id):
     query = Sponsor.objects.get(id=id)
     if request.POST:
@@ -149,18 +150,19 @@ class CrearSponsor(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateVie
     template_name = 'sponsor_nuevo.html'
     title = "CREAR ANUNCIANTE"
     success_url = reverse_lazy('sponsor:listar')
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'sponsor.add_sponsor'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Anunciante"
         return context
 
-class UpdateSponsor(UpdateView):
+class UpdateSponsor(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =SponsorForm
     model=Sponsor
     title = "ACTUALIZAR SPONSOR"
     template_name = 'sponsor_nuevo.html'
     success_url = reverse_lazy('sponsor:listar')
+    permission_required = 'sponsor.change_sponsor'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Anunciante"
@@ -172,7 +174,7 @@ class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filte
     model = Sucursal
     context_object_name = 'sucursal'
     template_name = "lista_sucursal.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'sponsor.view_sucursal'
     filterset_class=SucursalFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -205,6 +207,8 @@ class UpdateSucursal(UpdateView):
     title = "ACTUALIZAR SUCURSAL"
     template_name = 'sponsor_nuevo.html'
     success_url = reverse_lazy('sponsor:listarSucursal')
+    permission_required = 'sponsor.change_sucursal'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Sucursal"
@@ -217,11 +221,14 @@ class CrearSucursal(CreateView):
     template_name = 'sponsor_nuevo.html'
     title = "CREAR SUCURSAL"
     success_url = reverse_lazy('sponsor:listarSucursal')
+    permission_required = 'sponsor.add_sucursal'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Sucursal"
         return context
 
+@login_required
+@permission_required('sponsor.delete_sucursal')
 def deleteSucursal(request,id):
     query = Sucursal.objects.get(id=id)
     if request.POST:
@@ -231,6 +238,8 @@ def deleteSucursal(request,id):
         return redirect('sponsor:listarSucursal')
     return render(request, "ajax/sucursal_confirmar_elminar.html", {"sucursal": query})
 
+@login_required
+@permission_required('sponsor.change_sponsor')
 def ChangeState(request,pk):
     query = Sponsor.objects.get(id=pk)
     if request.POST:
@@ -246,6 +255,8 @@ def ChangeState(request,pk):
             return redirect('sponsor:listar')
     return render(request, "ajax/sponsor_confirmar_change.html", {"sponsor": query})
 
+@login_required
+@permission_required('sponsor.change_sucursal')
 def ChangeStateSucursal(request,pk):
     query = Sucursal.objects.get(id=pk)
     if request.POST:

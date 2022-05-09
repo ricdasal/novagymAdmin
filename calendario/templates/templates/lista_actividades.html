@@ -13,32 +13,23 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
+  <div class="col-12 d-flex justify-content-end">
+    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listar' %}">
+      <i class="fa fa-calendar-plus"></i> Regresar</a>
+    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
+      <i class="fa fa-calendar-plus"></i> Ver zonas</a>
+    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
+      <i class="fa fa-calendar-plus"></i> Agregar actividad</a>
+  </div>
   <hr>
 </div>
-<div class="col-12 d-flex justify-content-end">
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
-    <i class="fa fa-calendar-plus"></i> Ver zonas</a>
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crearHorarioActividad' %}">
-    <i class="fa fa-calendar-plus"></i> Agregar horario de actividad</a>
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarActividades' %}">
-    <i class="fa fa-calendar-plus"></i> Ver actividades</a>
-</div>
-<div class="row mt-4 justify-content-center">
-  <div class="col-12">
-    <form method="get">
-      {% crispy filter.form %}
-    </form>
-  </div>
-</div>
-
 <div class="row mt-4">
-  {% csrf_token %}
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="actividades">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
       <thead class="thead-light">
         <tr>
-          <th scope="col">Horario</th>
-          <th scope="col">Actividad</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Descripción</th>
           <th scope="col">Capacidad</th>
           <th scope="col">Gimnasio</th>
           <th scope="col">Activo</th>
@@ -46,34 +37,36 @@
         </tr>
       </thead>
       <tbody>
-        {% if horarios %}
-        {% for horario in horarios %}
-
+        {% if actividades %}
+        {% for actividad in actividades %}
         <tr class="text-center">
-          <td>{{horario.horario_inicio}} - {{horario.horario_fin}}</td>
-          <td>{{horario.horario.nombre}}</td>
-          <td>{{horario.horario.capacidad}}</td>
-          <td>{{horario.horario.gimnasio.nombre}}</td>
+          <td>{{actividad.nombre|capfirst}}</td>
+          <td>{{actividad.descripcion}}</td>
+          <td>{{actividad.capacidad}}</td>
+          <td>{{actividad.gimnasio.nombre}}</td>
           <td>activo</td>
           <td>
-            <a href="" class="btn btn-sm btn-primary">
+            <a href="{% url 'calendario:editar' actividad.id %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url=""
-              href="#">
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
+              data-url="{% url 'calendario:eliminar' actividad.id %}" href="#">
               <i class="fas fa-times "></i></a>
+              <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
+         data-url="{% url 'reservas:horariotoday' actividad.pk %}" href="#">
+           <i class="fas fa-book"></i></a>
           </td>
+
         </tr>
         {% endfor %}
         {% else %}
-        <td>
-          <h4>
-            No hay información disponible.
-          </h4>
-        </td>
+        <h4>
+          No se encontraron datos.
+        </h4>
         {% endif %}
       </tbody>
     </table>
   </div>
+  <hr width="100%" />
 </div>
 {% endblock main %}
 
@@ -84,15 +77,6 @@
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
-<script>
-  $(document).ready(function () {
-
-    var table = tableInit("#actividades");
-
-  });
-
-</script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));
@@ -102,5 +86,4 @@
     $("#export").val('');
   })
 </script>
-
 {% endblock %}

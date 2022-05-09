@@ -15,6 +15,7 @@ from django.contrib import messages
 from django.views.generic import CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from seguridad.views import UsuarioPermissionRequieredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 #Gimnasio - Contacto
 
@@ -24,7 +25,7 @@ class ListarGimnasio(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     model = Gimnasio
     context_object_name = 'gimnasio'
     template_name = "lista_gimnasio.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'gimnasio.view_gimnasio'
     filterset_class=GimnasioFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -39,13 +40,13 @@ class ListarGimnasio(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class CrearGimnasio(CreateView):
+class CrearGimnasio(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =GimnasioForm
     model=Gimnasio
     template_name = 'gimnasio_nuevo.html'
     title = "CREAR SPONSOR"
     success_url = reverse_lazy('gimnasio:listar')
-
+    permission_required = 'gimnasio.add_gimnasio'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Gimnasio"
@@ -66,13 +67,13 @@ class CrearGimnasio(CreateView):
         else:
             return self.form_invalid(form)
 
-class UpdateGimnasio(UpdateView):
+class UpdateGimnasio(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =GimnasioForm
     model=Gimnasio
     title = "ACTUALIZAR GIMNASIO"
     template_name = 'gimnasio_nuevo.html'
-    success_url = reverse_lazy('gimnasio:listar')
-
+    success_url = reverse_lazy('gimnasio:listar') 
+    permission_required = 'gimnasio.change_gimnasio'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Gimnasio"
@@ -91,6 +92,8 @@ class UpdateGimnasio(UpdateView):
         messages.success(request, "Gimnasio actualizado con éxito.")
         return super(UpdateGimnasio, self).post(request, *args, **kwargs)
 
+@login_required
+@permission_required('gimnasio.delete_gimnasio')
 def deleteGimnasio(request,id):
     query = Gimnasio.objects.get(id=id)
     if request.POST:
@@ -103,6 +106,8 @@ def deleteGimnasio(request,id):
         return redirect('gimnasio:listar')
     return render(request, "ajax/gimnasio_confirmar_elminar.html", {"gimnasio": query})
 
+@login_required
+@permission_required('gimnasio.view_gimnasio')
 def changeState(request,pk):
     gimnasio=Gimnasio.objects.get(id=pk)
     if request.POST:
@@ -118,6 +123,8 @@ def changeState(request,pk):
             return redirect('gimnasio:listar')
     return render(request, "ajax/gimnasio_confirmar_change.html", {"gimnasio": gimnasio})
 
+@login_required
+@permission_required('gimnasio.change_gimnasio')
 def changeAforo(request):
     gimnasios=Gimnasio.objects.all()
     aforoGlobal = request.GET.get('aforo')

@@ -2,13 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from rest_framework.decorators import api_view
+from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
 from rest_framework.views import APIView
-from calendario.filters import CalendarioFilter
+from calendario.filters import CalendarioFilter, HorarioHorarioFilter
 from .forms import *
 from .serializers import *
 from .models import *
@@ -18,6 +19,7 @@ from django.views.generic import CreateView, UpdateView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.mixins import LoginRequiredMixin
 from seguridad.views import UsuarioPermissionRequieredMixin
+from datetime import datetime
 # Create your views here.
 
 @api_view(["GET"])
@@ -36,13 +38,18 @@ def calendarioDetail(request,id):
 class Reservar(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
+        print(request.data)
         reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
-        idHorario=request.data["horario"]
+        clase=request.data["clase"]
         idUsuario=request.data["usuario"]
         nroPosicion=request.data["posicion"]
         fecha=request.data["fecha"]
-        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario).filter(fecha=fecha)
-        horario=Horario.objects.get(id=idHorario)
+        horario=request.data["horario"]
+        hora_inicio=horario.horario_inicio
+        hora_fin=horario.horario_fin
+        otrasReservas=HorarioReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
+        reservado=HorarioReserva.objects.all().filter(horario_id=clase).filter(usuario_id=idUsuario).filter(id=horario)
+        horario=Horario.objects.get(id=clase)
         idZona=horario.zona
         posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
         if reserva.is_valid():
@@ -57,14 +64,16 @@ class Reservar(APIView):
                     return Response(data=request.data, status=status.HTTP_200_OK)
                 else: 
                     return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
+            elif len(otrasReservas)>0:
+                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
             elif not posiciones:
                 return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
             elif horario.asistentes == horario.capacidad:
                 return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
             else:
-                return Response(data="Ocurrio un error", status=status.HTTP_200_OK)
+                return Response(data="Reserva no válida", status=status.HTTP_200_OK)
         else:
-            return Response(data="Reserva no válida", status=status.HTTP_400_BAD_REQUEST)
+            return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
 
 class ReservarMaquina(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -72,18 +81,18 @@ class ReservarMaquina(APIView):
         idUsuario=request.data["usuario"]
         fila=request.data["fila"]
         columna=request.data["columna"]
-        hora_inicio=request.data["horario_inicio"]
-        hora_fin=request.data["horario_fin"]
+        horario=request.data["horario"]
         fecha=request.data["fecha"]
         maquina=request.data["maquina"]
         gimnasio=request.data["gimnasio"]
-        #reservado=MaquinaReserva.objects.all().filter(maquina_id=maquina).filter(usuario_id=idUsuario)
-        #posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
-        
-        reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario_inicio=hora_inicio)
+
+        horario=HorarioMaquina.objects.get(id=horario)
+        hora_inicio=horario.horario_inicio
+        hora_fin=horario.horario_fin
+        reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario=horario)
         posiciones=PosicionMaquina.objects.filter(maquina=maquina)
         posicion=posiciones.filter(fila=fila).filter(columna=columna).get()
-        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario_inicio__lte=hora_fin).filter(horario_fin__gte=hora_inicio)
+        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
         newDict=request.data.copy()
         newDict["posicion"]=posicion.id
         reserva = MaquinaReservaSerializer(data=newDict, many=False)
@@ -97,8 +106,6 @@ class ReservarMaquina(APIView):
             for reservado in reservados:
                 if reservado.posicion.id==posicion.id:
                     return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
-            #elif posiciones.ocupado==True:
-                #return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
             else:
                 reserva.save()
             return Response(data=request.data, status=status.HTTP_200_OK)
@@ -126,56 +133,79 @@ class HorariosReservas(APIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
         return True      
 
+
+
 class ShowCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
-    paginate_by = 20
-    max_pages_render = 10
-    model = Horario
-    context_object_name = 'calendario'
+    model = HorarioHorario
+    context_object_name = 'horarios'
     template_name = "templates/lista_calendario.html"
-    permission_required = 'novagym.view_empleado'
-    filterset_class=CalendarioFilter
-
-    def get_filterset_class(self):
-        return self.filterset_class
-
-    def filtering(self, request, *args, **kwargs):
-        if request.GET.get('sucursales'):
-            data=request.GET.get('sucursales')
-            return data
-
-    def get_queryset(self):
-        return self.model.objects.filter(gimnasio=self.filtering(self.request))
+    permission_required = 'calendario.view_horario'
+    filterset_class=HorarioHorarioFilter
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "HORARIOS"
-        gimnasios=Gimnasio.objects.all()
-        context["gimnasios"]=gimnasios
-        #page_obj = context["page_obj"]
-        #context['num_pages'] = calculate_pages_to_render(self, page_obj)
+        context['title'] = "Horarios de actividades"
         return context
 
+class ListarActividades(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
+    model = Horario
+    context_object_name = 'actividades'
+    template_name = "templates/lista_actividades.html"
+    permission_required = 'calendario.view_horario'
+    #filterset_class=CalendarioFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Actividades"
+        gimnasios=Gimnasio.objects.all()
+        context["gimnasios"]=gimnasios
+        return context
+
+class CrearHorarioHorario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
+    form_class =HorarioHorarioForm
+    model=HorarioHorario
+    template_name = 'templates/horariohorario_nuevo.html'
+    success_url = reverse_lazy('calendario:listar')
+    permission_required = 'calendario.add_maquina'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Horario"
+        return context
+
+class CrearHorarioMaquina(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
+    form_class =HorarioMaquinaForm
+    model=HorarioMaquina
+    template_name = 'templates/horariomaquina_nuevo.html'
+    success_url = reverse_lazy('reservas:listarMaquinas')
+    permission_required = 'calendario.add_maquina'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Agregar Horario"
+        return context
     
 
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
-
-class CrearCalendario(CreateView):
+class CrearCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =HorarioForm
     model=Horario
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listar')
+    permission_required = 'calendario.add_horario'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = "AGREGAR ACTIVIDAD"
+        context['title'] = "Agregar actividad"
         return context
 
-class UpdateCalendario(UpdateView):
+class UpdateCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =HorarioForm
     model=Horario
     title = "ACTUALIZAR ACTIVIDAD"
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listar')
+    permission_required = 'calendario.change_horario'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Actualizar actividad"
+        return context
     
 class ShowZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
@@ -183,7 +213,7 @@ class ShowZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     model = Zona
     context_object_name = 'zona'
     template_name = "templates/lista_zona.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'calendario.view_zona'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "LISTAR ZONAS"
@@ -192,6 +222,8 @@ class ShowZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
         context['maquinas'] = len(Zona.objects.all().filter(tipo="clases"))
         return context
 
+@login_required
+@permission_required('calendario.delete_zona')
 def deleteZona(request,id):
     try:
         query = Zona.objects.get(id=id)
@@ -204,22 +236,24 @@ def deleteZona(request,id):
         messages.error(request, "No se puede eliminar esta zona.")
         return redirect('calendario:listarZona')
 
-class UpdateZona(UpdateView):
+class UpdateZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =ZonaForm
     model=Zona
     title = "ACTUALIZAR ZONA"
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listarZona')
+    permission_required = 'calendario.change_zona'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Zona"
         return context
 
-class CrearZona(CreateView):
+class CrearZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =ZonaForm
     model=Zona
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('calendario:listarZona')
+    permission_required = 'calendario.add_zona'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "CREAR ZONA"
@@ -234,6 +268,8 @@ class CrearZona(CreateView):
                 Posicion.objects.create(posicion=i,zona=self.object)
         return response
 
+@login_required
+@permission_required('calendario.delete_horario')
 def deleteCalendario(request,id):
     query = Horario.objects.get(id=id)
     if request.POST:
@@ -357,6 +393,38 @@ class VerificarMaquina(APIView):
             data={'reservas':len(reservas),'espacios':len(espacios),'completo':True}
             return Response(data=data,status=status.HTTP_400_BAD_REQUEST)
 
+class VerHorariosMaquinas(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        fecha=request.data["fecha"]
+        gimnasio=request.data["gimnasio"]
+        weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
+        try:
+            maquina=request.data["maquina"]
+            horarios=HorarioMaquina.objects.filter(dia=weekday).filter(maquina__gimnasio=gimnasio).filter(maquina=maquina)
+            serializer=HorarioMaquinaSerializer(horarios,many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+        except:
+            horarios=HorarioMaquina.objects.filter(dia=weekday).filter(maquina__gimnasio=gimnasio)
+            serializer=HorarioMaquinaSerializer(horarios,many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+class VerHorariosClase(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def get(self, request, *args, **kwargs):
+        fecha=request.data["fecha"]
+        gimnasio=request.data["gimnasio"]
+        weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
+        try:
+            horario=request.data["horario"]
+            horarios=HorarioHorario.objects.filter(dia=weekday).filter(horario__gimnasio=gimnasio).filter(horario=horario)
+            serializer=HorarioHorarioSerializer(horarios,many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+        except:
+            horarios=HorarioHorario.objects.filter(dia=weekday).filter(horario__gimnasio=gimnasio)
+            serializer=HorarioHorarioSerializer(horarios,many=True, context={"request":request})
+            return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 """ class Reservar(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -434,3 +502,77 @@ class ReservarMaquina(APIView):
                 return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
         except:
             Response(data="Membresia inválida", status=status.HTTP_400_BAD_REQUEST) """
+
+
+""" class ReservarMaquina(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        idUsuario=request.data["usuario"]
+        fila=request.data["fila"]
+        columna=request.data["columna"]
+        hora_inicio=request.data["horario_inicio"]
+        hora_fin=request.data["horario_fin"]
+        fecha=request.data["fecha"]
+        maquina=request.data["maquina"]
+        gimnasio=request.data["gimnasio"]
+        #reservado=MaquinaReserva.objects.all().filter(maquina_id=maquina).filter(usuario_id=idUsuario)
+        #posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
+        
+        reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario_inicio=hora_inicio)
+        posiciones=PosicionMaquina.objects.filter(maquina=maquina)
+        posicion=posiciones.filter(fila=fila).filter(columna=columna).get()
+        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario_inicio__lte=hora_fin).filter(horario_fin__gte=hora_inicio)
+        newDict=request.data.copy()
+        newDict["posicion"]=posicion.id
+        reserva = MaquinaReservaSerializer(data=newDict, many=False)
+        if reserva.is_valid():
+            if reservados.filter(usuario=idUsuario):
+                return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
+            elif len(otrasReservas)>0:
+                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
+            elif len(reservados)>=len(posiciones):
+                return Response(data="Horario lleno", status=status.HTTP_200_OK)
+            for reservado in reservados:
+                if reservado.posicion.id==posicion.id:
+                    return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
+            #elif posiciones.ocupado==True:
+                #return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
+            else:
+                reserva.save()
+            return Response(data=request.data, status=status.HTTP_200_OK)
+        else:
+            return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST) """
+
+""" class Reservar(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        print(request.data)
+        reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
+        idHorario=request.data["horario"]
+        idUsuario=request.data["usuario"]
+        nroPosicion=request.data["posicion"]
+        fecha=request.data["fecha"]
+        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario).filter(fecha=fecha)
+        horario=Horario.objects.get(id=idHorario)
+        idZona=horario.zona
+        posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
+        if reserva.is_valid():
+            if reservado:
+                return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
+            if horario.asistentes < horario.capacidad:
+                if reserva.save():
+                    posiciones.ocupado=True
+                    posiciones.save()
+                    horario.asistentes+=1
+                    horario.save()
+                    return Response(data=request.data, status=status.HTTP_200_OK)
+                else: 
+                    return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
+            elif not posiciones:
+                return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
+            elif horario.asistentes == horario.capacidad:
+                return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
+            else:
+                return Response(data="Ocurrio un error", status=status.HTTP_200_OK)
+        else:
+            return Response(data="Reserva no válida", status=status.HTTP_400_BAD_REQUEST) """
