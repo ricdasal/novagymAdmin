@@ -12,8 +12,10 @@ from django.shortcuts import redirect, render
 from math import sqrt, ceil
 import string
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 from seguridad.views import UsuarioPermissionRequieredMixin
 # Create your views here.
+
 
 class ListarMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
@@ -21,7 +23,7 @@ class ListarMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     model = Maquina
     context_object_name = 'maquina'
     template_name = "templates/lista_maquina.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'calendario.view_maquina'
     filterset_class=MaquinaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,11 +36,12 @@ class ListarMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
-class CrearMaquina(CreateView):
+class CrearMaquina(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =MaquinaForm
     model=Maquina
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('reservas:listarMaquinas')
+    permission_required = 'calendario.add_maquina'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "CREAR MÁQUINA"
@@ -60,12 +63,13 @@ class CrearMaquina(CreateView):
                     break
         return response
 
-class UpdateMaquina(UpdateView):
+class UpdateMaquina(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =MaquinaForm
     model=Maquina
     title = "ACTUALIZAR MÁQUINA"
     template_name = 'templates/calendario_nuevo.html'
     success_url = reverse_lazy('reservas:listarMaquinas')
+    permission_required = 'calendario.change_maquina'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Editar Máquina"
@@ -77,7 +81,7 @@ class ListarReservasMaquinas(LoginRequiredMixin, UsuarioPermissionRequieredMixin
     model = MaquinaReserva
     context_object_name = 'maquinaReserva'
     template_name = "templates/lista_maquinaReserva.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'calendario.view_maquinareserva'
     filterset_class=MaquinaReservaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -96,7 +100,7 @@ class ListarReservasHorarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin
     model = HorarioReserva
     context_object_name = 'horarioReserva'
     template_name = "templates/lista_horarioReserva.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'calendario.view_horarioreserva'
     filterset_class=HorarioReservaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,6 +113,8 @@ class ListarReservasHorarios(LoginRequiredMixin, UsuarioPermissionRequieredMixin
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
+@login_required
+@permission_required('calendario.delete_maquina')
 def deleteMaquina(request,id):
     query = Maquina.objects.get(id=id)
     try:
@@ -122,6 +128,8 @@ def deleteMaquina(request,id):
         messages.error(request, "No se puede eliminar esta máquina.")
         return redirect('reservas:listarMaquinas')
 
+@login_required
+@permission_required('calendario.change_maquina')
 def ChangeState(request,pk):
     query = Maquina.objects.get(id=pk)
     if request.POST:
@@ -137,6 +145,8 @@ def ChangeState(request,pk):
             return redirect('reservas:listarMaquinas')
     return render(request, "templates/ajax/maquina_confirmar_change.html", {"maquina": query})
 
+@login_required
+@permission_required('calendario.change_maquina')
 def changeReservable(request,pk):
     query = Maquina.objects.get(id=pk)
 

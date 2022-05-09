@@ -260,7 +260,7 @@
       </div>
     </div>
     <div
-      class="row  menu-container menu menu--collapsable"
+      class="row  menu-container menu menu--collapsable {% if request.resolver_match.namespace == 'reportes' %}menu-container--active{% endif %}"
       data-toggle="collapse"
       data-target="#collapsewo"
       aria-expanded="true"
@@ -284,8 +284,8 @@
     </div>
     <div id="collapsewo" class="collapse row menu menu--collapsable">
       <div class="col-12">
-        <a class="menu" href="">
-          <div class="row menu-container">
+        <a class="menu" href="{% url 'reportes:listarDolares' %}">
+          <div class="row menu-container{% if tipo == 'dolares' %}--active{% endif %}">
             <img
               src="{% static 'images/admin-icons/ventas_icon.png'%}"
               alt="repo-ventas"
@@ -298,8 +298,8 @@
         </a>
       </div>
       <div class="col-12">
-        <a class="menu" href="">
-          <div class="row menu-container">
+        <a class="menu" href="{% url 'reportes:listarCoins' %}">
+          <div class="row menu-container{% if tipo == 'novacoins' %}--active{% endif %}">
             <img
               src="{% static 'images/admin-icons/novacoins_icon.png'%}"
               alt="repo-nc"

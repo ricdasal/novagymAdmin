@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Listado de productos.</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+<div class="modal-dialog" id="productoModal">
+  <div class="modal-body" id="productoBody">
+    <div class="col-12 table-container">
+      <form method="POST" action="{% url 'reportes:verProductos' transaccion %}">
+        <table class="table table-responsive-lg table-condensed table-hover text-center" id="listaProductos">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Precio</th>
+              <th scope="col">Descuento</th>
+              <th scope="col">IVA</th>
+              <th scope="col">Subtotal</th>
+              <th scope="col">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for detalle in queryset %}
+            <tr class="text-center">
+              <td>{{detalle.producto.nombre}}</td>
+              <td>{{detalle.cantidad}}</td>
+              <td>${{detalle.precio}}</td>
+              <td>${{detalle.descuento}}</td>
+              <td>${{detalle.iva}}</td>
+              <td>${{detalle.subtotal}}</td>
+              <td>${{detalle.total}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </form>
+    </div>
+  </div>
+</div>
+</div>

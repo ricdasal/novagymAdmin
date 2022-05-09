@@ -19,8 +19,11 @@ from .models import *
 import datetime
 from sponsor.models import Sponsor
 from novagym.models import TipoPago, Transaccion
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 
+@login_required
+@permission_required('productos.add_categoria')
 def createCategoria(request):
     if request.method=='POST':
         form = CategoriaForm(request.POST)
@@ -31,6 +34,8 @@ def createCategoria(request):
         form=CategoriaForm()
     return render(request,'createCategoria.html',{'form':form})
 
+@login_required
+@permission_required('productos.add_producto')
 def createProducto(request):
     if request.method=='POST':
         form = ProductoForm(request.POST)
@@ -41,6 +46,8 @@ def createProducto(request):
         form=ProductoForm()
     return render(request,'createProducto.html',{'form':form})
 
+@login_required
+@permission_required('productos.add_inventario')
 def createInventario(request):
     if request.method=='POST':
         form = InventarioForm(request.POST)
@@ -51,7 +58,8 @@ def createInventario(request):
         form=InventarioForm()
     return render(request,'createInventario.html',{'form':form})
 
-
+@login_required
+@permission_required('productos.add_descuento')
 def createDescuento(request):
     if request.method=='POST':
         form = DescuentoForm(request.POST)
@@ -63,22 +71,24 @@ def createDescuento(request):
     return render(request,'createDescuento.html',{'form':form})
 
 
-class crearCategoria(CreateView):
+class crearCategoria(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =CategoriaForm
     model=Categoria
     template_name = 'categoria_nueva.html'
     title = "CREAR CATEGORIA"
     success_url = reverse_lazy('productos:listarCategoria')
+    permission_required = 'productos.add_categoria'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Agregar Categoría"
         return context
 
-class editarCategoria(UpdateView):
+class editarCategoria(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =CategoriaForm
     model=Categoria
     template_name = 'categoria_nueva.html'
     title = "EDITAR CATEGORIA"
+    permission_required = 'productos.change_categoria'
     success_url = reverse_lazy('productos:listarCategoria')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -92,6 +102,7 @@ class ListarCategoria(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
     context_object_name = 'categoria'
     template_name = "lista_categoria.html"
     permission_required = 'novagym.view_empleado'
+    permission_required = 'productos.view_categoria'
     filterset_class=CategoriaFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -109,7 +120,7 @@ class ListarProductos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
     model = Producto
     context_object_name = 'producto'
     template_name = "lista_productos.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'productos.view_producto'
     filterset_class=ProductoFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -127,6 +138,8 @@ class ListarProductos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
+@login_required
+@permission_required('productos.delete_categoria')
 def deleteCategoria(request,id):
     query = Categoria.objects.get(id=id)
     if request.POST:
@@ -139,11 +152,11 @@ def deleteCategoria(request,id):
         return redirect('productos:listarCategoria')
     return render(request, "ajax/categoria_confirmar_elminar.html", {"categoria": query})
 
-class CrearProducto(CreateView):
+class CrearProducto(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =ProductoForm
     template_name = 'producto_nuevo.html'
     title = "CREAR PRODUCTO"
-
+    permission_required = 'productos.add_producto'
     def get_context_data(self, **kwargs):
         context = super(CrearProducto, self).get_context_data(**kwargs)
         context['title'] = "Agregar Producto"
@@ -187,6 +200,7 @@ class UpdateProducto(UpdateView):
     model = Producto
     form_class = ProductoForm
     context_object_name = "first_obj"
+    permission_required = 'productos.change_producto'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -227,13 +241,16 @@ class Reportes(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     template_name="reportes.html"
     model=User
     context_object_name = 'users'
+    permission_required = 'seguridad.view_user'
     filterset_class=UsuarioFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Reportes de productos"
         context['list_url']=reverse_lazy('productos:reportes')
         return context
-    
+
+@login_required
+@permission_required('productos.delete_producto')
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)
     inventario = Inventario.objects.get(id=id)

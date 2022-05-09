@@ -16,6 +16,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth.mixins import LoginRequiredMixin
 from seguridad.views import UsuarioPermissionRequieredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 
 class getPromociones(APIView):
@@ -46,7 +47,7 @@ class ListarPromociones(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filt
     model = Promociones
     context_object_name = 'promocion'
     template_name = "lista_promocion.html"
-    permission_required = 'novagym.view_empleado'
+    permission_required = 'promociones.view_promociones'
     filterset_class=PromocionesFilter
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,16 +59,19 @@ class ListarPromociones(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filt
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
     
-class CrearPromociones(CreateView):
+class CrearPromociones(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =PromocionesForm
     model=Promociones
     template_name = 'promocion_nuevo.html'
     success_url = reverse_lazy('promociones:listar')
+    permission_required = 'promociones.add_promociones'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "AGREGAR ANUNCIO"
         return context
 
+@login_required
+@permission_required('promociones.delete_promociones')
 def deletePromocion(request,id):
     query = Promociones.objects.get(id=id)
     if request.POST:
@@ -77,16 +81,19 @@ def deletePromocion(request,id):
         return redirect('promociones:listar')
     return render(request, "ajax/promocion_confirmar_elminar.html", {"promocion": query})
 
-class UpdatePromocion(UpdateView):
+class UpdatePromocion(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
     form_class =PromocionesForm
     model=Promociones
     template_name = 'promocion_nuevo.html'
+    permission_required = 'promociones.change_promociones'
     success_url = reverse_lazy('promociones:listar')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "EDITAR ANUNCIO"
         return context
 
+@login_required
+@permission_required('promociones.change_promociones')
 def ChangeState(request,pk):
     query = Promociones.objects.get(id=pk)
     if request.POST:

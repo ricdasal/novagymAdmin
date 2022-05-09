@@ -1,9 +1,9 @@
 import django_filters
-from calendario.forms import HorarioReservaFilterForm, MaquinaFilterForm, MaquinaReservaFilterForm
+from calendario.forms import HorarioHorarioFilterForm, HorarioReservaFilterForm, MaquinaFilterForm, MaquinaReservaFilterForm
 from django_filters.widgets import RangeWidget
 from gimnasio.models import Gimnasio
 from seguridad.models import UserDetails
-from .models import Horario, HorarioReserva,Maquina, MaquinaReserva, Zona
+from .models import Horario, HorarioHorario, HorarioReserva,Maquina, MaquinaReserva, Zona
 class CalendarioFilter(django_filters.FilterSet):
     class Meta:
         model = Horario
@@ -30,7 +30,7 @@ class MaquinaFilter(django_filters.FilterSet):
 
 class MaquinaReservaFilter(django_filters.FilterSet):
     maquina = django_filters.ModelChoiceFilter(queryset=Maquina.objects.all())
-    usuario = django_filters.ModelChoiceFilter(queryset=UserDetails.objects.all())
+    usuario = django_filters.CharFilter(field_name='usuario__cedula',lookup_expr="exact", label='Nº de cédula')
     fecha= django_filters.DateFromToRangeFilter(
         widget=RangeWidget(attrs={"type": "date"}))
     class Meta:
@@ -43,7 +43,7 @@ class MaquinaReservaFilter(django_filters.FilterSet):
 
 class HorarioReservaFilter(django_filters.FilterSet):
     horario = django_filters.ModelChoiceFilter(queryset=Horario.objects.all())
-    usuario = django_filters.ModelChoiceFilter(queryset=UserDetails.objects.all())
+    usuario = django_filters.CharFilter(field_name='usuario__cedula',lookup_expr="exact", label='Nº de cédula')
     fecha= django_filters.DateFromToRangeFilter(
         widget=RangeWidget(attrs={"type": "date"}))
     class Meta:
@@ -53,3 +53,12 @@ class HorarioReservaFilter(django_filters.FilterSet):
                   'fecha'
                   ]
         form = HorarioReservaFilterForm
+
+class HorarioHorarioFilter(django_filters.FilterSet):
+    horario = django_filters.ModelChoiceFilter(field_name='horario',queryset=Horario.objects.all(),label='Actividad')
+    class Meta:
+        model = HorarioHorario
+        fields = ['dia',
+                  'horario'
+                  ]
+        form = HorarioHorarioFilterForm
