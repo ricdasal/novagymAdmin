@@ -6,8 +6,10 @@ from membresia.models import Historial
 from rest_framework import serializers
 
 from novagym.models import (DetalleTransaccionMembresia,
-                            DetalleTransaccionProducto, ObjetivoPeso,
-                            ProgresoImc, Transaccion)
+                            DetalleTransaccionProducto, 
+                            ObjetivoPeso,
+                            ProgresoImc, 
+                            Transaccion)
 
 
 class ProgresoImcSerializer(serializers.ModelSerializer):
@@ -55,6 +57,11 @@ class ObjetivoPesoSerializer(serializers.ModelSerializer):
         return objetivo
 
 
+
+"""
+revisar desde aqui
+"""
+
 class TransaccionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaccion
@@ -64,14 +71,13 @@ class TransaccionSerializer(serializers.ModelSerializer):
 class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleTransaccionMembresia
-        exclude = ('dias', 'meses', 'precio', 'descuento',
-                   'subtotal', 'iva', 'total',)
+        exclude = ('dias', 'meses')
 
 
 class DetalleTransaccionProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleTransaccionProducto
-        exclude = ('descuento', 'iva', 'subtotal', 'total',)
+        exclude = ('nombre')
 
 
 class TransaccionProductoSerializer(serializers.ModelSerializer):
@@ -81,11 +87,13 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
         model = Transaccion
         fields = ['id',
                   'usuario',
-                  'valor_total',
-                  'descuento',
+                  'nombre_user',
+                  'auth_code',
+                  'id_tramite',
                   'subtotal',
+                  'descuento',
                   'iva',
-                  'tipo_pago',
+                  'valor_total',
                   'estado',
                   'transaccion_producto',
                   ]
@@ -93,9 +101,6 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         detalles_data = validated_data.pop('transaccion_producto')
         transaccion = Transaccion.objects.create(**validated_data)
-        pre = str(transaccion.pk)
-        sec = '0'*(9-len(pre))+pre
-        transaccion.codigo = sec
         for producto in detalles_data:
             DetalleTransaccionProducto.objects.create(
                 transaccion=transaccion, **producto)
@@ -123,11 +128,13 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
         model = Transaccion
         fields = ['id',
                   'usuario',
-                  'valor_total',
-                  'descuento',
+                  'nombre_user',
+                  'auth_code',
+                  'id_tramite',
                   'subtotal',
+                  'descuento',
                   'iva',
-                  'tipo_pago',
+                  'valor_total',
                   'estado',
                   'transaccion_membresia',
                   ]
@@ -135,13 +142,11 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         detalles_data = validated_data.pop('transaccion_membresia')
         transaccion = Transaccion.objects.create(**validated_data)
-        pre = str(transaccion.pk)
-        sec = '0'*(9-len(pre))+pre
-        transaccion.codigo = sec
+
         for membresia_data in detalles_data:
-            DetalleTransaccionMembresia.objects.create(
-                transaccion=transaccion, **membresia_data)
+            DetalleTransaccionMembresia.objects.create(transaccion=transaccion, **membresia_data)
         transaccion.save()
+        
         membresia = transaccion.transaccion_membresia.all()[0].membresia
         fecha_inicio = timezone.now()
         usuario = transaccion.usuario.detalles
