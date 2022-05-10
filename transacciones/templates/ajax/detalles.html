@@ -13,7 +13,8 @@
         <th>Cant.</th>
         <th>Total</th>
       </tr>
-    {% for data in detalles %}
+    {% if membresias %}
+    {% for data in membresias %}
       <tr>
         <td>{{data.categoria}}</td>
         <td>{{data.descripcion}}</td>
@@ -21,7 +22,19 @@
         <td>{{data.cantidad}}</td>
         <td>{{data.total}}</td>
       </tr>
-      {% endfor %}
+    {% endfor %}
+    {% endif%}
+    {% if productos %}
+    {% for data in productos %}
+      <tr>
+        <td>{{data.categoria}}</td>
+        <td>{{data.descripcion}}</td>
+        <td>{{data.precio}}</td>
+        <td>{{data.cantidad}}</td>
+        <td>{{data.total}}</td>
+      </tr>
+    {% endfor %}
+    {% endif%}
     </table>
 </div>
 <div class="modal-footer">

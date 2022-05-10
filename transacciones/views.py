@@ -5,7 +5,7 @@ from django.views.generic import  ListView
 from novagym.utils import calculate_pages_to_render
 from seguridad.views import UsuarioPermissionRequieredMixin
 from rest_framework import viewsets
-from .models import Transaccion, DetalleTransaccion
+from novagym.models import Transaccion, DetalleTransaccionMembresia, DetalleTransaccionProducto
 from django.contrib import messages
 import requests
 import json
@@ -19,8 +19,9 @@ def AnularTransaccion(request, id):
     return render(request, "ajax/transaccion_delete.html", {"data": data})
 
 def showDetalleTransaccion(request, id):
-    detalles = DetalleTransaccion.objects.all().filter(transaccion=id)
-    return render(request, "ajax/detalles.html", {"detalles": detalles})
+    membresias = DetalleTransaccionMembresia.objects.all().filter(transaccion=id)
+    productos = DetalleTransaccionProducto.objects.all().filter(transaccion=id)
+    return render(request, "ajax/detalles.html", {"membresias": membresias, "productos": productos})
 
 def PaymentezRefound(request, id):
     tran = Transaccion.objects.get(id=id)
@@ -56,7 +57,7 @@ class ListarTransaccion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Lis
     max_pages_render = 10
     model = Transaccion
     context_object_name = 'transacciones'
-    template_name = "listar_transacciones.html"
+    template_name = "listar_transaccion.html"
     permission_required = 'transacciones.view_transaccion'
 
     def get_context_data(self, **kwargs):
@@ -65,3 +66,4 @@ class ListarTransaccion(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Lis
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
+
