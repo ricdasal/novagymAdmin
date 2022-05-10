@@ -23,8 +23,8 @@
       {% for transaccion in page_obj %}
       <tr>
         <td>
-          <p><b>Codigo:</b> {{transaccion.codigo}}</p>
-          <p><b>usuario:</b> {{transaccion.usuario}}</p>
+          <p><b>Codigo:</b> {{transaccion.usuario}}</p>
+          <p><b>usuario:</b> {{transaccion.nombre_user}}</p>
         </td>
         <td>
           <p><b>Autorizacion:</b> {{transaccion.auth_code}}</p>
