@@ -62,7 +62,7 @@ class Transaccion(models.Model):
         PAID = 'PAG', 'Pagada'
         DES = 'DES', 'Despachada'
     codigo = models.CharField(max_length=64, blank=True)
-    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True,related_name="transaccion_usuario")
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2)
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)

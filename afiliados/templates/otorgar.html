@@ -10,30 +10,34 @@
 
 {% block main %}
 <div class="row mt-4">
-  <div class="col">
+  <div class="col-6">
     <h2 class="text-left">{{title}}</h2>
-  </div>
-  <div class="col">
-    <a href="" class="btn btn-primary float-right">Otorgar Novacoins <i
-        class="fas fa-plus-circle"> </i></a>
-        <a style="margin-right: 1%;" href="{% url 'sponsor:listarSucursal' %}" class="btn btn-primary float-right">Ver sucursales <i
-          class="fas fa-plus-circle"> </i></a>
-      
   </div>
   <hr>
 </div>
 <div class="row mt-4">
-  <div class="col-12">
-    <form action="post"> 
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon1">SUC-</span>
-        <input type="text" class="form-control" placeholder="Username" aria-label="Código" aria-describedby="basic-addon1">
-        <input type="submit">
+  <div class="col-6">
+    <form action="" method="POST">
+      {% csrf_token %}
+      <div class="col-6">
+        {{ form.cedula.label_tag }}
+        <p> {{ form.cedula }} </p>
+        {{ form.cedula.errors }}
+        {{ form.codigo.label_tag }}
+        <div class="input-group mb-2">
+          <div class="input-group-prepend">
+            <div class="input-group-text">SPR-</div>
+          </div>
+          {{ form.codigo }}
+          {{ form.codigo.errors }}
+        </div>
+        <input class="btn btn-primary mt-1" type="submit" value="Entregar">
       </div>
     </form>
   </div>
-  <hr width="100%" />
 </div>
+<hr width="100%" />
+
 {% endblock main %}
 
 {% block specific_scripts %}
