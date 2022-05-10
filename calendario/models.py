@@ -87,6 +87,9 @@ class HorarioHorario(models.Model):
     horario_fin= models.TimeField()
     horario=models.ForeignKey(Horario, on_delete=models.PROTECT)
 
+    def nombreDia(self):
+        return self.Dia.labels[int(self.dia)]
+
     def __str__(self):
         return self.horario_inicio+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
 
@@ -128,6 +131,9 @@ class HorarioMaquina(models.Model):
     horario_inicio= models.TimeField()
     horario_fin= models.TimeField()
     maquina=models.ForeignKey(Maquina, on_delete=models.PROTECT)
+
+    def nombreDia(self):
+        return self.Dia.labels[int(self.dia)]
 
     def __str__(self):
         return self.maquina.nombre+"-"+self.dia

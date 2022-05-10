@@ -258,3 +258,30 @@ class HorarioHorarioFilterForm(forms.ModelForm):
                 )
             ),
         )
+
+class HorarioMaquinaFilterForm(forms.ModelForm):
+    class Meta:
+        model= HorarioMaquina
+        fields = ('dia','maquina')
+        labels={
+            "maquina":'Máquina'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('dia', css_class='col-6'),
+                Column('maquina', css_class='col-6'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
