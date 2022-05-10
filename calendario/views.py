@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
 from rest_framework.views import APIView
-from calendario.filters import CalendarioFilter, HorarioHorarioFilter
+from calendario.filters import CalendarioFilter, HorarioHorarioFilter, HorarioMaquinaFilter
 from .forms import *
 from .serializers import *
 from .models import *
@@ -158,6 +158,19 @@ class ShowCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
         context['type']="c"
         return context
 
+class ShowMaquinaHorario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
+    model = HorarioMaquina
+    context_object_name = 'horarios'
+    template_name = "templates/lista_calendarioMaquina.html"
+    permission_required = 'calendario.view_horario'
+    filterset_class=HorarioMaquinaFilter
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Horarios de actividades"
+        context['type']="m"
+        return context
+
 class ListarActividades(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     model = Horario
     context_object_name = 'actividades'
@@ -183,11 +196,22 @@ class CrearHorarioHorario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Cr
         context['title'] = "Agregar Horario"
         return context
 
+class EditarHorarioMaquina(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
+    form_class =HorarioMaquinaForm
+    model=HorarioMaquina
+    template_name = 'templates/horariohorario_nuevo.html'
+    success_url = reverse_lazy('calendario:listarHorarioMaquina')
+    permission_required = 'calendario.change_maquina'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Actualizar Horario"
+        return context
+
 class CrearHorarioMaquina(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateView):
     form_class =HorarioMaquinaForm
     model=HorarioMaquina
     template_name = 'templates/horariomaquina_nuevo.html'
-    success_url = reverse_lazy('reservas:listarMaquinas')
+    success_url = reverse_lazy('reservas:listarHorarioMaquina')
     permission_required = 'calendario.add_maquina'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -237,12 +261,26 @@ def deleteHorarioHorario(request,id):
         query = HorarioHorario.objects.get(id=id)
         if request.POST:
             query.delete()
-            messages.success(request, "Horario eliminada con éxito.")
+            messages.success(request, "Horario eliminado con éxito.")
             return redirect('calendario:listar')
         return render(request, "templates/ajax/horario_confirmar_elminar.html", {"horario": query})
     except:
         messages.error(request, "No se puede eliminar este horario.")
         return redirect('calendario:listar')
+
+@login_required
+@permission_required('calendario.delete_maquina')
+def deleteHorarioMaquina(request,id):
+    try:
+        query = HorarioMaquina.objects.get(id=id)
+        if request.POST:
+            query.delete()
+            messages.success(request, "Horario eliminado con éxito.")
+            return redirect('calendario:listarHorarioMaquina')
+        return render(request, "templates/ajax/horarioMaquina_confirmar_elminar.html", {"horario": query})
+    except:
+        messages.error(request, "No se puede eliminar este horario.")
+        return redirect('calendario:listarHorarioMaquina')
 
 @login_required
 @permission_required('calendario.change_horario')

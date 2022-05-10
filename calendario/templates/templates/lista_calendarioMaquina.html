@@ -16,12 +16,12 @@
   <hr>
 </div>
 <div class="col-12 d-flex justify-content-end">
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'calendario:listarZona' %}">
     <i class="fa fa-map"></i> Ver zonas</a>
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crearHorarioActividad' %}">
-    <i class="fa fa-plus-circle"></i> Agregar horario de actividad</a>
-  <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarActividades' %}">
-    <i class="fa fa-calendar-plus"></i> Ver actividades</a>
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'calendario:agregarHorario' %}">
+    <i class="fa fa-plus-circle"></i> Agregar horario de máquinas</a>
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'reservas:listarMaquinas' %}">
+    <i class="fa fa-calendar-plus"></i> Ver máquinas</a>
 </div>
 <div class="row mt-4 justify-content-left">
   <div class="col-6">
@@ -40,7 +40,7 @@
           <th scope="col">Día</th>
           <th scope="col">Horario</th>
           <th scope="col">Actividad</th>
-          <th scope="col">Capacidad</th>
+          <th scope="col">Categoría</th>
           <th scope="col">Gimnasio</th>
           <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
@@ -53,19 +53,19 @@
         <tr class="text-center">
           <td>{{horario.nombreDia}}</td>
           <td>{{horario.horario_inicio}} - {{horario.horario_fin}}</td>
-          <td>{{horario.horario.nombre}}</td>
-          <td>{{horario.horario.capacidad}}</td>
-          <td>{{horario.horario.gimnasio.nombre}}</td>
+          <td>{{horario.maquina.nombre}}</td>
+          <td>{{horario.maquina.categoria}}</td>
+          <td>{{horario.maquina.gimnasio.nombre}}</td>
 
-          {% if horario.horario.activo%}
+          {% if horario.maquina.activo%}
           <td style="color: green;">Activo</td>
           {% else %}
           <td style="color: red;">Activo</td>
           {% endif %}
           <td>
-            <a href="{% url 'calendario:editarHorario' horario.pk %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'calendario:editarHorarioMaquina' horario.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'calendario:eliminarHorario' horario.id %}"
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'calendario:eliminarHorarioMaquina' horario.id %}"
               href="#">
               <i class="fas fa-times "></i></a>
           </td>

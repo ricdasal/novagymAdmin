@@ -35,6 +35,9 @@ urlpatterns = [
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
     path('verificarMaquina/',VerificarMaquina.as_view(),name="verificarMaquina"),
 
+    path('listarHorarioMaquina/', ShowMaquinaHorario.as_view(), name='listarHorarioMaquina'),
+    path('editarHorarioMaquina/<int:pk>', EditarHorarioMaquina.as_view(), name='editarHorarioMaquina'),
+    path('eliminarHorarioMaquina/<int:id>',deleteHorarioMaquina,name="eliminarHorarioMaquina"),
     path('agregarHorario/', CrearHorarioMaquina.as_view(), name='agregarHorario'),
 
     path('verHorariosMaquinas/',VerHorariosMaquinas.as_view(),name="verHorariosMaquinas"),

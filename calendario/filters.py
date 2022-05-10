@@ -1,5 +1,5 @@
 import django_filters
-from calendario.forms import HorarioHorarioFilterForm, HorarioReservaFilterForm, MaquinaFilterForm, MaquinaReservaFilterForm
+from calendario.forms import HorarioHorarioFilterForm, HorarioMaquinaFilterForm, HorarioReservaFilterForm, MaquinaFilterForm, MaquinaReservaFilterForm
 from django_filters.widgets import RangeWidget
 from gimnasio.models import Gimnasio
 from seguridad.models import UserDetails
@@ -62,3 +62,12 @@ class HorarioHorarioFilter(django_filters.FilterSet):
                   'horario'
                   ]
         form = HorarioHorarioFilterForm
+
+class HorarioMaquinaFilter(django_filters.FilterSet):
+    maquina = django_filters.ModelChoiceFilter(field_name='maquina',queryset=Maquina.objects.all(),label='Máquina')
+    class Meta:
+        model = HorarioHorario
+        fields = ['dia',
+                  'maquina'
+                  ]
+        form = HorarioMaquinaFilterForm
