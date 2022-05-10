@@ -39,15 +39,6 @@ class Zona(models.Model):
 
 class Horario(models.Model):
     id = models.AutoField(primary_key=True)
-    class Dia(models.TextChoices):
-        LUNES = 'LUNES', 'LUNES'
-        MARTES = 'MARTES', 'MARTES'
-        MIERCOLES = 'MIERCOLES', 'MIERCOLES'
-        JUEVES = 'JUEVES', 'JUEVES'
-        VIERNES = 'VIERNES', 'VIERNES'
-        SABADO = 'SABADO', 'SABADO'
-        DOMINGO = 'DOMINGO', 'DOMINGO'
-
     class Nombre(models.TextChoices):
         Bailoterapia = 'Bailoterapia', 'Bailoterapia'
         Bicicletas = 'Bicicletas', 'Bicicletas'
@@ -58,11 +49,8 @@ class Horario(models.Model):
         Intensidad = 'Alta intensidad', 'Alta intensidad'
         Funcional = 'Entrenamiento funcional', 'Bailoterapia'
         Lifting = 'Power lifting', 'Power lifting'
-    dia=models.CharField(max_length=10, choices=Dia.choices)
     nombre = models.CharField(max_length=30,choices=Nombre.choices)
     descripcion = models.CharField(max_length=255)
-    horario_inicio = models.TimeField(blank=False)
-    horario_fin = models.TimeField(blank=False)
     gimnasio=models.ForeignKey(Gimnasio, on_delete=models.PROTECT)
     capacidadMaxima=models.PositiveIntegerField(blank=False,null=False)
     capacidad=models.PositiveIntegerField(blank=True,null=True)
@@ -70,9 +58,9 @@ class Horario(models.Model):
     activo=models.BooleanField(default=True)
     zona=models.ForeignKey(Zona,on_delete=models.PROTECT)
     class Meta:
-        ordering=('horario_inicio',)
+        ordering=('-id',)
     def __str__(self):
-        return self.nombre
+        return self.nombre+"-"+self.gimnasio.nombre
     def setAforo(self,aforo):
         valor=aforo/100
         newCapacidad=int(self.capacidadMaxima*valor)
@@ -84,6 +72,23 @@ class Horario(models.Model):
             self.capacidad = int(self.capacidadMaxima)
         super(Horario, self).save(*args, **kwargs)
 
+class HorarioHorario(models.Model):
+    class Dia(models.TextChoices):
+        LUNES = 0, 'LUNES'
+        MARTES = 1, 'MARTES'
+        MIERCOLES = 2, 'MIERCOLES'
+        JUEVES = 3, 'JUEVES'
+        VIERNES = 4, 'VIERNES'
+        SABADO = 5, 'SABADO'
+        DOMINGO = 6, 'DOMINGO'
+    dia=models.CharField(max_length=10, choices=Dia.choices)
+    id = models.AutoField(primary_key=True)
+    horario_inicio= models.TimeField()
+    horario_fin= models.TimeField()
+    horario=models.ForeignKey(Horario, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.horario_inicio+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
 
 class Maquina(models.Model):
     class Categoria(models.TextChoices):
@@ -107,7 +112,25 @@ class Maquina(models.Model):
     class Meta:
         ordering=('-id',)
     def __str__(self):
-        return self.nombre+"-"+self.categoria
+        return self.nombre+"-"+self.categoria+"-"+self.gimnasio.nombre
+
+class HorarioMaquina(models.Model):
+    class Dia(models.TextChoices):
+        LUNES = 0, 'LUNES'
+        MARTES = 1, 'MARTES'
+        MIERCOLES = 2, 'MIERCOLES'
+        JUEVES = 3, 'JUEVES'
+        VIERNES = 4, 'VIERNES'
+        SABADO = 5, 'SABADO'
+        DOMINGO = 6, 'DOMINGO'
+    dia=models.CharField(max_length=10, choices=Dia.choices)
+    id = models.AutoField(primary_key=True)
+    horario_inicio= models.TimeField()
+    horario_fin= models.TimeField()
+    maquina=models.ForeignKey(Maquina, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.maquina.nombre+"-"+self.dia
 
 class Posicion(models.Model):
     id=models.AutoField(primary_key=True)
@@ -131,8 +154,7 @@ class MaquinaReserva(models.Model):
     id=models.AutoField(primary_key=True)
     codigo=models.CharField(max_length=20, unique=True, default=generarCodigo, editable=False)
     maquina=models.ForeignKey(Maquina,on_delete=models.PROTECT)
-    horario_inicio=models.TimeField()
-    horario_fin=models.TimeField()
+    horario=models.ForeignKey(HorarioMaquina,on_delete=models.PROTECT)
     fecha= models.DateField()
     posicion=models.ForeignKey(PosicionMaquina, on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
@@ -144,10 +166,10 @@ class MaquinaReserva(models.Model):
 class HorarioReserva(models.Model):
     id = models.AutoField(primary_key=True)
     codigo=models.CharField(max_length=20, unique=True, default=generarCodigo, editable=False)
-    horario=models.ForeignKey(Horario,on_delete=models.PROTECT)
+    clase=models.ForeignKey(Horario,on_delete=models.PROTECT)
+    horario=models.ForeignKey(HorarioHorario,on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
     posicion=models.ForeignKey(Posicion, on_delete=models.PROTECT, blank=True,null=True)
-    fecha=models.DateField()
     created_at= models.DateTimeField(auto_now_add=True)
     class Meta:
         ordering=('-id',)

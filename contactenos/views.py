@@ -19,6 +19,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.mixins import LoginRequiredMixin
 from seguridad.views import UsuarioPermissionRequieredMixin
+from django.contrib.auth.decorators import login_required, permission_required
 # Create your views here.
 
 class SendMail(APIView):
@@ -54,7 +55,7 @@ class ShowBuzon(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     exclude = ['imagen']
     context_object_name = 'mail'
     template_name = "buzon.html"
-    permission_required = 'seguridad.view_userdetails'
+    permission_required = 'contactenos.view_buzon'
     filterset_class = BuzonFilter
 
     def get_context_data(self, **kwargs):
@@ -74,7 +75,7 @@ class ShowBuzonNoLeidos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filt
     exclude = ['imagen']
     context_object_name = 'mail'
     template_name = "buzonFilter.html"
-    permission_required = 'seguridad.view_userdetails'
+    permission_required = 'contactenos.view_buzon'
     filterset_class = BuzonFilter
     
     def get_context_data(self, **kwargs):
@@ -95,7 +96,7 @@ class ShowBuzonLeidos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
     exclude = ['imagen']
     context_object_name = 'mail'
     template_name = "buzonFilter.html"
-    permission_required = 'seguridad.view_userdetails'
+    permission_required = 'contactenos.view_buzon'
     filterset_class = BuzonFilter
 
     def get_context_data(self, **kwargs):
@@ -110,6 +111,8 @@ class ShowBuzonLeidos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
+@login_required
+@permission_required('contactenos.delete_buzon')
 def deleteMail(request,id):
     query = Buzon.objects.get(id=id)
     if request.POST:

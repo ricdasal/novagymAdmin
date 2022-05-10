@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h5 class="modal-title" id="ordenTitle">Eliminar horario</h5>
+  <h5 class="modal-title" id="ordenTitle">Eliminar actividad</h5>
   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
@@ -9,7 +9,7 @@
   {% csrf_token %}
 
   <div class="modal-body">
-    ¿Desea eliminar el siguiente horario?
+    ¿Desea eliminar la siguiente actividad?
     <div class="row">
       <div class="col-3">
         Nombre
@@ -20,18 +20,18 @@
     </div>
     <div class="row">
       <div class="col-3">
-        Día
+        Descipcion
       </div>
       <div class="col">
-        {{calendario.dia}}
+        {{calendario.descripcion}}
       </div>
     </div>
     <div class="row">
       <div class="col-3">
-        Horario
+        Gimnasio
       </div>
       <div class="col">
-        {{calendario.horario_inicio}} - {{calendario.horario_fin}}
+        {{calendario.gimnasio.nombre}}
       </div>
     </div>
   </div>

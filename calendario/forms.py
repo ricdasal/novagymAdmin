@@ -1,9 +1,10 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-from .models import Horario, Maquina, Zona
+from .models import Horario, HorarioHorario, HorarioMaquina, Maquina, Zona
 from crispy_forms.layout import Column,Layout, Row, Field,HTML
 from .widgets import TimePickerInput
 from crispy_forms.bootstrap import StrictButton
+
 class HorarioForm(forms.ModelForm):
     zona=forms.ModelChoiceField(queryset=Zona.objects.all().filter(tipo="clases"))
     class Meta:
@@ -13,12 +14,10 @@ class HorarioForm(forms.ModelForm):
             "descripcion": "Descripción de la actividad",
             "capacidadMaxima":"Capacidad"
         }
-        fields = ('dia','nombre', 'descripcion','horario_inicio','horario_fin','gimnasio','capacidadMaxima','zona')
+        fields = ('nombre', 'descripcion','gimnasio','capacidadMaxima','zona')
 
         widgets = {
             "descripcion":forms.Textarea(attrs={'rows':4, 'cols':15}),
-            "horario_inicio": TimePickerInput(),
-            "horario_fin": TimePickerInput(),
             "capacidadMaxima":forms.NumberInput(attrs={'min':1})
         }
     def __init__(self, *args, **kwargs):
@@ -28,15 +27,12 @@ class HorarioForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('dia', css_class='col-6'),
                 Column('nombre', css_class='col-6'),
                 Column('descripcion', css_class='col-6'),
                 Column('capacidadMaxima', css_class='col-6'),
+                Column('gimnasio', css_class='col-6'),
             ),
             Row(
-                Column('gimnasio', css_class='col-6'),
-                Column('horario_inicio', css_class='col-6'),
-                Column('horario_fin', css_class='col-6 '),
                 Column('zona', css_class='col-6 '),
             ),
         )
@@ -104,7 +100,7 @@ class MaquinaForm(forms.ModelForm):
                             <i class="fas fa-plus-circle"></i> Crear zona
                         </a>
                        """), css_class='col-auto align-self-end py-2'),
-            ),   
+            ),  
             Row(
                 Column('cantidad', css_class='col-6'),
                 Column('imagen', css_class='col-6'),
@@ -173,6 +169,86 @@ class HorarioReservaFilterForm(forms.Form):
                     Field('fecha', template="forms/fields/range-filter.html",
                           css_class="form-control"), css_class='col-12 col-md-6 col-lg-3'
                 ),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
+
+class HorarioMaquinaForm(forms.ModelForm):
+    class Meta:
+        model= HorarioMaquina
+        fields = ('dia','horario_inicio','horario_fin','maquina')
+        widgets = {
+                "horario_inicio":TimePickerInput,
+                "horario_fin":TimePickerInput,
+            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('horario_inicio', css_class='col-6'),
+                Column('horario_fin', css_class='col-6'),
+            ),
+            Row(
+                Column('dia', css_class='col-6'),
+                Column('maquina', css_class='col-6'),
+            ),
+        )
+
+class HorarioHorarioForm(forms.ModelForm):
+    class Meta:
+        model= HorarioHorario
+        fields = ('dia','horario_inicio','horario_fin','horario')
+        labels={
+            "horario":'Actividad'
+        }
+        widgets = {
+                "horario_inicio":TimePickerInput,
+                "horario_fin":TimePickerInput,
+            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('horario_inicio', css_class='col-6'),
+                Column('horario_fin', css_class='col-6'),
+            ),
+            Row(
+                Column('dia', css_class='col-6'),
+                Column('horario', css_class='col-6'),
+            ),
+        )
+
+class HorarioHorarioFilterForm(forms.ModelForm):
+    class Meta:
+        model= HorarioHorario
+        fields = ('dia','horario')
+        labels={
+            "horario":'Actividad'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('dia', css_class='col-6'),
+                Column('horario', css_class='col-6'),
             ),
             Row(
                 Column(
