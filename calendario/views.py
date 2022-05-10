@@ -1,3 +1,4 @@
+from calendar import week
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -38,23 +39,27 @@ def calendarioDetail(request,id):
 class Reservar(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
-        print(request.data)
         reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
         clase=request.data["clase"]
         idUsuario=request.data["usuario"]
         nroPosicion=request.data["posicion"]
         fecha=request.data["fecha"]
         horario=request.data["horario"]
-        hora_inicio=horario.horario_inicio
-        hora_fin=horario.horario_fin
+        horarioHorario=HorarioHorario.objects.get(id=horario)
+        hora_inicio=horarioHorario.horario_inicio
+        hora_fin=horarioHorario.horario_fin
         otrasReservas=HorarioReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
-        reservado=HorarioReserva.objects.all().filter(horario_id=clase).filter(usuario_id=idUsuario).filter(id=horario)
+        reservado=HorarioReserva.objects.all().filter(fecha=fecha).filter(horario_id=clase).filter(usuario_id=idUsuario)
         horario=Horario.objects.get(id=clase)
         idZona=horario.zona
         posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
+        weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
+        fechaValida=int(horarioHorario.dia) == weekday
         if reserva.is_valid():
             if reservado:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
+            if fechaValida==False:
+                return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
             if horario.asistentes < horario.capacidad:
                 if reserva.save():
                     posiciones.ocupado=True
@@ -96,9 +101,14 @@ class ReservarMaquina(APIView):
         newDict=request.data.copy()
         newDict["posicion"]=posicion.id
         reserva = MaquinaReservaSerializer(data=newDict, many=False)
+
+        weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
+        fechaValida=int(horario.dia) == weekday
         if reserva.is_valid():
             if reservados.filter(usuario=idUsuario):
                 return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
+            if fechaValida==False:
+                return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
             elif len(otrasReservas)>0:
                 return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
             elif len(reservados)>=len(posiciones):

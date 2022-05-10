@@ -41,7 +41,7 @@ class HorarioReservaSerializer(ModelSerializer):
     #posicion=PosicionSerializer(read_only=True, many=False)
     class Meta:
         model = HorarioReserva
-        fields = ('id','codigo','clase','horario','usuario','posicion','created_at')
+        fields = ('id','codigo','clase','fecha','horario','usuario','posicion','created_at')
     def create(self, validated_data):
             return HorarioReserva.objects.create(**validated_data)
 
@@ -120,10 +120,10 @@ class HorarioMaquinaSerializer(ModelSerializer):
     maquina=MaquinaSerializer(read_only=True,many=False)
     class Meta:
         model=HorarioMaquina
-        fields=('maquina','horario_inicio','horario_fin')
+        fields=('id','maquina','horario_inicio','horario_fin')
 
 class HorarioHorarioSerializer(ModelSerializer):
     horario=HorarioSerializer(read_only=True,many=False)
     class Meta:
         model=HorarioMaquina
-        fields=('horario','horario_inicio','horario_fin')
+        fields=('id','horario','horario_inicio','horario_fin')
