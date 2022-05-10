@@ -69,8 +69,7 @@
             <input type="checkbox" {%if maquina.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
             data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
             data-target="#mainModal" data-url-activar="{% url 'reservas:change' maquina.pk %}"
-            data-url-eliminar="{% url 'reservas:change' maquina.pk %}"
-            >
+            data-url-eliminar="{% url 'reservas:change' maquina.pk %}">
           </td>
           <td>
             <a href="{% url 'reservas:editarMaquina' maquina.pk %}" class="btn btn-sm btn-primary">
@@ -79,10 +78,6 @@
                <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
                data-url="{% url 'reservas:eliminarMaquina' maquina.id %}" href="#">
                  <i class="fas fa-times "></i></a>
-
-                 <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
-               data-url="{% url 'reservas:maquinatoday' maquina.pk %}" href="#">
-                 <i class="fas fa-book"></i></a>
           </td>
           
         </tr>
@@ -106,6 +101,15 @@
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
+<script>
+  $(document).ready(function () {
+    
+    var table = tableInit("#maquinas");
+
+  });
+
+</script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

@@ -145,6 +145,7 @@ class ShowCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "Horarios de actividades"
+        context['type']="c"
         return context
 
 class ListarActividades(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
@@ -206,7 +207,50 @@ class UpdateCalendario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Updat
         context = super().get_context_data(**kwargs)
         context['title'] = "Actualizar actividad"
         return context
-    
+
+class UpdateHorarioHorario(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateView):
+    form_class =HorarioHorarioForm
+    model=HorarioHorario
+    title = "Actualizar horario"
+    template_name = 'templates/horariohorario_nuevo.html'
+    success_url = reverse_lazy('calendario:listarActividades')
+    permission_required = 'calendario.change_horario'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = "Actualizar actividad"
+        return context
+
+@login_required
+@permission_required('calendario.delete_horario')
+def deleteHorarioHorario(request,id):
+    try:
+        query = HorarioHorario.objects.get(id=id)
+        if request.POST:
+            query.delete()
+            messages.success(request, "Horario eliminada con éxito.")
+            return redirect('calendario:listar')
+        return render(request, "templates/ajax/horario_confirmar_elminar.html", {"horario": query})
+    except:
+        messages.error(request, "No se puede eliminar este horario.")
+        return redirect('calendario:listar')
+
+@login_required
+@permission_required('calendario.change_horario')
+def ChangeState(request,pk):
+    query = Horario.objects.get(id=pk)
+    if request.POST:
+        if query.activo==0:
+            query.activo=1
+            messages.success(request, "Horario habilitado.")
+            query.save()
+            return redirect('calendario:listarActividades')
+        elif query.activo==1:
+            query.activo=0
+            messages.error(request, "Horario deshabilitado.")
+            query.save()
+            return redirect('calendario:listarActividades')
+    return render(request, "templates/ajax/horario_confirmar_change.html", {"actividad": query})
+
 class ShowZona(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
@@ -342,7 +386,7 @@ class HorarioSmall(APIView):
 
 class MaquinasDispo(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         maquinaId=request.data["maquina"]
         fecha=request.data["fecha"]
 
@@ -366,7 +410,7 @@ class MaquinasDispo(APIView):
 
 class HorariosDispo(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         idHorario=request.data["horario"]
         fecha=request.data["fecha"]
         horario=Horario.objects.get(id=idHorario)
@@ -379,7 +423,7 @@ class HorariosDispo(APIView):
 
 class VerificarMaquina(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
         hora=request.data["hora"]
@@ -395,7 +439,7 @@ class VerificarMaquina(APIView):
 
 class VerHorariosMaquinas(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
@@ -411,7 +455,7 @@ class VerHorariosMaquinas(APIView):
 
 class VerHorariosClase(APIView):
     parser_classes = (MultiPartParser, FormParser)
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()

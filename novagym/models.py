@@ -60,7 +60,8 @@ class Transaccion(models.Model):
         CANCEL = 'CNC', 'Anulada'
         PAID = 'PAG', 'Pagada'
         DES = 'DES', 'Despachada'
-    
+
+    codigo = models.CharField(max_length=64, blank=True)
     usuario     = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     nombre_user = models.CharField(max_length=50)
     auth_code   = models.CharField(max_length=20)

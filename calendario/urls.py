@@ -20,6 +20,10 @@ urlpatterns = [
     path('updateZona/<int:pk>',UpdateZona.as_view(),name="updateZona"),
     path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 
+    path('editarHorario/<int:pk>',UpdateHorarioHorario.as_view(),name="editarHorario"),
+    path('eliminarHorario/<int:id>',deleteHorarioHorario,name="eliminarHorario"),
+    path('change/<int:pk>',ChangeState,name="change"),
+
     path('datosHorario/',HorarioSmall.as_view(),name="datosHorario"),
     path('datosHorario/<int:opc>',HorarioSmall.as_view(),name="datosHorario"),
 

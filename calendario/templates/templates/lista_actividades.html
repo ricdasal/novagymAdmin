@@ -15,7 +15,7 @@
   </div>
   <div class="col-12 d-flex justify-content-end">
     <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listar' %}">
-      <i class="fa fa-calendar-plus"></i> Regresar</a>
+      <i class="fa fa-arrow-circle-left"></i> Regresar</a>
     <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
       <i class="fa fa-calendar-plus"></i> Ver zonas</a>
     <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
@@ -25,7 +25,7 @@
 </div>
 <div class="row mt-4">
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="horariohorario">
       <thead class="thead-light">
         <tr>
           <th scope="col">Nombre</th>
@@ -44,16 +44,18 @@
           <td>{{actividad.descripcion}}</td>
           <td>{{actividad.capacidad}}</td>
           <td>{{actividad.gimnasio.nombre}}</td>
-          <td>activo</td>
           <td>
-            <a href="{% url 'calendario:editar' actividad.id %}" class="btn btn-sm btn-primary">
+            <input type="checkbox" {%if actividad.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
+            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
+            data-target="#mainModal" data-url-activar="{% url 'calendario:change' actividad.pk %}"
+            data-url-eliminar="{% url 'calendario:change' actividad.pk %}">
+          </td>
+          <td>
+            <a href="{% url 'calendario:editar' actividad.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
             <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
               data-url="{% url 'calendario:eliminar' actividad.id %}" href="#">
               <i class="fas fa-times "></i></a>
-              <a class="btn btn-sm btn-info use-modal" data-toggle='modal' data-target="#mainModal"
-         data-url="{% url 'reservas:horariotoday' actividad.pk %}" href="#">
-           <i class="fas fa-book"></i></a>
           </td>
 
         </tr>
@@ -77,6 +79,15 @@
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
+<script>
+  $(document).ready(function () {
+    
+    var table = tableInit("#horariohorario");
+
+  });
+
+</script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

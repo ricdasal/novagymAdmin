@@ -17,14 +17,14 @@
 </div>
 <div class="col-12 d-flex justify-content-end">
   <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
-    <i class="fa fa-calendar-plus"></i> Ver zonas</a>
+    <i class="fa fa-map"></i> Ver zonas</a>
   <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crearHorarioActividad' %}">
-    <i class="fa fa-calendar-plus"></i> Agregar horario de actividad</a>
+    <i class="fa fa-plus-circle"></i> Agregar horario de actividad</a>
   <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarActividades' %}">
     <i class="fa fa-calendar-plus"></i> Ver actividades</a>
 </div>
-<div class="row mt-4 justify-content-center">
-  <div class="col-12">
+<div class="row mt-4 justify-content-left">
+  <div class="col-6">
     <form method="get">
       {% crispy filter.form %}
     </form>
@@ -48,17 +48,22 @@
       <tbody>
         {% if horarios %}
         {% for horario in horarios %}
-
+        
         <tr class="text-center">
           <td>{{horario.horario_inicio}} - {{horario.horario_fin}}</td>
           <td>{{horario.horario.nombre}}</td>
           <td>{{horario.horario.capacidad}}</td>
           <td>{{horario.horario.gimnasio.nombre}}</td>
-          <td>activo</td>
+
+          {% if horario.horario.activo%}
+          <td style="color: green;">Activo</td>
+          {% else %}
+          <td style="color: red;">Activo</td>
+          {% endif %}
           <td>
-            <a href="" class="btn btn-sm btn-primary">
+            <a href="{% url 'calendario:editarHorario' horario.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url=""
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'calendario:eliminarHorario' horario.id %}"
               href="#">
               <i class="fas fa-times "></i></a>
           </td>
