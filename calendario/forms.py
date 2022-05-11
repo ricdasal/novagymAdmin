@@ -203,6 +203,15 @@ class HorarioMaquinaForm(forms.ModelForm):
                 Column('maquina', css_class='col-6'),
             ),
         )
+    def clean(self):
+        cleaned_data = super(HorarioMaquinaForm, self).clean()
+        hora_inicio = cleaned_data.get("horario_inicio")
+        hora_fin = cleaned_data.get("horario_fin")
+        if hora_inicio and hora_fin:
+            if hora_fin < hora_inicio:
+                raise forms.ValidationError(
+                    "La hora de inicio no puede ser anterior a la hora de fin.")
+        return cleaned_data
 
 class HorarioHorarioForm(forms.ModelForm):
     class Meta:
@@ -231,6 +240,15 @@ class HorarioHorarioForm(forms.ModelForm):
                 Column('horario', css_class='col-6'),
             ),
         )
+    def clean(self):
+        cleaned_data = super(HorarioHorarioForm, self).clean()
+        hora_inicio = cleaned_data.get("horario_inicio")
+        hora_fin = cleaned_data.get("horario_fin")
+        if hora_inicio and hora_fin:
+            if hora_fin < hora_inicio:
+                raise forms.ValidationError(
+                    "La hora de inicio no puede ser anterior a la hora de fin.")
+        return cleaned_data
 
 class HorarioHorarioFilterForm(forms.ModelForm):
     class Meta:
