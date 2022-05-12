@@ -47,7 +47,7 @@ class Reservar(APIView):
         hora_inicio=horarioHorario.horario_inicio
         hora_fin=horarioHorario.horario_fin
         otrasReservas=HorarioReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
-        reservado=HorarioReserva.objects.all().filter(fecha=fecha).filter(horario_id=clase).filter(usuario_id=idUsuario)
+        reservado=HorarioReserva.objects.all().filter(fecha=fecha).filter(clase=clase).filter(usuario=idUsuario)
         horario=Horario.objects.get(id=clase)
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
         fechaValida=int(horarioHorario.dia) == weekday
