@@ -53,7 +53,7 @@ class Reservar(APIView):
         fechaValida=int(horarioHorario.dia) == weekday
         estaReserva=len(HorarioReserva.objects.filter(fecha=fecha).filter(horario=clase))
         if reserva.is_valid():
-            if reservado:
+            if len(reservado)>=1:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
             if fechaValida==False:
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
@@ -99,7 +99,7 @@ class ReservarMaquina(APIView):
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
         fechaValida=int(horario.dia) == weekday
         if reserva.is_valid():
-            if reservaUsuario:
+            if len(reservaUsuario)>=1:
                 return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
             if fechaValida==False:
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)

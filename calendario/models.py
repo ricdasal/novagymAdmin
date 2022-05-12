@@ -91,7 +91,7 @@ class HorarioHorario(models.Model):
         return self.Dia.labels[int(self.dia)]
 
     def __str__(self):
-        return self.horario_inicio+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
+        return str(self.horario_inicio)+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
 
 class Maquina(models.Model):
     class Categoria(models.TextChoices):
