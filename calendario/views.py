@@ -74,7 +74,7 @@ class Reservar(APIView):
 class ReservarMaquina(APIView):
     #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
-        idUsuario=request.data["usuario"]
+        usuario=request.data["usuario"]
         fila=request.data["fila"]
         columna=request.data["columna"]
         horario=request.data["horario"]
@@ -86,9 +86,10 @@ class ReservarMaquina(APIView):
         hora_inicio=horario.horario_inicio
         hora_fin=horario.horario_fin
         reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario=horario)
+        reservaUsuario=reservados.filter(usuario=usuario)
         posiciones=PosicionMaquina.objects.filter(maquina=maquina)
         posicion=posiciones.filter(fila=fila).filter(columna=columna).get()
-        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
+        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=usuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
         newDict=request.data.copy()
         newDict["posicion"]=posicion.id
         reserva = MaquinaReservaSerializer(data=newDict, many=False)
@@ -96,7 +97,7 @@ class ReservarMaquina(APIView):
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
         fechaValida=int(horario.dia) == weekday
         if reserva.is_valid():
-            if reservados.filter(usuario=idUsuario):
+            if reservaUsuario:
                 return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
             if fechaValida==False:
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
