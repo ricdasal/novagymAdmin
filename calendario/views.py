@@ -1,17 +1,15 @@
-from calendar import week
-from fileinput import filename
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.shortcuts import render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from rest_framework.decorators import api_view
 from django.contrib.auth.decorators import login_required, permission_required
 from rest_framework import status
 from rest_framework.response import Response
 from django_filters.views import FilterView
 from rest_framework.views import APIView
-from calendario.filters import CalendarioFilter, HorarioHorarioFilter, HorarioMaquinaFilter
+from calendario.filters import  HorarioHorarioFilter, HorarioMaquinaFilter
 from .forms import *
 from .serializers import *
 from .models import *
@@ -385,35 +383,35 @@ def getHorarios(request):
     return HttpResponse(json.dumps(urls))
 
 class MaquinasDispo(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
         data=Maquina.objects.all()
         serializer = MaquinaDispoSerializer(data, many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class HorariosDispo(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request, *args, **kwargs):
         data=Horario.objects.all()
         serializer = HorarioDispoSerializer(data, many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class HorariosUsuario(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,id, *args, **kwargs):
         data=HorarioReserva.objects.all().filter(usuario=id)
         serializer = ReporteHorarioReservaSerializer(data, many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class MaquinaUsuario(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,id, *args, **kwargs):
         data=MaquinaReserva.objects.all().filter(usuario=id)
         serializer = ReporteMaquinaReservaSerializer(data, many=True)
         return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class HorarioSmall(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,opc=None, *args, **kwargs):
         if opc==None:
             data=Horario.objects.all().filter(activo=True)
@@ -425,7 +423,7 @@ class HorarioSmall(APIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class DisponibilidadMaquina(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         maquinaId=request.data["maquina"]
         fecha=request.data["fecha"]
@@ -445,7 +443,7 @@ class DisponibilidadMaquina(APIView):
         return Response(lista,content_type='application/json',status=status.HTTP_200_OK)
 
 class HorariosDispo(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         idHorario=request.data["horario"]
         fecha=request.data["fecha"]
@@ -458,7 +456,7 @@ class HorariosDispo(APIView):
         return Response(data=datas,status=status.HTTP_200_OK)
 
 class VerificarMaquina(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
@@ -474,7 +472,7 @@ class VerificarMaquina(APIView):
             return Response(data=data,status=status.HTTP_400_BAD_REQUEST)
 
 class VerHorariosMaquinas(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
@@ -490,7 +488,7 @@ class VerHorariosMaquinas(APIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class VerHorariosClase(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         fecha=request.data["fecha"]
         gimnasio=request.data["gimnasio"]
