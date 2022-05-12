@@ -36,7 +36,7 @@ def calendarioDetail(request,id):
 
 
 class Reservar(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
         clase=request.data["clase"]
@@ -72,7 +72,7 @@ class Reservar(APIView):
             return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
 
 class ReservarMaquina(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         idUsuario=request.data["usuario"]
         fila=request.data["fila"]
@@ -114,7 +114,7 @@ class ReservarMaquina(APIView):
             return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
 
 class Horarios(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,opcion=None, *args, **kwargs):
         if opcion==None:
             data=Horario.objects.all().filter(activo=True)
@@ -126,7 +126,7 @@ class Horarios(APIView):
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
 class HorariosReservas(APIView):
-    parser_classes = (MultiPartParser, FormParser)
+    #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,opcion=None, *args, **kwargs):
         if opcion==None:
             data=HorarioReserva.objects.all()
