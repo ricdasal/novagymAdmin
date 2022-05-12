@@ -51,7 +51,7 @@ class Reservar(APIView):
         horario=Horario.objects.get(id=clase)
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
         fechaValida=int(horarioHorario.dia) == weekday
-        estaReserva=len(HorarioReserva.objects.filter(fecha=fecha,horario=clase))
+        estaReserva=len(HorarioReserva.objects.filter(fecha=fecha).filter(horario=clase))
         if reserva.is_valid():
             if reservado:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
@@ -59,7 +59,9 @@ class Reservar(APIView):
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
             if estaReserva < horario.capacidad:
                 if reserva.save():
-                    return Response(data=request.data, status=status.HTTP_200_OK)
+                    instance=HorarioReserva.objects.get(id=reserva["id"].value)
+                    serializer=HorarioReservaSerializer2(instance,many=False, context={"request":request})
+                    return Response(data=serializer.data, status=status.HTTP_200_OK)
                 else: 
                     return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
             elif estaReserva == horario.capacidad:
@@ -103,14 +105,16 @@ class ReservarMaquina(APIView):
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
             elif len(otrasReservas)>0:
                 return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
-            elif len(reservados)<=len(posiciones):
+            elif len(reservados)>=len(posiciones):
                 return Response(data="Horario lleno", status=status.HTTP_200_OK)
             for reservado in reservados:
                 if reservado.posicion.id==posicion.id:
                     return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
             else:
                 reserva.save()
-            return Response(data=request.data, status=status.HTTP_200_OK)
+                instance=MaquinaReserva.objects.get(id=reserva["id"].value)
+                serializer=MaquinaReservaSerializer2(instance,many=False, context={"request":request})
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
 
