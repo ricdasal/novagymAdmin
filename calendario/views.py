@@ -1,4 +1,5 @@
 from calendar import week
+from fileinput import filename
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
@@ -42,7 +43,6 @@ class Reservar(APIView):
         reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
         clase=request.data["clase"]
         idUsuario=request.data["usuario"]
-        nroPosicion=request.data["posicion"]
         fecha=request.data["fecha"]
         horario=request.data["horario"]
         horarioHorario=HorarioHorario.objects.get(id=horario)
@@ -51,30 +51,23 @@ class Reservar(APIView):
         otrasReservas=HorarioReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario__horario_inicio__lte=hora_fin).filter(horario__horario_fin__gte=hora_inicio)
         reservado=HorarioReserva.objects.all().filter(fecha=fecha).filter(horario_id=clase).filter(usuario_id=idUsuario)
         horario=Horario.objects.get(id=clase)
-        idZona=horario.zona
-        posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
         weekday=datetime.strptime(fecha,"%Y-%m-%d").weekday()
         fechaValida=int(horarioHorario.dia) == weekday
+        estaReserva=len(HorarioReserva.objects.filter(fecha=fecha,horario=clase))
         if reserva.is_valid():
             if reservado:
                 return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
             if fechaValida==False:
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
-            if horario.asistentes < horario.capacidad:
+            if estaReserva < horario.capacidad:
                 if reserva.save():
-                    posiciones.ocupado=True
-                    posiciones.save()
-                    horario.asistentes+=1
-                    horario.save()
                     return Response(data=request.data, status=status.HTTP_200_OK)
                 else: 
                     return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
-            elif len(otrasReservas)>0:
-                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
-            elif not posiciones:
-                return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
-            elif horario.asistentes == horario.capacidad:
+            elif estaReserva == horario.capacidad:
                 return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
+            elif len(otrasReservas)>0:
+                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)
             else:
                 return Response(data="Reserva no válida", status=status.HTTP_200_OK)
         else:
@@ -111,7 +104,7 @@ class ReservarMaquina(APIView):
                 return Response(data="Fecha de reserva no válida", status=status.HTTP_200_OK)
             elif len(otrasReservas)>0:
                 return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
-            elif len(reservados)>=len(posiciones):
+            elif len(reservados)<=len(posiciones):
                 return Response(data="Horario lleno", status=status.HTTP_200_OK)
             for reservado in reservados:
                 if reservado.posicion.id==posicion.id:
@@ -431,30 +424,25 @@ class HorarioSmall(APIView):
             serializer = HorarioSmallSerializer(data, many=False, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
-
-class MaquinasDispo(APIView):
+class DisponibilidadMaquina(APIView):
     parser_classes = (MultiPartParser, FormParser)
     def post(self, request, *args, **kwargs):
         maquinaId=request.data["maquina"]
         fecha=request.data["fecha"]
-
-        reservas=MaquinaReserva.objects.all().filter(fecha=fecha).filter(maquina=maquinaId)
+        lista=[]
+        reservas=MaquinaReserva.objects.filter(fecha=fecha).filter(maquina=maquinaId)
+        valores=reservas.values_list("posicion", flat=True)
         maquinas=PosicionMaquina.objects.all().filter(maquina=maquinaId)
-
         for maquina in maquinas:
-            maquina.ocupado=False
-            maquina.save()
-        
-        for reserva in reservas:
-            idPosicion=reserva.posicion.id
+            id=maquina.id
+            fila=maquina.fila
+            columna=maquina.columna
+            if id in valores:
+                lista.append({"id":id,"fila":fila,"columna":columna,"ocupado":True})
+            else:
+                lista.append({"id":id,"fila":fila,"columna":columna,"ocupado":False})
 
-            posicion=PosicionMaquina.objects.get(id=idPosicion)
-            posicion.ocupado=True
-            posicion.save()
-
-        maquinas=PosicionMaquina.objects.all().filter(maquina=maquinaId)
-        serializer = PosicionMaquinaSerializer(maquinas, many=True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
+        return Response(lista,content_type='application/json',status=status.HTTP_200_OK)
 
 class HorariosDispo(APIView):
     parser_classes = (MultiPartParser, FormParser)
@@ -518,153 +506,3 @@ class VerHorariosClase(APIView):
             serializer=HorarioHorarioSerializer(horarios,many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
-""" class Reservar(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, request, *args, **kwargs):
-        reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
-        idHorario=request.data["horario"]
-        idUsuario=request.data["usuario"]
-        nroPosicion=request.data["posicion"]
-        fecha=request.data["fecha"]
-
-        #validaciones de reservas usando membresias
-        
-
-        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario).filter(fecha=fecha)
-        horario=Horario.objects.get(id=idHorario)
-        idZona=horario.zona
-        posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
-
-        try:
-            membresia=Historial.objects.filter(usuario=idUsuario).filter(activa=True).get()
-            if reserva.is_valid():
-                if reservado:
-                    return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
-                if horario.asistentes < horario.capacidad:
-                    if reserva.save():
-                        posiciones.ocupado=True
-                        posiciones.save()
-                        horario.asistentes+=1
-                        horario.save()
-                        return Response(data=request.data, status=status.HTTP_200_OK)
-                    else: 
-                        return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
-                elif not posiciones:
-                    return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
-                elif horario.asistentes == horario.capacidad:
-                    return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
-                else:
-                    return Response(data="Ocurrio un error", status=status.HTTP_200_OK)
-            else:
-                return Response(data="Reserva no válida", status=status.HTTP_400_BAD_REQUEST)
-        except:
-            Response(data="Membresia inválida", status=status.HTTP_400_BAD_REQUEST)
-
-class ReservarMaquina(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, request, *args, **kwargs):
-        idUsuario=request.data["usuario"]
-        fila=request.data["fila"]
-        columna=request.data["columna"]
-        hora_inicio=request.data["horario_inicio"]
-        hora_fin=request.data["horario_fin"]
-        fecha=request.data["fecha"]
-        maquina=request.data["maquina"]
-
-        #reservado=MaquinaReserva.objects.all().filter(maquina_id=maquina).filter(usuario_id=idUsuario)
-        posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
-        newDict=request.data.copy()
-        
-        newDict["posicion"]=posiciones.id
-        reserva = MaquinaReservaSerializer(data=newDict, many=False)
-        reservado=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario)
-        try:
-            membresia=Historial.objects.filter(usuario=idUsuario).filter(activa=True).get()
-            if reserva.is_valid():
-                #if reservado:
-                    #return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
-                if not reservado:
-                    reserva.save()
-                elif not posiciones:
-                    return Response(data="La máquina es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
-                elif posiciones.ocupado==True:
-                    return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
-                return Response(data=request.data, status=status.HTTP_200_OK)
-            else:
-                return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST)
-        except:
-            Response(data="Membresia inválida", status=status.HTTP_400_BAD_REQUEST) """
-
-
-""" class ReservarMaquina(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, request, *args, **kwargs):
-        idUsuario=request.data["usuario"]
-        fila=request.data["fila"]
-        columna=request.data["columna"]
-        hora_inicio=request.data["horario_inicio"]
-        hora_fin=request.data["horario_fin"]
-        fecha=request.data["fecha"]
-        maquina=request.data["maquina"]
-        gimnasio=request.data["gimnasio"]
-        #reservado=MaquinaReserva.objects.all().filter(maquina_id=maquina).filter(usuario_id=idUsuario)
-        #posiciones=PosicionMaquina.objects.all().filter(maquina=maquina).filter(fila=fila).filter(columna=columna).get()
-        
-        reservados=MaquinaReserva.objects.filter(fecha=fecha).filter(gimnasio=gimnasio).filter(maquina=maquina).filter(horario_inicio=hora_inicio)
-        posiciones=PosicionMaquina.objects.filter(maquina=maquina)
-        posicion=posiciones.filter(fila=fila).filter(columna=columna).get()
-        otrasReservas=MaquinaReserva.objects.filter(fecha=fecha).filter(usuario=idUsuario).filter(horario_inicio__lte=hora_fin).filter(horario_fin__gte=hora_inicio)
-        newDict=request.data.copy()
-        newDict["posicion"]=posicion.id
-        reserva = MaquinaReservaSerializer(data=newDict, many=False)
-        if reserva.is_valid():
-            if reservados.filter(usuario=idUsuario):
-                return Response(data="Sólo puede reservar este tipo de máquina una vez.", status=status.HTTP_200_OK)
-            elif len(otrasReservas)>0:
-                return Response(data="Existe un cruce de horarios", status=status.HTTP_200_OK)    
-            elif len(reservados)>=len(posiciones):
-                return Response(data="Horario lleno", status=status.HTTP_200_OK)
-            for reservado in reservados:
-                if reservado.posicion.id==posicion.id:
-                    return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
-            #elif posiciones.ocupado==True:
-                #return Response(data="Máquina no disponible", status=status.HTTP_403_FORBIDDEN)
-            else:
-                reserva.save()
-            return Response(data=request.data, status=status.HTTP_200_OK)
-        else:
-            return Response(data="Ocurrio un error", status=status.HTTP_400_BAD_REQUEST) """
-
-""" class Reservar(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-    def post(self, request, *args, **kwargs):
-        print(request.data)
-        reserva = HorarioReservaSerializer(data=request.data, many=False, context={"request":request})
-        idHorario=request.data["horario"]
-        idUsuario=request.data["usuario"]
-        nroPosicion=request.data["posicion"]
-        fecha=request.data["fecha"]
-        reservado=HorarioReserva.objects.all().filter(horario_id=idHorario).filter(usuario_id=idUsuario).filter(fecha=fecha)
-        horario=Horario.objects.get(id=idHorario)
-        idZona=horario.zona
-        posiciones=Posicion.objects.all().filter(zona=idZona).filter(posicion=nroPosicion).get()
-        if reserva.is_valid():
-            if reservado:
-                return Response(data="Sólo puede reservar la clase una vez", status=status.HTTP_200_OK)
-            if horario.asistentes < horario.capacidad:
-                if reserva.save():
-                    posiciones.ocupado=True
-                    posiciones.save()
-                    horario.asistentes+=1
-                    horario.save()
-                    return Response(data=request.data, status=status.HTTP_200_OK)
-                else: 
-                    return Response(data="No se pudo reservar", status=status.HTTP_200_OK)
-            elif not posiciones:
-                return Response(data="La posición es incorrecta o ya se ha reservado", status=status.HTTP_200_OK)
-            elif horario.asistentes == horario.capacidad:
-                return Response(data="Horario lleno", status=status.HTTP_403_FORBIDDEN)
-            else:
-                return Response(data="Ocurrio un error", status=status.HTTP_200_OK)
-        else:
-            return Response(data="Reserva no válida", status=status.HTTP_400_BAD_REQUEST) """

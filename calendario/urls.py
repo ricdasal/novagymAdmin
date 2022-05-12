@@ -29,7 +29,7 @@ urlpatterns = [
 
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
     path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
-    path('maquinasDispo/',MaquinasDispo.as_view(),name="maquinasDispo"),
+    path('maquinasDispo/',DisponibilidadMaquina.as_view(),name="maquinasDispo"),
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
