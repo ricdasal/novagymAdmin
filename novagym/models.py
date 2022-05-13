@@ -97,7 +97,7 @@ class DetalleTransaccionProducto(models.Model):
     producto        = models.ForeignKey(    Producto, on_delete=models.SET_NULL, null=True)
     categoria       = models.CharField(max_length=20)
     descripcion     = models.CharField(max_length=50)
-    nombre          = models.CharField(max_length=24, unique=True)
+    nombre          = models.CharField(max_length=24)
     cantidad        = models.PositiveIntegerField()
     precio          = models.DecimalField(max_digits=12, decimal_places=2)
     total           = models.DecimalField(max_digits=12, decimal_places=2)
