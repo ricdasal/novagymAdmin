@@ -33,7 +33,6 @@
           <th scope="col">Cédula</th>
           <th scope="col">Usuario</th>
           <th scope="col">Horario</th>
-          <th scope="col">Posición</th>
           <th scope="col">Gimnasio</th>
           <th scope="col">Fecha de reserva</th>
           <th scope="col">Horario de reserva</th>
@@ -47,9 +46,8 @@
           <td>{{reserva.codigo}}</td>
           <td>{{reserva.usuario.cedula}}</td>
           <td>{{reserva.usuario.nombres|title}} {{reserva.usuario.apellidos|title}}</td>
-          <td>{{reserva.horario.nombre|title}}</td>
-          <td>{{reserva.posicion.posicion}}</td>
-          <td>{{reserva.horario.gimnasio.nombre}} - {{reserva.horario.zona.nombre|title}}</td>
+          <td>{{reserva.clase.nombre|title}}</td>
+          <td>{{reserva.clase.gimnasio.nombre}} - {{reserva.clase.zona.nombre|title}}</td>
           <td>{{reserva.fecha}}</td>
           <td>{{reserva.horario.horario_inicio}}-{{reserva.horario.horario_fin}}</td>
           <td>{{reserva.created_at}}</td>

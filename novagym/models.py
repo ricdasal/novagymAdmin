@@ -72,7 +72,7 @@ class Transaccion(models.Model):
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     estado      = models.CharField(max_length=24, choices=Estado.choices, default=Estado.NOPAG)
     created_at  = models.DateTimeField(auto_now_add=True)
-    
+    tipo_pago = models.ForeignKey(TipoPago, on_delete=models.SET_NULL, null=True)
 
 class DetalleTransaccionMembresia(models.Model):
     transaccion = models.ForeignKey(  Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_membresia')
