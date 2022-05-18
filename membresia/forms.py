@@ -36,7 +36,8 @@ class MembresiaForm(forms.ModelForm):
         labels = {
             'descripcion': 'Descripción',
             'meses_duracion': 'Duración (meses)',
-            'dias_duracion': 'Duración (dias)'
+            'dias_duracion': 'Duración (dias)',
+            'acceso_todo': 'Permitir acceso a todos los gimnasios',
         }
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 2}),
@@ -49,10 +50,13 @@ class MembresiaForm(forms.ModelForm):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                Column('nombre', css_class='col-12 col-md-6'),
+                Column('imagen', css_class='col-12 col-md-7')
             ),
             Row(
-                Column('descripcion', css_class='col-12 col-md-6'),
+                Column('nombre', css_class='col-12 col-md-7'),
+            ),
+            Row(
+                Column('descripcion', css_class='col-12 col-md-7'),
             ),
             Row(
                 Column(PrependedText('precio', '$'),
@@ -72,7 +76,7 @@ class MembresiaForm(forms.ModelForm):
                        """), css_class='col-auto align-self-end py-2')
             ),
             Row(
-                Column('imagen', css_class='col-12 col-md-7')
+              'acceso_todo'
             ),
         )
 
