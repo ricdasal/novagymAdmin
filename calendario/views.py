@@ -405,8 +405,12 @@ class HorariosUsuario(APIView):
     #parser_classes = (MultiPartParser, FormParser)
     def get(self, request,id, *args, **kwargs):
         data=HorarioReserva.objects.all().filter(usuario=id)
+        data2=MaquinaReserva.objects.all().filter(usuario=id)
         serializer = ReporteHorarioReservaSerializer(data, many=True)
-        return Response(data=serializer.data,status=status.HTTP_200_OK)
+        serializer2 = ReporteMaquinaReservaSerializer(data2, many=True)
+        
+        #dataMix={"clases":serializer.data,"maquinas":serializer2.data}
+        return Response(serializer.data+serializer2.data,status=status.HTTP_200_OK)
 
 class MaquinaUsuario(APIView):
     #parser_classes = (MultiPartParser, FormParser)
