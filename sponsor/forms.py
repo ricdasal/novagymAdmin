@@ -1,6 +1,6 @@
 from crispy_forms.helper import FormHelper
 from django import forms
-
+from crispy_forms.bootstrap import StrictButton
 from .models import *
 import datetime
 from crispy_forms.layout import Column, Div, Field, Layout, Row
@@ -161,3 +161,31 @@ class SucursalForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "La fecha de fin no puede ser anterior a la fecha de inicio.")
         return cleaned_data
+
+class SucursalFilterForm(forms.ModelForm):
+    class Meta:
+        model= Sucursal
+        fields = ('nombre','activo','sponsor')
+        labels={
+            "activo":'Estado'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('nombre', css_class='col-6'),
+                Column('activo', css_class='col-6'),
+                Column('sponsor', css_class='col-6'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
