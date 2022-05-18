@@ -1,7 +1,9 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from gimnasio.models import Gimnasio
 from seguridad.models import UserDetails
-from seguridad.validators import validate_decimal_positive, validate_decimal_positive_include
+from seguridad.validators import (validate_decimal_positive,
+                                  validate_decimal_positive_include)
 
 # Create your models here.
 
@@ -26,6 +28,7 @@ class Membresia(models.Model):
     beneficios = models.ManyToManyField(Beneficio, related_name='membresia')
     estado = models.BooleanField(default=True)
     imagen = models.ImageField(upload_to='membresia/', null=True, blank=True)
+    acceso_todo = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-pk']
@@ -66,6 +69,7 @@ class Historial(models.Model):
     activa = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    gimnasio = models.ForeignKey(Gimnasio, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.usuario.nombres + ' - ' + self.membresia.nombre

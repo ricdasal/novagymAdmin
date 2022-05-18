@@ -6,9 +6,9 @@ from membresia.models import Historial
 from rest_framework import serializers
 
 from novagym.models import (DetalleTransaccionMembresia,
-                            DetalleTransaccionProducto, 
+                            DetalleTransaccionProducto,
                             ObjetivoPeso,
-                            ProgresoImc, 
+                            ProgresoImc,
                             Transaccion)
 
 
@@ -57,10 +57,10 @@ class ObjetivoPesoSerializer(serializers.ModelSerializer):
         return objetivo
 
 
-
 """
 revisar desde aqui
 """
+
 
 class TransaccionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -123,6 +123,7 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
 
 class TransaccionMembresiaSerializer(serializers.ModelSerializer):
     transaccion_membresia = DetalleTransaccionMembresiaSerializer(many=True)
+    gimnasio = serializers.CharField(write_only=True,required=False)
 
     class Meta:
         model = Transaccion
@@ -137,19 +138,23 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
                   'valor_total',
                   'estado',
                   'transaccion_membresia',
+                  'gimnasio',
                   ]
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('transaccion_membresia')
+        gimnasio = validated_data.pop('gimnasio') if 'gimnasio' in validated_data else None
         transaccion = Transaccion.objects.create(**validated_data)
 
         for membresia_data in detalles_data:
-            DetalleTransaccionMembresia.objects.create(transaccion=transaccion, **membresia_data)
+            DetalleTransaccionMembresia.objects.create(
+                transaccion=transaccion, **membresia_data)
         transaccion.save()
-        
+
         membresia = transaccion.transaccion_membresia.all()[0].membresia
         fecha_inicio = timezone.now()
         usuario = transaccion.usuario.detalles
+        
         if usuario.tiene_membresia:
             current_membresia = usuario.membresia
             current_membresia.activa = False
@@ -158,12 +163,12 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
             usuario=usuario,
             membresia=membresia,
             fecha_inicio=fecha_inicio,
-            fecha_fin = fecha_inicio + \
+            fecha_fin=fecha_inicio +
             relativedelta(months=membresia.dias_duracion,
                           days=membresia.meses_duracion),
-            costo = membresia.precio,
-            activa = True
-        )
+            costo=membresia.precio,
+            activa=True,
+            gimnasio_id=gimnasio)
         return transaccion
 
     def update(self, instance, validated_data):
