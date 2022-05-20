@@ -103,7 +103,7 @@ class ReporteHorarioReservaSerializer(ModelSerializer):
             return HorarioReserva.objects.create(**validated_data)
 
 class ReporteMaquinaReservaSerializer(ModelSerializer):
-    maquina=CharField(source="maquina.nombre",read_only=True)
+    nombre_clase=CharField(source="maquina.nombre",read_only=True)
     fila=CharField(source="posicion.fila", read_only=True)
     columna=CharField(source="posicion.columna", read_only=True)
     horario_inicio=CharField(source="horario.horario_inicio",read_only=True)
@@ -111,7 +111,7 @@ class ReporteMaquinaReservaSerializer(ModelSerializer):
     gimnasio=CharField(source="maquina.gimnasio.nombre",read_only=True)
     class Meta:
         model = MaquinaReserva
-        fields = ('id','codigo','maquina','fila','columna','horario_inicio','horario_fin','fecha','gimnasio')
+        fields = ('id','codigo','nombre_clase','fila','columna','horario_inicio','horario_fin','fecha','gimnasio')
     def create(self, validated_data):
             return MaquinaReserva.objects.create(**validated_data)
 
