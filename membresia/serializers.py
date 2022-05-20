@@ -19,11 +19,12 @@ class DescuentoSerializer(serializers.ModelSerializer):
 class HistorialSerializer(serializers.ModelSerializer):
     nombre = serializers.CharField(source='membresia.nombre')
     descripcion = serializers.CharField(source='membresia.descripcion')
+    membresia_id = serializers.CharField(source='membresia.pk')
 
     class Meta:
         model = Historial
-        fields = ['fecha_inicio', 'fecha_fin',
-                  'costo', 'activa', 'nombre', 'descripcion', 'gimnasio']
+        fields = ['id','fecha_inicio', 'fecha_fin',
+                  'costo', 'activa', 'nombre', 'descripcion', 'gimnasio','membresia_id']
 
 
 class MembresiaSerializer(serializers.HyperlinkedModelSerializer):
