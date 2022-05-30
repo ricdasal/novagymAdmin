@@ -77,7 +77,7 @@ class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
 class DetalleTransaccionProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DetalleTransaccionProducto
-        exclude = ('nombre')
+        exclude = ('nombre', 'total')
 
 
 class TransaccionProductoSerializer(serializers.ModelSerializer):

@@ -104,4 +104,5 @@ class DetalleTransaccionProducto(models.Model):
 
     def save(self, *args, **kwargs):
         self.nombre = self.producto.nombre
+        self.total = self.cantidad * self.precio
         return super().save(*args, **kwargs)
