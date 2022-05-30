@@ -13,62 +13,74 @@
   <div class="col">
     <h2 class="text-left">{{title}}</h2>
   </div>
-  <div class="col-12 d-flex justify-content-end">
-    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listar' %}">
-      <i class="fa fa-arrow-circle-left"></i> Regresar</a>
-    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:listarZona' %}">
-      <i class="fa fa-calendar-plus"></i> Ver zonas</a>
-    <a class="btn btn-sm btn-warning" id="menu" href="{% url 'calendario:crear' %}">
-      <i class="fa fa-calendar-plus"></i> Agregar actividad</a>
-  </div>
   <hr>
 </div>
+<div class="col-12 d-flex justify-content-end">
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'calendario:listarZona' %}">
+    <i class="fa fa-map"></i> Ver zonas</a>
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'calendario:agregarHorario' %}">
+    <i class="fa fa-plus-circle"></i> Agregar horario de máquinas</a>
+  <a class="btn btn-primary float-right" id="menu" href="{% url 'reservas:listarMaquinas' %}">
+    <i class="fa fa-calendar-plus"></i> Ver máquinas</a>
+</div>
+<div class="row mt-4 justify-content-left">
+  <div class="col-6">
+    <form method="get">
+      {% crispy filter.form %}
+    </form>
+  </div>
+</div>
+
 <div class="row mt-4">
+  {% csrf_token %}
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="horariohorario">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="actividades">
       <thead class="thead-light">
         <tr>
-          <th scope="col">Nombre</th>
-          <th scope="col">Descripción</th>
-          <th scope="col">Capacidad</th>
+          <th scope="col">Día</th>
+          <th scope="col">Horario</th>
+          <th scope="col">Actividad</th>
+          <th scope="col">Categoría</th>
           <th scope="col">Gimnasio</th>
           <th scope="col">Activo</th>
           <th scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
-        {% if actividades %}
-        {% for actividad in actividades %}
+        {% if horarios %}
+        {% for horario in horarios %}
+        
         <tr class="text-center">
-          <td>{{actividad.nombre|capfirst}}</td>
-          <td>{{actividad.descripcion}}</td>
-          <td>{{actividad.capacidad}}</td>
-          <td>{{actividad.gimnasio.nombre}}</td>
+          <td>{{horario.nombreDia}}</td>
+          <td>{{horario.horario_inicio}} - {{horario.horario_fin}}</td>
+          <td>{{horario.maquina.nombre}}</td>
+          <td>{{horario.maquina.categoria}}</td>
+          <td>{{horario.maquina.gimnasio.nombre}}</td>
+
+          {% if horario.maquina.activo%}
+          <td style="color: green;">Activo</td>
+          {% else %}
+          <td style="color: red;">Activo</td>
+          {% endif %}
           <td>
-            <input type="checkbox" {%if actividad.activo%}checked{%endif%} class="use-modal" data-toggle="toggle" 
-            data-type="checkbox" data-on="Habilitado" data-off="Deshabilitado" data-onstyle="success" data-offstyle="danger" 
-            data-target="#mainModal" data-url-activar="{% url 'calendario:change' actividad.pk %}"
-            data-url-eliminar="{% url 'calendario:change' actividad.pk %}">
-          </td>
-          <td>
-            <a href="{% url 'calendario:editar' actividad.pk %}" class="btn btn-sm btn-primary">
+            <a href="{% url 'calendario:editarHorarioMaquina' horario.pk %}" class="btn btn-sm btn-primary">
               <i class="fas fa-edit "></i></a>
-            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal"
-              data-url="{% url 'calendario:eliminar' actividad.id %}" href="#">
+            <a class="btn btn-sm btn-danger use-modal" data-toggle='modal' data-target="#mainModal" data-url="{% url 'calendario:eliminarHorarioMaquina' horario.id %}"
+              href="#">
               <i class="fas fa-times "></i></a>
           </td>
-
         </tr>
         {% endfor %}
         {% else %}
-        <h4>
-          No se encontraron datos.
-        </h4>
+        <td>
+          <h4>
+            No hay información disponible.
+          </h4>
+        </td>
         {% endif %}
       </tbody>
     </table>
   </div>
-  <hr width="100%" />
 </div>
 {% endblock main %}
 
@@ -82,8 +94,8 @@
 <script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
 <script>
   $(document).ready(function () {
-    
-    var table = tableInit("#horariohorario");
+
+    var table = tableInit("#actividades");
 
   });
 
@@ -97,4 +109,5 @@
     $("#export").val('');
   })
 </script>
+
 {% endblock %}

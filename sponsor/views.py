@@ -172,7 +172,7 @@ class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filte
     paginate_by = 20
     max_pages_render = 10
     model = Sucursal
-    context_object_name = 'sucursal'
+    context_object_name = 'sucursales'
     template_name = "lista_sucursal.html"
     permission_required = 'sponsor.view_sucursal'
     filterset_class=SucursalFilter
@@ -181,25 +181,10 @@ class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filte
         context['title'] = "SUCURSALES"
         page_obj = context["page_obj"]
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
-        context['sponsors'] = Sponsor.objects.all()
         context["total"]=Sucursal.objects.all().count()
         context["activos"]=Sucursal.objects.filter(activo=True).count()
         context["inactivos"]=Sucursal.objects.filter(activo=False).count()
         return context
-
-    def filtering(self, request, *args, **kwargs):
-        if request.GET.get('sucursales'):
-            data=request.GET.get('sucursales')
-            return data
-
-    def get_queryset(self):
-        filtro=self.filtering(self.request)
-        if filtro=='all':
-            return self.model.objects.all()
-        return self.model.objects.filter(sponsor=filtro)
-
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
 
 class UpdateSucursal(UpdateView):
     form_class =SucursalForm

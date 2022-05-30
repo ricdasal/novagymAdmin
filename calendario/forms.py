@@ -203,6 +203,15 @@ class HorarioMaquinaForm(forms.ModelForm):
                 Column('maquina', css_class='col-6'),
             ),
         )
+    def clean(self):
+        cleaned_data = super(HorarioMaquinaForm, self).clean()
+        hora_inicio = cleaned_data.get("horario_inicio")
+        hora_fin = cleaned_data.get("horario_fin")
+        if hora_inicio and hora_fin:
+            if hora_fin < hora_inicio:
+                raise forms.ValidationError(
+                    "La hora de inicio no puede ser anterior a la hora de fin.")
+        return cleaned_data
 
 class HorarioHorarioForm(forms.ModelForm):
     class Meta:
@@ -231,6 +240,15 @@ class HorarioHorarioForm(forms.ModelForm):
                 Column('horario', css_class='col-6'),
             ),
         )
+    def clean(self):
+        cleaned_data = super(HorarioHorarioForm, self).clean()
+        hora_inicio = cleaned_data.get("horario_inicio")
+        hora_fin = cleaned_data.get("horario_fin")
+        if hora_inicio and hora_fin:
+            if hora_fin < hora_inicio:
+                raise forms.ValidationError(
+                    "La hora de inicio no puede ser anterior a la hora de fin.")
+        return cleaned_data
 
 class HorarioHorarioFilterForm(forms.ModelForm):
     class Meta:
@@ -249,6 +267,33 @@ class HorarioHorarioFilterForm(forms.ModelForm):
             Row(
                 Column('dia', css_class='col-6'),
                 Column('horario', css_class='col-6'),
+            ),
+            Row(
+                Column(
+                    StrictButton("Buscar", type='submit',
+                                 css_class='btn btn-primary mt-1'),
+                    css_class='col-12'
+                )
+            ),
+        )
+
+class HorarioMaquinaFilterForm(forms.ModelForm):
+    class Meta:
+        model= HorarioMaquina
+        fields = ('dia','maquina')
+        labels={
+            "maquina":'Máquina'
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.disable_csrf = True
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('dia', css_class='col-6'),
+                Column('maquina', css_class='col-6'),
             ),
             Row(
                 Column(

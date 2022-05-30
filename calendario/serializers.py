@@ -1,8 +1,9 @@
+from numpy import source
 from gimnasio.serializers import GimnasioSerializer,GimnasioSmallSerializer
 from seguridad.models import UserDetails
 from seguridad.serializers import UsuarioDetallesSerializer
 from .models import Horario, HorarioMaquina, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField,ImageField,CharField,FileField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField,ImageField,CharField,FileField, RelatedField
 
 class ZonaSerializer(ModelSerializer):
     class Meta:
@@ -28,7 +29,7 @@ class ZonaHorarioSerializer(ModelSerializer):
 
 class HorarioSerializer(ModelSerializer):
     #zona=ZonaSerializer(read_only=True, many=False)
-    gimnasio=PrimaryKeyRelatedField(many=False,read_only=True)
+    gimnasio=GimnasioSerializer(many=False,read_only=True)
     class Meta:
         model = Horario
         fields = ('id','nombre', 'descripcion','gimnasio','capacidad','asistentes','activo','zona')
@@ -41,7 +42,7 @@ class HorarioReservaSerializer(ModelSerializer):
     #posicion=PosicionSerializer(read_only=True, many=False)
     class Meta:
         model = HorarioReserva
-        fields = ('id','codigo','clase','horario','usuario','posicion','created_at')
+        fields = ('id','codigo','clase','fecha','horario','usuario','posicion','created_at')
     def create(self, validated_data):
             return HorarioReserva.objects.create(**validated_data)
 
@@ -62,14 +63,14 @@ class PosicionMaquinaSerializer(ModelSerializer):
             return PosicionMaquina.objects.create(**validated_data)  
 
 class MaquinaReservaSerializer(ModelSerializer):
-    usuario=PrimaryKeyRelatedField(queryset=UserDetails.objects.all())
-    maquina=PrimaryKeyRelatedField(queryset=Maquina.objects.all())
-    posicion=PrimaryKeyRelatedField(queryset=PosicionMaquina.objects.all())
+    #usuario=PrimaryKeyRelatedField(queryset=UserDetails.objects.all(),many=False)
+    #maquina=MaquinaSerializer(many=False)
+    #posicion=PosicionMaquinaSerializer(many=False)
     class Meta:
         model = MaquinaReserva
         fields = ('id','codigo','maquina', 'usuario','posicion','horario','fecha','gimnasio')
     def create(self, validated_data):
-            return MaquinaReserva.objects.create(**validated_data)
+        return MaquinaReserva.objects.create(**validated_data)
 
 class MaquinaDispoSerializer(ModelSerializer):
     imagen=ImageField(max_length=None, use_url=True, allow_null=True, required=False)
@@ -91,22 +92,26 @@ class HorarioDispoSerializer(ModelSerializer):
             return Horario.objects.create(**validated_data)
 
 class ReporteHorarioReservaSerializer(ModelSerializer):
-    usuario=CharField(read_only=True)
-    horario_nombre=CharField(source="horario",read_only=True)
-    posicion_posicion=CharField(source="posicion",read_only=True)
+    nombre_clase=CharField(source="clase.nombre",read_only=True)
+    horario_inicio=CharField(source="horario.horario_inicio",read_only=True)
+    horario_fin=CharField(source="horario.horario_fin",read_only=True)
+    gimnasio=CharField(source="clase.gimnasio.nombre",read_only=True)
     class Meta:
         model = HorarioReserva
-        fields = ('id','codigo','horario_nombre', 'usuario','posicion_posicion')
+        fields = ('id','codigo','nombre_clase','fecha','horario_inicio','horario_fin','gimnasio')
     def create(self, validated_data):
             return HorarioReserva.objects.create(**validated_data)
 
 class ReporteMaquinaReservaSerializer(ModelSerializer):
-    usuario=CharField(read_only=True)
-    maquina=CharField(read_only=True)
-    posicion=CharField(read_only=True)
+    nombre_clase=CharField(source="maquina.nombre",read_only=True)
+    fila=CharField(source="posicion.fila", read_only=True)
+    columna=CharField(source="posicion.columna", read_only=True)
+    horario_inicio=CharField(source="horario.horario_inicio",read_only=True)
+    horario_fin=CharField(source="horario.horario_fin",read_only=True)
+    gimnasio=CharField(source="maquina.gimnasio.nombre",read_only=True)
     class Meta:
         model = MaquinaReserva
-        fields = ('id','codigo','maquina', 'usuario','posicion','horario_inicio','horario_fin','fecha','gimnasio')
+        fields = ('id','codigo','nombre_clase','fila','columna','horario_inicio','horario_fin','fecha','gimnasio')
     def create(self, validated_data):
             return MaquinaReserva.objects.create(**validated_data)
 
@@ -120,10 +125,23 @@ class HorarioMaquinaSerializer(ModelSerializer):
     maquina=MaquinaSerializer(read_only=True,many=False)
     class Meta:
         model=HorarioMaquina
-        fields=('maquina','horario_inicio','horario_fin')
+        fields=('id','maquina','horario_inicio','horario_fin')
 
 class HorarioHorarioSerializer(ModelSerializer):
     horario=HorarioSerializer(read_only=True,many=False)
     class Meta:
         model=HorarioMaquina
-        fields=('horario','horario_inicio','horario_fin')
+        fields=('id','horario','horario_inicio','horario_fin')
+
+class MaquinaReservaSerializer2(ModelSerializer):
+    horario=HorarioMaquinaSerializer(read_only=True,many=False)
+    gimnasio=GimnasioSerializer(read_only=True,many=False)
+    class Meta:
+        model = MaquinaReserva
+        fields = ('id','codigo','maquina', 'usuario','posicion','horario','fecha','gimnasio')
+
+class HorarioReservaSerializer2(ModelSerializer):
+    horario=HorarioHorarioSerializer(read_only=True, many=False)
+    class Meta:
+        model = HorarioReserva
+        fields = ('id','codigo','clase','fecha','horario','usuario','created_at')

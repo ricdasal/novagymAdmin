@@ -272,6 +272,7 @@ def getAllProducts(request):
         id=producto.id
         descuento=ProductoDescuento.objects.get(id=id)
         urls[producto.producto.nombre]={
+                            "id":producto.producto.id,
                             "codigo":producto.producto.codigo,
                             "descripcion":producto.producto.descripcion,
                             "imagen":request.build_absolute_uri('/media/')+str(producto.producto.imagen),

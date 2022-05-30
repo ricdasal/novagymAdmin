@@ -12,7 +12,7 @@ class TransaccionDolaresFilterForm(forms.Form):
         self.helper.form_tag = False
         self.helper.layout = Layout(
             Row(
-                #Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
+                Column('usuario', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
                 Column('estado', css_class='col-12 col-sm-6 col-md-4 col-lg-3'),
                 Column(
                     Field('created_at', template="forms/fields/range-filter.html",

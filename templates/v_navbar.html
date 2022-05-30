@@ -156,39 +156,60 @@
       </div>
     </div>
 
-    <div class="row menu-container {% if request.resolver_match.namespace == 'calendario' %}menu-container--active{% endif %}">
-      <div class="col-12">
-        <a class="menu" href="{% url 'calendario:listar' %}">
-          <div class="row">
-            <img
-              src="{% static 'images/admin-icons/calendario_icon.png'%}"
-              alt="calendario"
-              class="menu__image"
-            />
-            <div class="d-flex align-items-center">
-              <span class="menu__title">Horarios</span>
-            </div>
-          </div>
-        </a>
+    <div
+    class="row  menu-container menu menu--collapsable {% if request.resolver_match.namespace == 'calendario' %}menu-container--active{% endif %}"
+    data-toggle="collapse"
+    data-target="#collaps-calendario"
+    aria-expanded="true"
+    aria-controls="collaps-calendario"
+  >
+    <div class="col-12">
+      <div class="row">
+        <img
+          src="{% static 'images/admin-icons/calendario_icon.png'%}"
+          alt="usuarios"
+          class="menu__image"
+        />
+        <div class="d-flex align-items-center">
+          <span class="menu__title">Horarios</span>
+          <span class="px-4">
+            <i class="fas fa-angle-down"></i>
+          </span>
+        </div>
       </div>
     </div>
-
-<!--     <div class="row menu-container">
-      <div class="col-12">
-        <a class="menu" href="">
-          <div class="row">
-            <img
-              src="{% static 'images/admin-icons/reservaciones_icon.png'%}"
-              alt="reservaciones"
-              class="menu__image"
-            />
-            <div class="d-flex align-items-center">
-              <span class="menu__title">Reservaciones</span>
-            </div>
+  </div>
+  <div id="collaps-calendario" class="collapse row menu menu--collapsable {% if request.resolver_match.namespace == 'calendario' %}show{% endif %} ">
+    <div class="col-12">
+      <a class="menu" href="{% url 'calendario:listar' %}">
+        <div class="row menu-container {% if request.resolver_match.namespace == 'calendario' and type == 'c' %}menu-container--active {% endif %}">
+          <img
+            src="{% static 'images/admin-icons/coach_icon.png'%}"
+            alt="empleados"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Clases</span>
           </div>
-        </a>
-      </div>
-    </div> -->
+        </div>
+      </a>
+    </div>
+    <div class="col-12">
+      <a class="menu" href="{% url 'calendario:listarHorarioMaquina' %}">
+        <div class="row menu-container {% if request.resolver_match.namespace == 'calendario' and type == 'm' %} menu-container--active {% endif %}">
+          <img
+            src="{% static 'images/admin-icons/maquina_icon.png'%}"
+            alt="clientes"
+            class="menu__image"
+          />
+          <div class="d-flex align-items-center">
+            <span class="menu__title">Máquinas</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+
 
     <div
       class="row  menu-container menu menu--collapsable {% if request.resolver_match.namespace == 'reservas' %}menu-container--active{% endif %}"
@@ -216,7 +237,7 @@
     <div id="collaps-reservas" class="collapse row menu menu--collapsable {% if request.resolver_match.namespace == 'reservas' %}show{% endif %} ">
       <div class="col-12">
         <a class="menu" href="{% url 'reservas:listarHorarios' %}">
-          <div class="row menu-container {% if type == 'c' %}menu-container--active{% endif %}">
+          <div class="row menu-container {% if request.resolver_match.namespace == 'reservas' and type == 'c' %}menu-container--active{% endif %}">
             <img
               src="{% static 'images/admin-icons/coach_icon.png'%}"
               alt="empleados"
@@ -230,7 +251,7 @@
       </div>
       <div class="col-12">
         <a class="menu" href="{% url 'reservas:reservasMaquinas' %}">
-          <div class="row menu-container {% if type == 'm' %}menu-container--active{% endif %}">
+          <div class="row menu-container {% if request.resolver_match.namespace == 'reservas' and type == 'm' %}menu-container--active{% endif %}">
             <img
               src="{% static 'images/admin-icons/maquina_icon.png'%}"
               alt="clientes"
@@ -365,7 +386,7 @@
     </div>
     <div class="row menu-container">
       <div class="col-12">
-        <a class="menu" href="">
+        <a class="menu" href="{% url 'afiliados:entregar' %}">
           <div class="row">
             <img
               src="{% static 'images/admin-icons/afiliados_icon.png'%}"

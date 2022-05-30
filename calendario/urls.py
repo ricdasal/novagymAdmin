@@ -20,17 +20,24 @@ urlpatterns = [
     path('updateZona/<int:pk>',UpdateZona.as_view(),name="updateZona"),
     path('eliminarZona/<int:id>',deleteZona,name="eliminarZona"),
 
+    path('editarHorario/<int:pk>',UpdateHorarioHorario.as_view(),name="editarHorario"),
+    path('eliminarHorario/<int:id>',deleteHorarioHorario,name="eliminarHorario"),
+    path('change/<int:pk>',ChangeState,name="change"),
+
     path('datosHorario/',HorarioSmall.as_view(),name="datosHorario"),
     path('datosHorario/<int:opc>',HorarioSmall.as_view(),name="datosHorario"),
 
     path('reservarClase/',Reservar.as_view(),name="reservarClase"),
     path('reservarMaquina/',ReservarMaquina.as_view(),name="reservarMaquina"),    
-    path('maquinasDispo/',MaquinasDispo.as_view(),name="maquinasDispo"),
+    path('maquinasDispo/',DisponibilidadMaquina.as_view(),name="maquinasDispo"),
     path('horariosDispo/',HorariosDispo.as_view(),name="horariosDispo"),
     path('horariosUsuario/<int:id>',HorariosUsuario.as_view(),name="horariosUsuario"),
     path('maquinasUsuario/<int:id>',MaquinaUsuario.as_view(),name="maquinasUsuario"),
     path('verificarMaquina/',VerificarMaquina.as_view(),name="verificarMaquina"),
 
+    path('listarHorarioMaquina/', ShowMaquinaHorario.as_view(), name='listarHorarioMaquina'),
+    path('editarHorarioMaquina/<int:pk>', EditarHorarioMaquina.as_view(), name='editarHorarioMaquina'),
+    path('eliminarHorarioMaquina/<int:id>',deleteHorarioMaquina,name="eliminarHorarioMaquina"),
     path('agregarHorario/', CrearHorarioMaquina.as_view(), name='agregarHorario'),
 
     path('verHorariosMaquinas/',VerHorariosMaquinas.as_view(),name="verHorariosMaquinas"),

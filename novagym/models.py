@@ -60,7 +60,8 @@ class Transaccion(models.Model):
         CANCEL = 'CNC', 'Anulada'
         PAID = 'PAG', 'Pagada'
         DES = 'DES', 'Despachada'
-    
+
+    codigo = models.CharField(max_length=64, blank=True)
     usuario     = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     nombre_user = models.CharField(max_length=50)
     auth_code   = models.CharField(max_length=20)
@@ -71,7 +72,7 @@ class Transaccion(models.Model):
     valor_total = models.DecimalField(max_digits=10, decimal_places=2)
     estado      = models.CharField(max_length=24, choices=Estado.choices, default=Estado.NOPAG)
     created_at  = models.DateTimeField(auto_now_add=True)
-    
+    tipo_pago = models.ForeignKey(TipoPago, on_delete=models.SET_NULL, null=True)
 
 class DetalleTransaccionMembresia(models.Model):
     transaccion = models.ForeignKey(  Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_membresia')
@@ -96,7 +97,7 @@ class DetalleTransaccionProducto(models.Model):
     producto        = models.ForeignKey(    Producto, on_delete=models.SET_NULL, null=True)
     categoria       = models.CharField(max_length=20)
     descripcion     = models.CharField(max_length=50)
-    nombre          = models.CharField(max_length=24, unique=True)
+    nombre          = models.CharField(max_length=24)
     cantidad        = models.PositiveIntegerField()
     precio          = models.DecimalField(max_digits=12, decimal_places=2)
     total           = models.DecimalField(max_digits=12, decimal_places=2)

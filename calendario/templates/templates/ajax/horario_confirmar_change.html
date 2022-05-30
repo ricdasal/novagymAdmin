@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h5 class="modal-title" id="ordenTitle">Estado de la actividad</h5>
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% csrf_token %}
+<form method="POST" action="{% url 'calendario:change' actividad.pk %}">
+  {% csrf_token %}
+
+  <div class="modal-body">
+    {% if horario.activo %}
+    ¿Desea desactivar la siguiente actividad?
+    {% else %}
+    ¿Desea activar la siguiente actividad?
+    {% endif %}
+   <br>
+    <div class="row">
+      <div class="col-3">
+        Nombre
+      </div>
+      <div class="col">
+        {{actividad.nombre}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Descripción
+      </div>
+      <div class="col">
+        {{actividad.descripcion}}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Capacidad
+      </div>
+      <div class="col">
+        {{actividad.capacidad}} personas
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-3">
+        Gimnasio
+      </div>
+      <div class="col">
+        {{actividad.gimnasio.nombre}}
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+    {% if actividad.activo %}
+    <button id="anular" class="btn btn-danger mr-3" type="submit">Desactivar</button>
+    {% else %}
+    <button id="anular" class="btn btn-success mr-3" type="submit">Activar</button>
+    {% endif %}
+  </div>
+</form>

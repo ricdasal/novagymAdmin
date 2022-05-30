@@ -87,8 +87,11 @@ class HorarioHorario(models.Model):
     horario_fin= models.TimeField()
     horario=models.ForeignKey(Horario, on_delete=models.PROTECT)
 
+    def nombreDia(self):
+        return self.Dia.labels[int(self.dia)]
+
     def __str__(self):
-        return self.horario_inicio+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
+        return str(self.horario_inicio)+"-"+self.horario.nombre+"-"+self.horario.gimnasio.nombre
 
 class Maquina(models.Model):
     class Categoria(models.TextChoices):
@@ -129,6 +132,9 @@ class HorarioMaquina(models.Model):
     horario_fin= models.TimeField()
     maquina=models.ForeignKey(Maquina, on_delete=models.PROTECT)
 
+    def nombreDia(self):
+        return self.Dia.labels[int(self.dia)]
+
     def __str__(self):
         return self.maquina.nombre+"-"+self.dia
 
@@ -167,6 +173,7 @@ class HorarioReserva(models.Model):
     id = models.AutoField(primary_key=True)
     codigo=models.CharField(max_length=20, unique=True, default=generarCodigo, editable=False)
     clase=models.ForeignKey(Horario,on_delete=models.PROTECT)
+    fecha= models.DateField()
     horario=models.ForeignKey(HorarioHorario,on_delete=models.PROTECT)
     usuario=models.ForeignKey(UserDetails,on_delete=models.PROTECT)
     posicion=models.ForeignKey(Posicion, on_delete=models.PROTECT, blank=True,null=True)

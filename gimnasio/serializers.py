@@ -11,7 +11,7 @@ class GimnasioSerializer(serializers.ModelSerializer):
         , 'imagen','telefono','celular','ubicacion'
         ,'horario_inicio', 'horario_fin'
         ,'estado','ciudad','aforo','capacidad','personas',
-        'latitud','longitud')
+        'latitud','longitud','envio')
     
 class GimnasioSmallSerializer(serializers.ModelSerializer):
     class Meta:

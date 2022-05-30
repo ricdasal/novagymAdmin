@@ -12,7 +12,8 @@ class GimnasioForm(forms.ModelForm):
             "estado": "Gimnasio activo",
             "aforo": "Aforo (%)",
             "capacidad": "Capacidad de personas",
-            "ubicacion":"Dirección"
+            "ubicacion":"Dirección",
+            "envio":"Precio de envío"
         }
         widgets = {
             "imagen": forms.ClearableFileInput(),
@@ -21,9 +22,10 @@ class GimnasioForm(forms.ModelForm):
             "aforo": forms.NumberInput(attrs={'min':0,'max': 100}),
             "capacidad": forms.NumberInput(attrs={'min':0,'max': 999}),
             "celular": forms.NumberInput(attrs={'type': "tel", "pattern": "^(09)[0-9]{8}"}),
-            "telefono": forms.NumberInput(attrs={'type': "tel", "pattern": "^(0)[1-9]{1}(\s){1}[0-9]{7}"})
+            "telefono": forms.NumberInput(attrs={'type': "tel", "pattern": "^(0)[1-9]{1}(\s){1}[0-9]{7}"}),
+            "envio": forms.NumberInput(attrs={'min':0,'max': 100})
         }
-        fields = ('nombre', 'imagen','telefono','celular','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo','capacidad','latitud','longitud')
+        fields = ('nombre', 'imagen','telefono','celular','ubicacion','horario_inicio', 'horario_fin','estado','ciudad','aforo','capacidad','latitud','longitud','envio')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -46,6 +48,7 @@ class GimnasioForm(forms.ModelForm):
                 Column('horario_fin', css_class='col-6'),
                 Column('aforo', css_class='col-6'),
                 Column('capacidad', css_class='col-6'),
+                Column('envio', css_class='col-6'),
                 Column('imagen', css_class='col-6')
             )
         )

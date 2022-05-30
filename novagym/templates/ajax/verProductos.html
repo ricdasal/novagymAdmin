@@ -26,11 +26,20 @@
             <tr class="text-center">
               <td>{{detalle.producto.nombre}}</td>
               <td>{{detalle.cantidad}}</td>
+              {% if detalle.producto.usaNovacoins == 0 %}
               <td>${{detalle.precio}}</td>
-              <td>${{detalle.descuento}}</td>
-              <td>${{detalle.iva}}</td>
-              <td>${{detalle.subtotal}}</td>
-              <td>${{detalle.total}}</td>
+              <td>${{detalle.transaccion.descuento}}</td>
+              <td>${{detalle.transaccion.iva}}</td>
+              <td>${{detalle.transaccion.subtotal}}</td>
+              <td>${{detalle.transaccion.valor_total}}</td>
+              {% else %}
+              <td>{{detalle.precio}}</td>
+              <td>{{detalle.transaccion.descuento}} NC</td>
+              <td>{{detalle.transaccion.iva}} NC</td>
+              <td>{{detalle.transaccion.subtotal}} NC</td>
+              <td>{{detalle.transaccion.valor_total}} NC</td>
+              {% endif %}
+              
             </tr>
             {% endfor %}
           </tbody>
