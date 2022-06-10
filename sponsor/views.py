@@ -113,8 +113,6 @@ def createSponsor(request):
     return render(request,'createSponsor.html',{'form':form})
 
 class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
-    paginate_by = 20
-    max_pages_render = 10
     model = Sponsor
     context_object_name = 'sponsor'
     template_name = "lista_sponsor.html"
@@ -123,11 +121,9 @@ class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterV
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "ANUNCIANTES"
-        page_obj = context["page_obj"]
         context["total"]=Sponsor.objects.all().count()
         context["activos"]=Sponsor.objects.filter(activo=True).count()
         context["inactivos"]=Sponsor.objects.filter(activo=False).count()
-        context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
 
     def get(self, request, *args, **kwargs):
@@ -169,8 +165,6 @@ class UpdateSponsor(LoginRequiredMixin, UsuarioPermissionRequieredMixin,UpdateVi
         return context
 
 class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
-    paginate_by = 20
-    max_pages_render = 10
     model = Sucursal
     context_object_name = 'sucursales'
     template_name = "lista_sucursal.html"
@@ -179,8 +173,6 @@ class ListarSucursales(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filte
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = "SUCURSALES"
-        page_obj = context["page_obj"]
-        context['num_pages'] = calculate_pages_to_render(self, page_obj)
         context["total"]=Sucursal.objects.all().count()
         context["activos"]=Sucursal.objects.filter(activo=True).count()
         context["inactivos"]=Sucursal.objects.filter(activo=False).count()
