@@ -32,13 +32,8 @@
   </div>
 </div>
 <div class="row mt-4">
-  <div class="col-12">
-    <form method="get">
-      {% include "export_records.html" %}
-    </form>
-  </div>
   <div class="col-12 table-container">
-    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sponsor">
+    <table class="table table-responsive-lg table-condensed table-hover text-center" id="tabla-sucursal">
       <thead class="thead-light">
         <tr>
           <th scope="col">Imágen</th>
@@ -92,7 +87,6 @@
         {% endif %}
       </tbody>
     </table>
-    {% include "pagination.html" %}
   </div>
   <hr width="100%" />
   <div class="col-12">
@@ -112,6 +106,15 @@
 <script type="text/javascript" src="{% static 'js/utilsDates.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal2.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/utilsModal.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/datatableUtils.js' %}"></script>
+<script>
+  $(document).ready(function () {
+    
+    var table = tableInit("#tabla-sucursal");
+
+  });
+
+</script>
 <script>
   $(".export").click(function () {
     $("#export").val($(this).data('value'));

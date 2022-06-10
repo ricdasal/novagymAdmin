@@ -48,6 +48,18 @@ class SendMail(APIView):
         else:
             return Response(file_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class CorreoBienvenida(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+    def post(self, request, *args, **kwargs):
+        correo=request.POST.get('correo')
+        try:
+            msg = EmailMultiAlternatives(subject="Bienvenido a Novagym!", body=bienvenidaMailContent(request),from_email= env("E_MAIL"),to=[correo])
+            msg.content_subtype = 'html'
+            msg.send()
+            return Response("Bienvenida enviada", status=status.HTTP_200_OK)
+        except:
+            return Response("Ocurrió un error", status=status.HTTP_400_BAD_REQUEST)
+
 class ShowBuzon(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     paginate_by = 20
     max_pages_render = 10
@@ -125,6 +137,10 @@ def deleteMail(request,id):
 def mailContent(request,body):
     template=loader.get_template('mailTemplate.html')
     return template.render({"body": body})
+
+def bienvenidaMailContent(request,username="Usuario"):
+    template=loader.get_template('bienvenidaMailTemplate.html')
+    return template.render({"body": username})
 
 def logo_data():
     with open("./static/images/logoBlack.png", "rb") as f:

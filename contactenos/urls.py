@@ -13,5 +13,6 @@ urlpatterns = [
     path('buzon/noLeidos', ShowBuzonNoLeidos.as_view(), name='buzonNoLeidos'),
     path('markAsRead/<int:id>', markAsRead, name='markAsRead'),
     path('eliminar/<int:id>', deleteMail, name='eliminar'),
-    path('leer/<int:id>', readMail, name='leer')
+    path('leer/<int:id>', readMail, name='leer'),
+    path('bienvenida/', CorreoBienvenida.as_view(), name='bienvenida'),
 ]
