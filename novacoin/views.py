@@ -10,8 +10,9 @@ from novagym.utils import calculate_pages_to_render
 from seguridad.views import UsuarioPermissionRequieredMixin
 
 from novacoin.filters import RangoCambioCoinsFilter
-from novacoin.forms import MotivoCanjeForm, RangoCambioCoinsForm, RecompensaForm
-from novacoin.models import RangoCambioCoins
+from novacoin.forms import (MotivoCanjeForm, RangoCambioCoinsForm,
+                            RecompensaForm)
+from novacoin.models import DetalleCartera, RangoCambioCoins
 
 
 # Create your views here.
@@ -149,3 +150,14 @@ class EditarTasaCambio(LoginRequiredMixin, UsuarioPermissionRequieredMixin, Upda
 
     def post(self, request, *args, **kwargs):
         return super().post(request, *args, **kwargs)
+
+
+def addCoinsToCartera(cartera, name_event):
+    canje_existe = RangoCambioCoins.objects.filter(motivo__evento=name_event)
+    if canje_existe.count():
+        canje = canje_existe[0]
+        if not(canje and canje.estado): return
+        DetalleCartera.objects.create(
+            cartera=cartera, motivo_canje=canje.motivo, coins_egreso=0, coins_ingreso=canje.coins)
+        cartera.saldo_coins += canje.coins
+        cartera.save()

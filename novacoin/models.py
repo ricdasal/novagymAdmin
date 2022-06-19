@@ -18,6 +18,7 @@ class MotivoCanje(models.Model):
         EGRESO = 'OUR', 'Egreso'
     nombre = models.CharField(max_length=255)
     estado = models.BooleanField(default=True)
+    evento = models.CharField(max_length=255, blank=True)
     tipo_movimiento = models.CharField(
         max_length=4, choices=Tipo.choices, default=Tipo.INGRESO)
 

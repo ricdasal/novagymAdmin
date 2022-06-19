@@ -3,6 +3,7 @@ from drf_extra_fields.fields import Base64ImageField
 from membresia.serializers import HistorialSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from novacoin.views import addCoinsToCartera
 
 from seguridad.models import UserDetails
 
@@ -94,6 +95,7 @@ class RegistrarSerializer(serializers.ModelSerializer):
             sec = '0001'
         detalles_data['codigo'] = sec
         UserDetails.objects.create(usuario=user, **detalles_data)
+        addCoinsToCartera(user.cartera, 'registrarse')
         return user
 
 

@@ -94,7 +94,7 @@ class DetalleTransaccionMembresia(models.Model):
 
 class DetalleTransaccionProducto(models.Model):
     transaccion     = models.ForeignKey( Transaccion, on_delete=models.SET_NULL, null=True, related_name='transaccion_producto')
-    producto        = models.ForeignKey(    Producto, on_delete=models.SET_NULL, null=True)
+    producto        = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
     categoria       = models.CharField(max_length=20)
     descripcion     = models.CharField(max_length=50)
     nombre          = models.CharField(max_length=24)

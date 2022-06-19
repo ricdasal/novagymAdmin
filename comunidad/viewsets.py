@@ -7,6 +7,7 @@ from rest_framework import status, viewsets, permissions
 from push_notifications.models import GCMDevice
 
 from notificaciones.serializers import NotificacionSerializer
+from novacoin.views import addCoinsToCartera
 from .models import Publicacion
 from .serializers import *
 
@@ -341,7 +342,7 @@ class LikeView(viewsets.ViewSet):
                 extra['image'] = request.build_absolute_uri('/')+notificacion.imagen.url[1:]
             GCMDevice.objects.filter(user=publicacion.usuario.usuario).send_message(
                 notificacion.cuerpo, extra=extra)
-
+            addCoinsToCartera(usuario.cartera, 'dar_like')
             return Response(status=status.HTTP_201_CREATED)
     
     def destroy(self, request, pk):
