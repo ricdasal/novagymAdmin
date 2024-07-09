@@ -5,6 +5,7 @@ from django.utils import timezone
 from membresia.models import Historial
 from novacoin.views import addCoinsToCartera
 from rest_framework import serializers
+from productos.models import Producto
 
 from novagym.models import (DetalleTransaccionMembresia,
                             DetalleTransaccionProducto, ObjetivoPeso,
@@ -66,6 +67,11 @@ class TransaccionSerializer(serializers.ModelSerializer):
         model = Transaccion
         fields = '__all__'
 
+class ProductoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Producto
+        fields = '__all__'  # o lista de campos específicos que quieras incluir
+
 
 class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -74,9 +80,17 @@ class DetalleTransaccionMembresiaSerializer(serializers.ModelSerializer):
 
 
 class DetalleTransaccionProductoSerializer(serializers.ModelSerializer):
+    #producto = ProductoSerializer()
+    producto = serializers.PrimaryKeyRelatedField(queryset=Producto.objects.all())
     class Meta:
         model = DetalleTransaccionProducto
-        exclude = ('nombre', 'total')
+        #fields = '__all__'
+        exclude = ('nombre','descripcion')
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['producto'] = ProductoSerializer(instance.producto).data
+        return representation
 
 
 class TransaccionProductoSerializer(serializers.ModelSerializer):
@@ -96,6 +110,11 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
                   'estado',
                   'transaccion_producto',
                   ]
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not representation['transaccion_producto']:
+            return None
+        return representation
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('transaccion_producto')
@@ -104,7 +123,8 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
             DetalleTransaccionProducto.objects.create(
                 transaccion=transaccion, **producto)
         transaccion.save()
-        addCoinsToCartera(self.request.user.cartera, 'comprar_producto')
+        request = self.context.get('request')
+        addCoinsToCartera(request.user.cartera, 'comprar_producto')
         return transaccion
 
     def update(self, instance, validated_data):
@@ -140,6 +160,11 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
                   'transaccion_membresia',
                   'gimnasio',
                   ]
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        if not representation['transaccion_membresia']:
+            return None
+        return representation
 
     def create(self, validated_data):
         detalles_data = validated_data.pop('transaccion_membresia')
@@ -154,6 +179,8 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
 
         membresia = transaccion.transaccion_membresia.all()[0].membresia
         fecha_inicio = timezone.now()
+        #if transaccion.usuario is None:
+         #   raise serializers.ValidationError("Auth Token is necesary")
         usuario = transaccion.usuario.detalles
 
         if usuario.tiene_membresia:
@@ -165,8 +192,8 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
             membresia=membresia,
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_inicio +
-            relativedelta(months=membresia.dias_duracion,
-                          days=membresia.meses_duracion),
+            relativedelta(months=membresia.meses_duracion,
+                          days=membresia.dias_duracion),
             costo=membresia.precio,
             activa=True,
             gimnasio_id=gimnasio)

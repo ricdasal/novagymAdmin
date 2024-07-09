@@ -131,7 +131,7 @@ class ListarProductos(LoginRequiredMixin, UsuarioPermissionRequieredMixin,Filter
         context["usaDolares"]=Producto.objects.filter(usaNovacoins=False).count()
         context['num_pages'] = calculate_pages_to_render(self, page_obj)
         return context
-        
+
     def post(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
 
@@ -163,7 +163,7 @@ class CrearProducto(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateVi
         context['product_meta_formset'] = ProductoMeta()
         context['descuento_meta_formset'] = DescuentoMeta()
         return context
-    
+
     def post(self, request, *args, **kwargs):
         self.object = None
         form_class = self.get_form_class()
@@ -174,7 +174,7 @@ class CrearProducto(LoginRequiredMixin, UsuarioPermissionRequieredMixin,CreateVi
             return self.form_valid(form, product_meta_formset,descuento_meta_formset)
         else:
             return self.form_invalid(form, product_meta_formset)
-        
+
     def form_valid(self, form, product_meta_formset,descuento_meta_formset):
         self.object = form.save(commit=False)
         self.object.save()
@@ -214,7 +214,7 @@ class UpdateProducto(UpdateView):
         return context
 
     def forms_valid(self, first, seconds,third):
-        try:      
+        try:
             seconds.save()
             third.save()
             first.save()
@@ -253,8 +253,8 @@ class Reportes(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
 @permission_required('productos.delete_producto')
 def deleteProducto(request,id):
     producto = Producto.objects.get(id=id)
-    inventario = Inventario.objects.get(id=id)
-    descuento = ProductoDescuento.objects.get(id=id)
+    inventario = Inventario.objects.get(producto_id=id)
+    descuento = ProductoDescuento.objects.get(producto_id=id)
     if request.POST:
         descuento.delete()
         inventario.delete()
@@ -270,7 +270,11 @@ def getAllProducts(request):
     productos=Inventario.objects.all()
     for producto in productos:
         id=producto.id
-        descuento=ProductoDescuento.objects.get(id=id)
+        descuento=0
+        try:
+            descuento = ProductoDescuento.objects.get(producto_id=producto.id)
+        except ProductoDescuento.DoesNotExist:
+            descuento = 0  # Handle the case where no ProductoDescuento exists
         urls[producto.producto.nombre]={
                             "id":producto.producto.id,
                             "codigo":producto.producto.codigo,
@@ -283,10 +287,10 @@ def getAllProducts(request):
                             "novacoins":producto.novacoins,
                             "usaNovacoins":producto.producto.usaNovacoins,
                             "envio":producto.producto.envio,
-                            "porcentajeDescuento":str(descuento.porcentaje_descuento)+"%",
-                            "fechaHoraDesde":str(descuento.fecha_hora_desde),
-                            "fechaHoraHasta":str(descuento.fecha_hora_hasta),
-                            "descuentoActivo":descuento.estado
+                            "porcentajeDescuento": str(descuento.porcentaje_descuento) + "%" if descuento else "0%",
+                            "fechaHoraDesde": str(descuento.fecha_hora_desde) if descuento else str(datetime.datetime.now()),
+                            "fechaHoraHasta": str(descuento.fecha_hora_hasta) if descuento else str(datetime.datetime.now()),
+                            "descuentoActivo": descuento.estado if descuento else False
                             }
     return HttpResponse(json.dumps(urls))
 
@@ -364,7 +368,7 @@ def dateRangeFilter(request):
 
 def update_items(request):
     rango=request.GET.get("daterange", None)
-    token=str(rango).split("-")   
+    token=str(rango).split("-")
     fechaI=datetime.datetime.strptime(token[0].strip(" "), "%m/%d/%Y")
     fechaF=datetime.datetime.strptime(token[1].strip(" "), "%m/%d/%Y")
     items=Sponsor.objects.all().filter(fecha_inicio__range=[fechaI,fechaF])

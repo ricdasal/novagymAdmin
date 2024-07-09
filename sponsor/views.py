@@ -114,7 +114,7 @@ def createSponsor(request):
 
 class ListarSponsors(LoginRequiredMixin, UsuarioPermissionRequieredMixin,FilterView):
     model = Sponsor
-    context_object_name = 'sponsor'
+    context_object_name = 'page_obj'
     template_name = "lista_sponsor.html"
     permission_required = 'sponsor.view_sponsor'
     filterset_class=SponsorFilter

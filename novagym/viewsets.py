@@ -36,9 +36,18 @@ class TransaccionMembresiaViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = TransaccionMembresiaSerializer
 
+    #def get_queryset(self):
+     #   queryset = Transaccion.objects.filter(
+      #      usuario=self.request.user)
+       # return queryset
+
     def get_queryset(self):
+        # Filtrar las transacciones por el usuario actual y que tengan al menos un detalle de membresía
         queryset = Transaccion.objects.filter(
-            usuario=self.request.user)
+            usuario=self.request.user,
+            transaccion_membresia__isnull=False
+        ).distinct()
+
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -50,11 +59,23 @@ class TransaccionProductoViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = TransaccionProductoSerializer
 
+    #def get_queryset(self):
+     #   queryset = Transaccion.objects.filter(
+      #      usuario=self.request.user)
+       # return queryset
+
     def get_queryset(self):
+        # Filtrar las transacciones por el usuario actual y que tengan al menos un detalle de membresía
         queryset = Transaccion.objects.filter(
-            usuario=self.request.user)
+            usuario=self.request.user,
+            transaccion_producto__isnull=False
+        ).distinct()
+
         return queryset
 
     def create(self, request, *args, **kwargs):
         request.data['usuario'] = request.user.pk
         return super().create(request, *args, **kwargs)
+
+    #def get_serializer_context(self):
+     #   return {'request': self.request}

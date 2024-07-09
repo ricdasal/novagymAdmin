@@ -1,5 +1,7 @@
 from django.db import models
 
+from seguridad.models import UserDetails
+
 # Create your models here.
 class Cardauth(models.Model):
     id_cardauth = models.AutoField(primary_key=True)

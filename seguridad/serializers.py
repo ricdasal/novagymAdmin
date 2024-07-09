@@ -4,6 +4,8 @@ from membresia.serializers import HistorialSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from novacoin.views import addCoinsToCartera
+from django.core.exceptions import ObjectDoesNotExist
+
 
 from seguridad.models import UserDetails
 
@@ -78,25 +80,55 @@ class RegistrarSerializer(serializers.ModelSerializer):
                 {"password": "Las contraseñas no coinciden"})
         return attrs
 
+    # def create(self, validated_data):
+    #     detalles_data = validated_data.pop('detalles')
+    #     # extract imagen from data and readd to detalles_data.
+    #     if "imagen" in validated_data:
+    #         imagen = validated_data.pop('imagen')
+    #         detalles_data['imagen'] = imagen
+    #     user = User.objects.create(
+    #         username=validated_data['email'], email=validated_data['email'])
+    #     user.set_password(validated_data['password'])
+    #     user.save()
+    #     try:
+    #         pre = str(int(UserDetails.objects.latest('pk').pk+1))
+    #         sec = '0'*(4-len(pre))+pre
+    #     except self.model.DoesNotExist:
+    #         sec = '0001'
+    #     detalles_data['codigo'] = sec
+    #     UserDetails.objects.create(usuario=user, **detalles_data)
+    #     addCoinsToCartera(user.cartera, 'registrarse')
+    #     return user
+
     def create(self, validated_data):
         detalles_data = validated_data.pop('detalles')
-        # extract imagen from data and readd to detalles_data.
+        
         if "imagen" in validated_data:
             imagen = validated_data.pop('imagen')
             detalles_data['imagen'] = imagen
+        
         user = User.objects.create(
-            username=validated_data['email'], email=validated_data['email'])
+            username=validated_data['email'],
+            email=validated_data['email']
+        )
         user.set_password(validated_data['password'])
         user.save()
+
         try:
-            pre = str(int(UserDetails.objects.latest('pk').pk+1))
-            sec = '0'*(4-len(pre))+pre
-        except self.model.DoesNotExist:
+            last_user_details = UserDetails.objects.latest('pk')
+            sec = str(last_user_details.pk + 1).zfill(4)
+        except ObjectDoesNotExist:
             sec = '0001'
+        
         detalles_data['codigo'] = sec
         UserDetails.objects.create(usuario=user, **detalles_data)
+
+        # Assuming addCoinsToCartera is defined elsewhere and correct
         addCoinsToCartera(user.cartera, 'registrarse')
+
         return user
+
+
 
 
 class ChangePasswordSerializer(serializers.ModelSerializer):
