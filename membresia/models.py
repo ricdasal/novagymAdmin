@@ -70,6 +70,7 @@ class Historial(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     gimnasio = models.ForeignKey(Gimnasio, on_delete=models.SET_NULL, null=True, blank=True)
+    pagoRecurrente = models.BooleanField(default=False)
 
     def __str__(self):
         return self.usuario.nombres + ' - ' + self.membresia.nombre

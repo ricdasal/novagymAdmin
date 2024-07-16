@@ -180,6 +180,24 @@ class PublicacionUsuarioView(viewsets.ViewSet):
 
         return Response(paginated_response.data, status=status.HTTP_200_OK)
 
+class PublicacionUsuarioViewPorId(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def list(self, request):
+        usuario_id = request.query_params.get('id')
+        if usuario_id:
+            publicaciones = Publicacion.objects.filter(usuario=usuario_id)
+
+        paginator = PageNumberPagination()
+        paginator.page_size = 10
+        result = paginator.paginate_queryset(publicaciones, request)
+
+        serializer = PublicacionSerializer(result, many=True)
+        paginated_response = paginator.get_paginated_response(serializer.data)
+
+        return Response(paginated_response.data, status=status.HTTP_200_OK)
+
+
 
 class ReportarPublicacionView(viewsets.ViewSet):
     permission_classes = (permissions.IsAuthenticated,)

@@ -144,6 +144,8 @@ class TransaccionProductoSerializer(serializers.ModelSerializer):
 class TransaccionMembresiaSerializer(serializers.ModelSerializer):
     transaccion_membresia = DetalleTransaccionMembresiaSerializer(many=True)
     gimnasio = serializers.CharField(write_only=True, required=False)
+    pagoRecurrente = serializers.BooleanField(write_only=True, required=False)
+    
 
     class Meta:
         model = Transaccion
@@ -159,6 +161,7 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
                   'estado',
                   'transaccion_membresia',
                   'gimnasio',
+                  'pagoRecurrente'
                   ]
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -170,6 +173,8 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
         detalles_data = validated_data.pop('transaccion_membresia')
         gimnasio = validated_data.pop(
             'gimnasio') if 'gimnasio' in validated_data else None
+        pagoRecurrente = validated_data.pop(
+            'pagoRecurrente') if 'pagoRecurrente' in validated_data else None
         transaccion = Transaccion.objects.create(**validated_data)
 
         for membresia_data in detalles_data:
@@ -196,7 +201,8 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
                           days=membresia.dias_duracion),
             costo=membresia.precio,
             activa=True,
-            gimnasio_id=gimnasio)
+            gimnasio_id=gimnasio,
+            pagoRecurrente=pagoRecurrente)
         return transaccion
 
     def update(self, instance, validated_data):

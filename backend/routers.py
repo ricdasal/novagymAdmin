@@ -3,7 +3,7 @@ from knox import views as knox_views
 from membresia.viewsets import (BeneficioViewSet, DescuentoViewSet,
                                 HistorialMemebresiaViewset, MembresiaViewSet)
 from notificaciones.viewsets import NotificacionUsuarioViewSet
-from novagym.viewsets import (ObjetivoPesoViewSet, PagoPlaceToPayViewSet, ProgresoImcViewSet,
+from novagym.viewsets import (ObjetivoPesoViewSet, ProgresoImcViewSet,
                               TransaccionMembresiaViewset,
                               TransaccionProductoViewSet)
 from push_notifications.api.rest_framework import GCMDeviceAuthorizedViewSet
@@ -30,8 +30,6 @@ novagym.register('transaccion-producto',
                  TransaccionProductoViewSet, 'transaccion-producto')
 novagym.register('transaccion-membresia',
                  TransaccionMembresiaViewset, 'transaccion-membresia')
-novagym.register('pagos', PagoPlaceToPayViewSet)
-
 novagym_api = novagym.urls
 
 """
