@@ -45,6 +45,7 @@ class Sponsor(models.Model):
     horario_cierre=models.TimeField()
     es_matriz=models.BooleanField(default=True)
     correo=models.EmailField(max_length=50,blank=False,null=False)
+    beneficios=models.CharField(max_length=500)
     class Meta:
         ordering=('-id',)
     def __str__(self):

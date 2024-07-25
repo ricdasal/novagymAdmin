@@ -45,4 +45,9 @@ urlpatterns = [
 
     path('listarActividades/',ListarActividades.as_view(),name="listarActividades"),
     path('crearHorarioActividad/',CrearHorarioHorario.as_view(),name="crearHorarioActividad"),
+    path('horarios/', HorarioHorarioList.as_view(), name='horario-list'),
+    path('horarios/<str:horario_nombre>/<int:id_gimnasio>/', HorarioHorarioByNombre.as_view(), name='horario-by-nombre'),
+    path('horario-maquinas/', HorarioMaquinaListCreateView.as_view(), name='horario-maquina-list-create'),
+    path('horarios-maquina/<str:categoria>/<int:id_gimnasio>/', HorarioMaquinaByCategoriaView.as_view(), name='horario-maquina-by-categoria'),
+
 ]

@@ -205,15 +205,33 @@ class TransaccionMembresiaSerializer(serializers.ModelSerializer):
             pagoRecurrente=pagoRecurrente)
         return transaccion
 
+    # def update(self, instance, validated_data):
+    #     detalles_data = []
+    #     if 'transaccion_membresia' in validated_data:
+    #         detalles_data = validated_data.pop('transaccion_membresia')
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.transaccion_membresia.all().delete()
+    #     for producto in detalles_data:
+    #         DetalleTransaccionMembresia.objects.create(
+    #             transaccion=instance, **producto)
+    #     instance.save()
+    #     return instance
     def update(self, instance, validated_data):
-        detalles_data = []
-        if 'transaccion_membresia' in validated_data:
-            detalles_data = validated_data.pop('transaccion_membresia')
+    # Extrae los datos de transaccion_membresia de validated_data, si están presentes
+        detalles_data = validated_data.pop('transaccion_membresia', [])
+        
+        # Actualiza todos los campos del modelo Transaccion con los datos validados
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
+        
+        # Elimina los detalles actuales de transaccion_membresia relacionados con esta transacción
         instance.transaccion_membresia.all().delete()
+        
+        # Crea nuevos detalles de transaccion_membresia con los datos proporcionados
         for producto in detalles_data:
-            DetalleTransaccionMembresia.objects.create(
-                transaccion=instance, **producto)
+            DetalleTransaccionMembresia.objects.create(transaccion=instance, **producto)
+        
+        # Guarda la instancia actualizada de Transaccion
         instance.save()
         return instance

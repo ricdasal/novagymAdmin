@@ -2,7 +2,7 @@ from numpy import source
 from gimnasio.serializers import GimnasioSerializer,GimnasioSmallSerializer
 from seguridad.models import UserDetails
 from seguridad.serializers import UsuarioDetallesSerializer
-from .models import Horario, HorarioMaquina, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
+from .models import Horario, HorarioHorario, HorarioMaquina, HorarioReserva, MaquinaReserva,Posicion, PosicionMaquina, Zona,Maquina
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField,ImageField,CharField,FileField, RelatedField
 
 class ZonaSerializer(ModelSerializer):
@@ -125,13 +125,13 @@ class HorarioMaquinaSerializer(ModelSerializer):
     maquina=MaquinaSerializer(read_only=True,many=False)
     class Meta:
         model=HorarioMaquina
-        fields=('id','maquina','horario_inicio','horario_fin')
+        fields=('id', 'dia','maquina','horario_inicio','horario_fin')
 
 class HorarioHorarioSerializer(ModelSerializer):
     horario=HorarioSerializer(read_only=True,many=False)
     class Meta:
-        model=HorarioMaquina
-        fields=('id','horario','horario_inicio','horario_fin')
+        model=HorarioHorario
+        fields=('id', 'dia','horario','horario_inicio','horario_fin')
 
 class MaquinaReservaSerializer2(ModelSerializer):
     horario=HorarioMaquinaSerializer(read_only=True,many=False)

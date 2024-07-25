@@ -26,8 +26,8 @@ class Gimnasio(models.Model):
     aforo = models.PositiveIntegerField(blank=False,null=False)
     capacidad=models.PositiveIntegerField(blank=False,null=False)
     personas= models.PositiveIntegerField(null=True, blank=True)
-    latitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
-    longitud= models.DecimalField(decimal_places=5,max_digits=9,null=True, blank=True,)
+    latitud= models.DecimalField(decimal_places=15,max_digits=20,null=True, blank=True,)
+    longitud= models.DecimalField(decimal_places=15,max_digits=20,null=True, blank=True,)
     envio= models.DecimalField(decimal_places=2,max_digits=4,null=False, blank=False,)
     class Meta:
         ordering=('-id',)

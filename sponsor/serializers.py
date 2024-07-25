@@ -16,4 +16,4 @@ class SponsorSerializer(ModelSerializer):
     imagen=ImageField(max_length=None, use_url=True, allow_null=True, required=False)
     class Meta:
         model = Sponsor
-        fields = ('id', 'nombre','direccion','correo','es_matriz', 'descripcion', 'telefono','celular', 'nombre_contacto', 'url','red_social','imagen','fecha_inicio','fecha_fin',"activo",'horario_apertura','horario_cierre','sucursal_set')
+        fields = ('id', 'nombre','direccion','correo','es_matriz', 'descripcion', 'telefono','celular', 'nombre_contacto', 'url','red_social','imagen','fecha_inicio','fecha_fin',"activo",'horario_apertura','horario_cierre','sucursal_set', 'beneficios')

@@ -20,6 +20,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.mixins import LoginRequiredMixin
 from seguridad.views import UsuarioPermissionRequieredMixin
 from datetime import datetime
+from rest_framework import generics
 # Create your views here.
 
 @api_view(["GET"])
@@ -513,3 +514,56 @@ class VerHorariosClase(APIView):
             serializer=HorarioHorarioSerializer(horarios,many=True, context={"request":request})
             return Response(data=serializer.data,status=status.HTTP_200_OK)
 
+class HorarioHorarioList(generics.ListAPIView):
+    queryset = HorarioHorario.objects.all()
+    serializer_class = HorarioHorarioSerializer
+
+class HorarioHorarioByNombre(generics.ListAPIView):
+    serializer_class = HorarioHorarioSerializer
+
+    def get_queryset(self):
+        horario_nombre = self.kwargs.get('horario_nombre')
+        id_gimnasio = self.kwargs.get('id_gimnasio')
+
+        current_date = datetime.today()
+        # Obtener el día de la semana (0=Lunes, 6=Domingo)
+        day_of_week = current_date.weekday()
+        return HorarioHorario.objects.filter(horario__nombre=horario_nombre, horario__gimnasio_id=id_gimnasio, dia=day_of_week)
+
+class HorarioMaquinaDetailView(generics.RetrieveAPIView):
+    queryset = HorarioMaquina.objects.all()
+    serializer_class = HorarioMaquinaSerializer
+
+class HorarioMaquinaListCreateView(generics.ListCreateAPIView):
+    queryset = HorarioMaquina.objects.all()
+    serializer_class = HorarioMaquinaSerializer
+
+class HorarioMaquinaByCategoriaView(generics.ListAPIView):
+    serializer_class = HorarioMaquinaSerializer
+
+    def get_queryset(self):
+        categoria = self.kwargs.get('categoria')
+        id_gimnasio = self.kwargs.get('id_gimnasio')
+
+        # Obtener la fecha actual
+        current_date = datetime.today()
+        # Obtener el día de la semana (0=Lunes, 6=Domingo)
+        day_of_week = current_date.weekday()
+        # Mapeo de número de día a string
+        dia_map = {
+            0: 'LUNES',
+            1: 'MARTES',
+            2: 'MIERCOLES',
+            3: 'JUEVES',
+            4: 'VIERNES',
+            5: 'SABADO',
+            6: 'DOMINGO'
+        }
+        dia_str = dia_map.get(day_of_week)
+
+        # Filtrar el queryset por categoría, gimnasio y día de la semana
+        return HorarioMaquina.objects.filter(
+            maquina__categoria=categoria,
+            maquina__gimnasio_id=id_gimnasio,
+            dia=day_of_week
+        )

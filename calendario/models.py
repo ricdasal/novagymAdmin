@@ -53,8 +53,11 @@ class Horario(models.Model):
         Personal = 'Entrenamiento personal', 'Entrenamiento personal'
         Peso = 'Peso corporal', 'Peso corporal'
         Intensidad = 'Alta intensidad', 'Alta intensidad'
-        Funcional = 'Entrenamiento funcional', 'Bailoterapia'
+        Funcional = 'Entrenamiento funcional', 'Entrenamiento Funcional'
         Lifting = 'Power lifting', 'Power lifting'
+        Nutricion = 'Nutrución', 'Nutrición' 
+
+        
     nombre = models.CharField(max_length=30, choices=Nombre.choices)
     descripcion = models.CharField(max_length=255)
     gimnasio = models.ForeignKey(Gimnasio, on_delete=models.PROTECT)
@@ -106,7 +109,7 @@ class HorarioHorario(models.Model):
 
 class Maquina(models.Model):
     class Categoria(models.TextChoices):
-        CORRER = 'Cintas de correr', 'Cintas de correr'
+        CORRER = 'Caminadora', 'Caminadora'
         BICICLETAS = 'Bicicletas', 'Bicicletas'
         ELIPTICAS = 'Elipticas', 'Elipticas'
         REMO = 'Remo', 'Remo'

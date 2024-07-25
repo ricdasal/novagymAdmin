@@ -9,8 +9,8 @@ from django.contrib.auth.models import User
 class Cardauth(models.Model):
     id_cardauth = models.AutoField(primary_key=True)
     usuario     = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    token = models.CharField(max_length=100)
-    subtoken =  models.CharField(max_length=20)
+    token = models.CharField(max_length=100, default= '0000000')
+    subtoken =  models.CharField(max_length=20, default= '0000000')
     lastDigits = models.CharField(max_length=4, default='0000')
     payerDocument = models.CharField(max_length=20, default= '0000000')
     payerDocumentType = models.CharField(max_length=20, default= '0000000')
